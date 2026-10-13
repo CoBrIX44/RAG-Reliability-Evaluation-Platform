@@ -34,3 +34,8 @@ Export immutable manifest, hashes, Git revision, dependency locks, provider/mode
 ## References
 - Precision/recall foundations: https://nlp.stanford.edu/IR-book/html/htmledition/evaluation-of-unranked-retrieval-sets-1.html
 - Separate RAG evaluation dimensions: https://arxiv.org/abs/2309.15217
+
+## Implemented M4 baseline limitations
+M4 supplies one explicitly approved free local CPU answer model with greedy decoding. It records exact prompts/artifacts/library/runtime identities, evidence budgets, question-repeat counts, and raw output/timing traces. Context packing uses the answer tokenizer and full prompts exceeding 2048 input tokens fail rather than silently truncate. Shared model preparation and queue time are outside per-question stage times; generation wall time includes hashing/loading. Use run timestamps for the broader execution window. These are software execution traces; controlled first/warm conditions and aggregate p50/p95 analysis remain M5 work.
+
+The one live reviewed transaction fixture belongs to development_fixture and is separate from the future benchmark. Raw generated answers have no automatic quality endorsement. Exact refusal marker and syntactic citations do not score abstention or support; those metrics and cost remain unavailable. Greedy repeats may produce identical answers and must not inflate independent question counts or bootstrap sample size.

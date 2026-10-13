@@ -12,6 +12,7 @@ const chunkSchema = z.object({
 });
 export const searchSchema = z.object({
   index_id: z.string().uuid(), strategy: z.string(), query: z.string(), returned_count: z.number(),
+  embedding: z.record(z.string(), z.unknown()).nullable().optional(),
   hits: z.array(z.object({ rank: z.number(), score: z.number(), chunk: chunkSchema })),
   context: z.object({ token_budget: z.number(), token_count: z.number(), tokenizer: z.string(), text: z.string(),
     passages: z.array(chunkSchema), truncated_chunk_ids: z.array(z.string()), omitted_chunk_ids: z.array(z.string()) }),

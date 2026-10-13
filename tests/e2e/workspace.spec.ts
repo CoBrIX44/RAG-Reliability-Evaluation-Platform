@@ -11,7 +11,7 @@ test("empty workspace explains capability limits and every destination works", a
   await page.route("**/api/workspace", (route) => route.fulfill({ json: readyStatus }));
   await page.goto("/");
   await expect(page.getByRole("heading", { name: "Experiments", exact: true })).toBeVisible();
-  await expect(page.getByText("Execution not enabled")).toBeVisible();
+  await expect(page.getByRole("button", { name: "Start run", exact: true })).toBeDisabled();
   await page.getByRole("link", { name: "View setup" }).click();
   await expect(page.getByRole("heading", { name: "Workspace setup" })).toBeVisible();
   await expect(page.getByText("Not configured", { exact: true })).toHaveCount(2);
@@ -22,7 +22,7 @@ test("empty workspace explains capability limits and every destination works", a
   await expect(page.getByRole("button", { name: "Create dataset" })).toBeDisabled();
   await expect(page.getByText("Dataset curation needs PostgreSQL", { exact: false })).toBeVisible();
   await page.getByRole("link", { name: "Comparisons", exact: true }).click();
-  await expect(page.getByText("Experiment execution is not enabled yet.", { exact: false })).toBeVisible();
+  await expect(page.getByText("Paired comparisons arrive in M5.", { exact: false })).toBeVisible();
 });
 
 test("connection errors are actionable and refresh recovers", async ({ page }) => {

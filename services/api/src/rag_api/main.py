@@ -20,10 +20,11 @@ from rag_api.datasets import dataset_router
 from rag_api.documents import document_router
 from rag_api.indexes import index_router
 from rag_api.limits import BodyLimit
+from rag_api.runs import run_router
 
 
 class WorkspaceStatus(BaseModel):
-    stage: Literal["datasets"] = "datasets"
+    stage: Literal["baselines"] = "baselines"
     api: Literal["ready"] = "ready"
     database: DatabaseHealth
     capabilities: list[str] = [
@@ -34,6 +35,7 @@ class WorkspaceStatus(BaseModel):
         "dataset_curation",
         "lexical_indexing",
         "dense_indexing",
+        "experiment_runs",
     ]
     generation_configured: bool
     judge_configured: bool
@@ -56,7 +58,7 @@ def create_app(
         title="RAG Reliability Platform",
         version="0.1.0",
         description=(
-            "Document ingestion and immutable corpus versions. Evaluation pipelines are pending."
+            "Frozen experiments, local generation, and source-based retrieval evaluation."
         ),
         lifespan=lifespan,
     )
@@ -64,12 +66,13 @@ def create_app(
         CORSMiddleware,
         allow_origins=config.cors_origins,
         allow_methods=["GET", "POST", "PATCH"],
-        allow_headers=["Content-Type"],
+        allow_headers=["Content-Type", "Idempotency-Key"],
     )
     application.add_middleware(BodyLimit, limit=config.max_upload_bytes + 1_048_576)
     application.include_router(document_router(engine, config))
     application.include_router(dataset_router(engine, config))
     application.include_router(index_router(engine, config))
+    application.include_router(run_router(engine, config))
 
     @application.get("/api/v1/health/live")
     def live() -> dict[str, str]:
@@ -87,14 +90,14 @@ def create_app(
         # Provider configuration is visible; provider secrets and names are not returned.
         return WorkspaceStatus(
             database=check(),
-            generation_configured=bool(config.generation_provider and config.generation_model_id),
+            generation_configured=config.local_generation_enabled,
             judge_configured=bool(config.judge_provider and config.judge_model_id),
         )
 
     @application.get("/api/v1/capabilities")
     def capabilities() -> dict[str, object]:
         return {
-            "stage": "datasets",
+            "stage": "baselines",
             "implemented": [
                 "health",
                 "workspace_status",
@@ -103,9 +106,10 @@ def create_app(
                 "dataset_curation",
                 "lexical_indexing",
                 "dense_indexing",
+                "experiment_runs",
             ],
             "retrieval_strategies": ["postgresql_lexical", "pgvector_exact_dense"],
-            "metrics": [],
+            "metrics": ["retrieval_precision", "retrieval_recall", "context_recall"],
             "document_types": ["pdf", "html", "markdown", "text"],
         }
 

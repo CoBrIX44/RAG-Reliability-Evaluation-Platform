@@ -19,3 +19,6 @@ Initial sample is small; labels may miss alternative relevant passages; topics m
 
 ## Release gate
 Schema passes; all published questions reviewed; evidence resolves to snapshot; duplicate/leakage check complete; split frozen; licensing/attribution recorded; dataset statistics computed from actual records. Do not fill this card with invented counts or scores.
+
+## Development software fixture
+Separate from this planned research card, the live workspace has one authored transaction question in a published development_fixture version. The project owner explicitly approved its reference answer/fact and annotated source, with reviewer Project owner. It uses the development split and transactions-smoke group. Its publication and actual local-model runs verify the software pipeline; they are not benchmark sampling, a numbered PostgreSQL release, or a research conclusion.

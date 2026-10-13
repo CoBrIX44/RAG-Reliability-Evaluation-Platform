@@ -31,3 +31,8 @@ M4 is in progress. Published-corpus lexical indexing/search is implemented with 
 
 ## M4 dense runtime update
 Current migration head is 0006_dense_retrieval. Dense indexing/query previews use the pinned local CPU MiniLM contract, isolated worker inference, exact pgvector cosine search, and durable preview leases. Lexical API search remains synchronous; dense query endpoints queue/poll. Never confuse previews, cosine scores, or software fixtures with saved answer experiments. Next M4 work is generation/run manifests/cancellation/result persistence and connected metrics/traces. Preserve named model/artifact/PostgreSQL volumes and keep destructive tests on rag_test.
+
+## M4 runtime update
+M1-M4 are locally verified. Migration head is 0007_experiment_runs; workspace stage baselines. Git main has initial commit ab83409 and the user reports it pushed; current M4 changes are uncommitted. The user explicitly chose local CPU generation (no paid API) and reviewed/published the existing transaction development fixture with reviewer Project owner. Do not promote this fixture into a research benchmark. .env enables local generation; .env.example opts out by default. Preserve both native and Docker model/data caches.
+
+Saved runs freeze code/lock/runtime/settings identity; API and worker need matching code and configuration to execute/resume. Terminal runs/results are immutable. Missing answer correctness/faithfulness/citation support/abstention quality/cost remain unavailable until M5. See CODEX_HANDOFF.md for actual run IDs and completed verification.

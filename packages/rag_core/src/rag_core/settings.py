@@ -33,6 +33,10 @@ class Settings(BaseSettings):
     job_max_attempts: int = Field(default=3, ge=1, le=10)
     model_timeout_seconds: int = Field(default=120, ge=1, le=1800)
     model_cache_dir: Path = Path("data/models")
+    generation_timeout_seconds: int = Field(default=300, ge=1, le=1800)
+    generation_threads: int = Field(default=2, ge=1, le=8)
+    local_generation_enabled: bool = False
+    source_revision: str = "unrecorded"
     embedding_threads: int = Field(default=2, ge=1, le=8)
     embedding_batch_size: int = Field(default=16, ge=1, le=64)
     max_dense_chunks: int = Field(default=10_000, ge=1, le=10_000)

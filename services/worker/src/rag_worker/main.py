@@ -1,4 +1,4 @@
-"""Signal-aware service heartbeat. No experiment processing is claimed in M1."""
+"""Signal-aware durable worker for ingestion, indexes, previews, and experiment runs."""
 
 import argparse
 import logging
@@ -9,6 +9,7 @@ from rag_core.database import create_database_engine, inspect_database, record_w
 from rag_core.dense_searches import DenseSearchQueue
 from rag_core.indexes import IndexQueue
 from rag_core.jobs import IngestionQueue
+from rag_core.run_worker import RunQueue
 from rag_core.settings import Settings
 from sqlalchemy.exc import SQLAlchemyError
 
@@ -19,7 +20,7 @@ def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--check", action="store_true", help="Check schema readiness and exit")
     parser.add_argument(
-        "--once", action="store_true", help="Process one eligible ingestion job and exit"
+        "--once", action="store_true", help="Process one eligible durable job and exit"
     )
     args = parser.parse_args()
     logging.basicConfig(level=logging.INFO, format="%(levelname)s %(name)s %(message)s")
@@ -29,6 +30,7 @@ def main() -> int:
     queue = IngestionQueue(engine, settings)
     indexes = IndexQueue(engine, settings)
     previews = DenseSearchQueue(engine, settings)
+    runs = RunQueue(engine, settings)
     next_queue = 0
     for signum in (signal.SIGINT, signal.SIGTERM):
         signal.signal(signum, lambda _signum, _frame: stop.set())
@@ -38,14 +40,14 @@ def main() -> int:
             health = inspect_database(engine)
             logger.info("Database readiness: %s", health.code)
             return 0 if health.status == "ready" else 1
-        logger.info("Document ingestion and lexical index worker started.")
+        logger.info("Ingestion, retrieval, and experiment worker started.")
         while not stop.is_set():
             health = inspect_database(engine)
             if health.status == "ready":
                 try:
                     record_worker_heartbeat(engine)
                     # Rotate queue priority to keep each kind of durable work eligible.
-                    all_processors = (queue, indexes, previews)
+                    all_processors = (queue, indexes, previews, runs)
                     processors = all_processors[next_queue:] + all_processors[:next_queue]
                     for processor in processors:
                         if claim := processor.claim():

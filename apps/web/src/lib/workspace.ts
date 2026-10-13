@@ -1,7 +1,7 @@
 import { z } from "zod";
 
 export const workspaceSchema = z.object({
-  stage: z.enum(["foundation", "documents", "datasets"]),
+  stage: z.enum(["foundation", "documents", "datasets", "baselines"]),
   api: z.literal("ready"),
   database: z.object({
     status: z.enum(["ready", "unavailable"]),

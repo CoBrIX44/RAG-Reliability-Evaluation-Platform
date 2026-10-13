@@ -9,7 +9,7 @@ from sqlalchemy.exc import SQLAlchemyError
 
 from rag_core.settings import Settings
 
-SCHEMA_REVISION = "0006_dense_retrieval"
+SCHEMA_REVISION = "0007_experiment_runs"
 WORKER_FRESHNESS_SECONDS = 60
 
 

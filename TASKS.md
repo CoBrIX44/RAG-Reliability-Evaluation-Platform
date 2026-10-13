@@ -33,7 +33,7 @@ Real PostgreSQL migration, locking, retry, immutability, and checkpoint tests pa
 - [x] Atomic JSONL import/export and publication validation.
 - [x] Version isolation and evidence lineage checks.
 
-M3 real database tests verify publication/export/import round trips, review gates, source spans, immutable snapshots, optimistic conflicts, duplicates, and split leakage. Browser fixtures verify curation/publication, Unicode annotation selection, fresh-review requirements, accessibility, and responsive layout. Live Docker UI saves and edits candidate evidence annotations; malformed JSONL reports its physical line and commits nothing. The live candidate remains unreviewed, unpublished, and labeled as a development fixture.
+M3 real database tests verify publication/export/import round trips, review gates, source spans, immutable snapshots, optimistic conflicts, duplicates, and split leakage. Browser fixtures verify curation/publication, Unicode annotation selection, fresh-review requirements, accessibility, and responsive layout. Live Docker UI saves and edits candidate evidence annotations; malformed JSONL reports its physical line and commits nothing. The live fixture was subsequently explicitly reviewed by the project owner and published during M4; it remains separate from the research benchmark.
 
 ## M4 Baselines
 - [x] Fixed-token/section chunks with canonical span lineage and a pinned tokenizer.
@@ -41,10 +41,10 @@ M3 real database tests verify publication/export/import round trips, review gate
 - [x] Rank-order token-budget packing with retained/truncated/omitted source traces.
 - [x] Independently checked evidence-group recall and passage precision core.
 - [x] Compatible embedding storage, sentence-transformer indexing, and exact dense retrieval.
-- [ ] Generation adapter, run manifest, cancellation and result persistence.
-- [ ] Connect evidence scoring to saved question results and complete the question trace UI.
+- [x] Generation adapter, run manifest, cancellation and result persistence.
+- [x] Connect evidence scoring to saved question results and complete the question trace UI.
 
-M4 is in progress. Lexical inspection is a usable vertical slice, not a saved experiment. A live labeled development corpus was indexed/searched with the actual pinned MiniLM tokenizer; context truncation and original source inspection are exposed. Dataset labels remain unreviewed/unpublished. Local dense embedding inference and queued exact retrieval are implemented; measured answer runs remain pending. Dense slice verification: 109 Python tests on real rag_test, 13 Chromium tests, lint/type checks, actual local model build/query/source inspection, and unchanged dense metadata/results after database/API/worker restart.
+M4 gate passed: actual pinned local CPU runs from the owner-reviewed published development fixture persist complete inputs, raw answers/prompts/usage, ranked and delivered source traces, retrieval precision/recall/context recall, errors, timings, and unavailable answer metrics. Runs cancel durably; real PostgreSQL tests verify interrupted recovery, retained checkpoints, stale ownership, result uniqueness, concurrent submissions and immutable lineage. An actual browser starts a run and opens gold source evidence at desktop/mobile widths. Two completed actual runs and one queued cancellation are exactly unchanged after database/API/worker restart. Full Python suite: 128 passed/no skips on rag_test; after the final summary-query optimization, all 10 run integration tests passed again. Sixteen Chromium tests, Ruff/mypy, ESLint/TypeScript, Linux production builds and full Compose health pass. No research benchmark or answer-quality conclusion has been produced.
 
 ## M5 Research
 - [ ] Hybrid RRF and cross-encoder reranking.

@@ -2,7 +2,7 @@
 
 Design contract. Prefix /api/v1. JSON responses, UUID resource IDs, UTC ISO-8601 timestamps. Multipart for files; JSONL for dataset interchange. Generated OpenAPI must agree with implemented endpoints.
 
-Implemented: health, workspace, capabilities, corpora, document ingestion/status/sections/retry, corpus versions, ingestion job status, datasets/questions, dataset publication, JSONL import/export, and published source lookup. Lexical index build/status/retry/search endpoints are also implemented; experiment/comparison/run-export endpoints remain planned. /workspace returns stage datasets, actual database/schema/worker status, and provider-configuration booleans; no secrets. Readiness returns 503 for database unavailability, migration mismatch, or missing vector extension. Liveness is independent of PostgreSQL. /capabilities lists PDF/HTML/Markdown/text support; the lexical strategy is available and run-metric lists remain empty.
+Implemented: health/workspace/capabilities, document/corpus publication and source inspection, reviewed datasets and JSONL interchange, lexical/dense indexes and queued dense previews, immutable experiments, saved local CPU runs, cancellation, evidence metrics, question results and attempts. /workspace reports stage baselines, actual database/schema/worker state, and configuration booleans without secrets. /capabilities reports lexical/exact dense strategies and retrieval_precision/retrieval_recall/context_recall. Answer evaluators, comparisons and full run-export jobs remain planned. Readiness returns 503 for database unavailability, migration mismatch or missing vector extension; liveness is independent of PostgreSQL.
 
 Next.js exposes /api/health and a server-side /api/workspace proxy. The proxy validates response shape, applies timeouts, and returns sanitized 503 errors for upstream failure. INTERNAL_API_URL stays server-side.
 
@@ -31,15 +31,17 @@ Next.js /api/platform/{path} streams document requests to an allowlisted set of 
 | GET | /corpus-versions/{id}/sections/{section_id} | One source section, checked against snapshot membership |
 | GET, POST | /experiments | List/create immutable experiment definitions |
 | POST | /experiments/{id}/runs | Queue run; 202 |
-| GET | /runs | Filtered run list |
-| GET | /runs/{id} | Manifest, progress, summary, compatibility fingerprint |
+| GET | /runs | Paginated run list (filters arrive in M6) |
+| GET | /runs/{id} | Manifest summary/hash, progress, metric coverage, and safe errors |
+| GET | /runs/{id}/manifest | Complete frozen input manifest |
+| GET | /runs/{id}/attempts | Paginated attempt states and retained checkpoints |
 | POST | /runs/{id}/cancel | Request cooperative cancellation |
 | GET | /runs/{id}/results | Paginated question summaries |
-| GET | /runs/{id}/results/{question_id} | Full evidence/answer/evaluation/error trace |
-| POST | /comparisons | Compare selected runs with explicit compatibility report |
-| POST | /runs/{id}/exports | Queue artifact export; 202 |
+| GET | /runs/{id}/results/{result_id} | Full evidence/answer/evaluation/error trace |
+| POST | /comparisons | Planned M5/M6: compare selected runs with compatibility report |
+| POST | /runs/{id}/exports | Planned M6: queue full artifact export; 202 |
 | GET | /jobs/{id} | Job progress and sanitized error |
-| GET | /exports/{id} | Export status and local download link |
+| GET | /exports/{id} | Planned M6: export status and local download link |
 | GET | /capabilities | Configured models, supported metrics and strategies; no secrets |
 
 ## Contracts
@@ -52,11 +54,11 @@ Run response: state, total/completed/failed/cancelled counts, timestamps, manife
 ## Validation and errors
 400 invalid operation; 404 absent resource; 409 publication/state/version conflict; 413 oversized upload; 415 unsupported media; 422 schema/configuration failure; 503 unavailable dependency. Error envelope: code, message, field_errors, request_id, retryable. Never include credentials or stack traces.
 
-Implemented ingestion pagination uses an integer offset cursor, append-only ordering by timestamp/ID (versions by version number, sections by ordinal), default 100/max 100; source sections default 20. Response: items and next_cursor (string or null). Offset pagination is an explicit M2 choice; future editable run resources will use keyset cursors.
+Implemented ingestion pagination uses an integer offset cursor, append-only ordering by timestamp/ID (versions by version number, sections by ordinal), default 100/max 100; source sections default 20. Response: items and next_cursor (string or null). Offset pagination is an explicit M2 choice; M4 runs/results/attempts also use bounded offset cursors; keyset pagination is deferred.
 
 Upload returns the document with job_id, state, checksum, byte_count, revision_id, section_count, and safe errors. SHA-256 content deduplicates within a corpus. Publishing an unchanged draft returns its existing version; incomplete/empty drafts return 409. A published manifest includes document/revision IDs, original and normalized-text checksums, extractor version, and source counts. Section offsets address NFC text joined by two newlines; source locations retain original PDF pages, Markdown/text line ranges, or HTML anchors and heading paths. Database triggers reject mutation or appending children to sealed evidence.
 
-Planned run submission accepts Idempotency-Key: same key/body returns original run, different body returns 409. Retry must not silently create another experiment run. Comparisons will reject incompatible runs by default; exploratory=true returns differences and restricted paired summaries.
+Implemented run submission requires Idempotency-Key and an empty JSON object: the same key/experiment returns the original run, including after local generation is disabled; a key reused for another experiment returns 409. Retry must not silently create another experiment run. Comparisons will reject incompatible runs by default; exploratory=true returns differences and restricted paired summaries.
 
 ## Implemented dataset contract
 Dataset creation: name, description (optional), corpus_version_id, purpose (research or development_fixture). The corpus must be sealed; its lineage cannot change. Questions use text, answerable, reference_answer, required_facts[], evidence_groups[], topic, difficulty (easy/medium/hard), split (unassigned/development/test), split_group, review_status (candidate/reviewed), and reviewer. Candidate is the default. Explicit reviewed status requires a named reviewer; the server records reviewed_at. Ordinary clients submit full question content; PATCH additionally requires expected_revision and returns the incremented revision.
@@ -72,11 +74,22 @@ GET/POST /indexes lists or queues durable lexical index builds. POST body: corpu
 
 POST /indexes/{id}/search accepts query (1..4000 trimmed characters), top_k (1..50, default 5), and context_tokens (0..8192, default 1024). A ready index and matching cached tokenizer are required. Response includes ranked chunks, canonical source spans, returned_count, and packed context with exact token count and truncated/omitted chunk IDs. A span stores section_id plus section-local start_offset/end_offset and chunk-local text_start/text_end, all Unicode code points. No context text is reconstructed from decoded tokens.
 
-Search uses plainto_tsquery with English configuration, ts_rank_cd normalization 0, and stable ordinal/ID ties. This is PostgreSQL full-text ranking, not BM25. The preview is bounded interactive inspection, not durable experiment execution. It does not generate or score answers, persist question results, or assert reviewer labels. Index-list pagination uses the existing offset cursor contract. The workspace stage remains datasets; lexical_indexing is a capability and postgresql_lexical is now a supported retrieval strategy.
+Search uses plainto_tsquery with English configuration, ts_rank_cd normalization 0, and stable ordinal/ID ties. This is PostgreSQL full-text ranking, not BM25. The preview is bounded interactive inspection, not durable experiment execution. It does not generate or score answers, persist question results, or assert reviewer labels. Index-list pagination uses the existing offset cursor contract. The workspace stage is baselines; lexical_indexing is a capability and postgresql_lexical is now a supported retrieval strategy.
 
 ## Implemented dense inspection contract
 POST /indexes also accepts retrieval: lexical|dense (default lexical). Dense chunks are limited to 254 content tokens; the model is the pinned MiniLM CPU baseline, not selected through arbitrary environment model IDs. Dense configurations include the embedding compatibility contract; incompatible configurations receive distinct fingerprints.
 
 POST /indexes/{id}/dense-searches accepts the same query/top_k/context_tokens body as lexical search and returns 202 with a durable preview. It requires a ready dense index and a query fitting 254 content tokens. The API performs no model inference. GET /dense-searches/{id} polls pending/running/completed/failed, attempts, request, nullable result, and safe errors. POST /dense-searches/{id}/retry resets only failed previews. Identical requests for an index reuse the original preview, including completed results. Failed previews must be explicitly retried.
 
-Dense results retain ranked source-linked chunks and packed context, strategy pgvector-exact-cosine-v1, and embedding contract/artifact/runtime metadata. Scores are cosine similarities, not answer correctness. Queries use the exact same contract/artifacts as the built index; mismatches fail closed. The synchronous /indexes/{id}/search endpoint accepts lexical indexes only (409 dense_preview_required for dense). Supported capabilities add dense_indexing and retrieval strategy pgvector_exact_dense; workspace stage remains datasets until saved runs exist.
+Dense results retain ranked source-linked chunks and packed context, strategy pgvector-exact-cosine-v1, and embedding contract/artifact/runtime metadata. Scores are cosine similarities, not answer correctness. Queries use the exact same contract/artifacts as the built index; mismatches fail closed. The synchronous /indexes/{id}/search endpoint accepts lexical indexes only (409 dense_preview_required for dense). Supported capabilities add dense_indexing and retrieval strategy pgvector_exact_dense; workspace stage is now baselines with saved runs.
+
+## Implemented saved-run contract
+POST /experiments accepts name, dataset_version_id, index_id, split (development/test), top_k (1..50), context_tokens (0..1536), max_new_tokens (1..256), repeats (1..3), and seed (0..2147483644). The sealed dataset and ready index must share a corpus version; the split must be nonempty and the planned question-repeat observations within MAX_RUN_QUESTIONS. Defaults are development, 5, 1024, 128, 1, 0. Identical definitions return the same immutable experiment. Arbitrary model/provider/prompt overrides are unsupported in M4.
+
+POST /experiments/{id}/runs requires an ASCII Idempotency-Key (1..128 letters/digits/dot/underscore/colon/hyphen) and body {}. A new key creates a fresh execution. Submission freezes actual question snapshots/revisions, corpus/dataset hashes, index manifest, matching policy, generation contract, code/lock hashes, declared source revision, runtime and bounded settings. Only new submissions require LOCAL_GENERATION_ENABLED=true. GET /runs defaults to 20 rows (max 100); other run lists default to 100. The frontend shows 20 runs per page and links to /runs/{id}.
+
+Terminal states are completed, completed_with_errors, failed, cancelled. completed_count means successful observations; failed_count means persisted failed observations; cancelled_count counts remaining observations only after cancellation finishes. Queued cancellation is immediate; active cancellation is cooperative and prevents further publication after observation. Completed rows and terminal runs are immutable. Interrupted attempts retain checkpoints, may be executed again, and never count as published results. Recovery is bounded by the frozen max-attempt budget. There is no terminal-run reset endpoint; submit a new key for another recorded execution.
+
+GET /runs/{id} returns nullable means and applicable/scored/error/unavailable counts for retrieval_precision, retrieval_recall, and context_recall. Correctness, faithfulness, citation support, abstention quality, and cost remain unavailable. Stage timings are raw per-question milliseconds, not run-level p50/p95 summaries yet. GET /runs/{id}/results returns small question/answer previews and evidence scores. GET /runs/{id}/results/{result_id} returns the frozen question, original ranked retrieval, delivered context, raw answer/prompt/hash, token counts, finish reason, syntactic citation references, exact abstention marker, model/query metadata, errors, timings, and attempts. result_id distinguishes repeats; it is not question_id. Canonical source endpoints resolve gold/retrieved/delivered spans against the run's corpus version.
+
+GET /runs/{id}/manifest downloads frozen inputs; full result exports, comparison endpoints and export jobs in the original route plan remain M5/M6 work. The API queues model work; it never performs answer inference. Next.js forwards Idempotency-Key only on allowlisted routes and keeps its same-origin mutation guard.

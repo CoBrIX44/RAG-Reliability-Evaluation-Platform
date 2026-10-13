@@ -5,7 +5,8 @@ const allowed = /^(corpora(?:\/[0-9a-f-]{36}(?:\/(?:documents|versions))?)?|docu
 async function proxy(request: NextRequest, context: { params: Promise<{ path: string[] }> }) {
   const { path } = await context.params;
   const target = path.join("/");
-  if (!/^dense-searches\/[0-9a-f-]{36}(?:\/retry)?$/i.test(target) && !allowed.test(target) && !/^indexes(?:\/[0-9a-f-]{36}(?:\/(?:retry|search|dense-searches))?)?$/i.test(target)) return NextResponse.json({ message: "Route not found." }, { status: 404 });
+  const runRoute = /^(experiments(?:\/[0-9a-f-]{36}\/runs)?|runs(?:\/[0-9a-f-]{36}(?:\/(?:cancel|manifest|attempts|results(?:\/[0-9a-f-]{36})?))?)?)$/i.test(target);
+  if (!runRoute && !/^dense-searches\/[0-9a-f-]{36}(?:\/retry)?$/i.test(target) && !allowed.test(target) && !/^indexes(?:\/[0-9a-f-]{36}(?:\/(?:retry|search|dense-searches))?)?$/i.test(target)) return NextResponse.json({ message: "Route not found." }, { status: 404 });
   const origin = request.headers.get("origin");
   const expectedOrigin = `${request.nextUrl.protocol}//${request.headers.get("host") ?? request.nextUrl.host}`;
   if (["POST", "PATCH"].includes(request.method) && origin && origin !== expectedOrigin) {
@@ -15,7 +16,7 @@ async function proxy(request: NextRequest, context: { params: Promise<{ path: st
     const url = new URL(`/api/v1/${target}`, process.env.INTERNAL_API_URL ?? "http://127.0.0.1:8000");
     url.search = request.nextUrl.search;
     const headers = new Headers({ Accept: "application/json" });
-    for (const key of ["content-type", "content-length"]) {
+    for (const key of ["content-type", "content-length", "idempotency-key"]) {
       const value = request.headers.get(key);
       if (value) headers.set(key, value);
     }
