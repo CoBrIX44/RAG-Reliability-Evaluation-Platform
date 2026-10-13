@@ -1,0 +1,59 @@
+[project]
+name = "rag-reliability-platform"
+version = "0.1.0"
+description = "Evidence-grounded RAG research workspace"
+requires-python = ">=3.12,<3.13"
+dependencies = [
+  "rag-core",
+  "rag-api",
+  "rag-worker",
+  "alembic>=1.16,<2",
+]
+
+[tool.uv]
+package = false
+
+[tool.uv.workspace]
+members = ["packages/rag_core", "services/api", "services/worker"]
+
+[tool.uv.sources]
+rag-core = { workspace = true }
+rag-api = { workspace = true }
+rag-worker = { workspace = true }
+torch = { index = "pytorch-cpu" }
+
+[[tool.uv.index]]
+name = "pytorch-cpu"
+url = "https://download.pytorch.org/whl/cpu"
+explicit = true
+
+[dependency-groups]
+dev = [
+    "ruff>=0.12,<1",
+    "mypy>=1.16,<2",
+    "pytest>=8.4,<10",
+    "pyyaml>=6,<7",
+    "types-pyyaml>=6,<7",
+    "httpx2>=2,<3",
+    "types-beautifulsoup4>=4.12.0.20250516",
+    "reportlab>=4,<5",
+    "types-reportlab>=5.0.0.20261008",
+]
+
+[tool.ruff]
+target-version = "py312"
+line-length = 100
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "UP", "B", "SIM"]
+
+[tool.mypy]
+plugins = ["pydantic.mypy"]
+python_version = "3.12"
+strict = true
+files = ["packages/rag_core/src", "services/api/src", "services/worker/src", "migrations", "tests"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "-ra --strict-markers"
+markers = ["integration: requires a disposable PostgreSQL/pgvector database via TEST_DATABASE_URL"]

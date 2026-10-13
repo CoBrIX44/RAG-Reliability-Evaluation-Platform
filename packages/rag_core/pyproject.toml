@@ -1,0 +1,21 @@
+[project]
+name = "rag-core"
+version = "0.1.0"
+requires-python = ">=3.12,<3.13"
+dependencies = [
+    "pydantic-settings>=2.10,<3",
+    "sqlalchemy>=2.0,<3",
+    "psycopg[binary]>=3.2,<4",
+    "pypdf>=6,<7",
+    "beautifulsoup4>=4.13,<5",
+    "markdown-it-py>=4,<5",
+    "tokenizers==0.23.3",
+    "huggingface-hub==1.33.0",
+    "sentence-transformers==6.1.0",
+    "transformers==5.19.0",
+    "torch==2.14.1",
+]
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"

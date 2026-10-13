@@ -1,0 +1,96 @@
+name: rag-observatory
+
+x-python: &python
+  build:
+    context: .
+    dockerfile: infra/python.Dockerfile
+  env_file: .env
+  environment: &python-env
+    APP_ENV: development
+    DATABASE_URL: postgresql+psycopg://rag:${POSTGRES_PASSWORD:?Copy .env.example to .env first}@db:5432/rag
+    ARTIFACT_ROOT: /app/data/artifacts
+    MODEL_CACHE_DIR: /app/data/models
+    CORS_ORIGINS: http://localhost:${WEB_PORT:-3000}
+    WORKER_POLL_SECONDS: 15
+  volumes:
+    - artifacts:/app/data/artifacts
+    - models:/app/data/models
+
+services:
+  db:
+    image: pgvector/pgvector:0.8.1-pg17
+    environment:
+      POSTGRES_USER: rag
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?Copy .env.example to .env first}
+      POSTGRES_DB: rag
+    ports:
+      - "127.0.0.1:${POSTGRES_PORT:-5432}:5432"
+    volumes:
+      - postgres:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U rag -d rag"]
+      interval: 5s
+      timeout: 3s
+      retries: 12
+    restart: unless-stopped
+
+  migrate:
+    <<: *python
+    command: ["alembic", "upgrade", "head"]
+    depends_on:
+      db:
+        condition: service_healthy
+
+  api:
+    <<: *python
+    ports:
+      - "127.0.0.1:${API_PORT:-8000}:8000"
+    depends_on:
+      migrate:
+        condition: service_completed_successfully
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://127.0.0.1:8000/api/v1/health/ready', timeout=5)"]
+      interval: 15s
+      timeout: 6s
+      retries: 3
+      start_period: 10s
+    restart: unless-stopped
+
+  worker:
+    <<: *python
+    command: ["rag-worker"]
+    mem_limit: 4g
+    cpus: 4
+    depends_on:
+      migrate:
+        condition: service_completed_successfully
+    healthcheck:
+      test: ["CMD", "rag-worker", "--check"]
+      interval: 20s
+      timeout: 8s
+      retries: 3
+    restart: unless-stopped
+
+  web:
+    build:
+      context: .
+      dockerfile: infra/web.Dockerfile
+    environment:
+      INTERNAL_API_URL: http://api:8000
+      NEXT_TELEMETRY_DISABLED: 1
+    ports:
+      - "127.0.0.1:${WEB_PORT:-3000}:3000"
+    depends_on:
+      api:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "node", "-e", "fetch('http://127.0.0.1:3000/api/health').then(r=>process.exit(r.ok?0:1)).catch(()=>process.exit(1))"]
+      interval: 20s
+      timeout: 5s
+      retries: 3
+    restart: unless-stopped
+
+volumes:
+  postgres:
+  artifacts:
+  models:

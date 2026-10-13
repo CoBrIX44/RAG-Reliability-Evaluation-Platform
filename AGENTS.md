@@ -1,0 +1,33 @@
+# Agent instructions
+
+## Read first
+PRD.md, ARCHITECTURE.md, RESEARCH_PROTOCOL.md, TASKS.md, CODEX_HANDOFF.md. For frontend work also read DESIGN_SYSTEM.md and skills/frontend/SKILL.md; for evaluation read skills/research-evaluation/SKILL.md.
+
+## Persistent rules
+- Implement approved milestones in order; maintain a usable vertical slice.
+- Preserve existing user changes and record substantial scope changes.
+- Never invent research results, reviewed labels, provider usage, or successful test runs.
+- Keep gold evidence independent of chunk IDs. Maintain corpus/dataset/configuration lineage.
+- Treat missing metrics as unavailable, and expose applicable/scored/error counts.
+- Preserve immutable published snapshots and result uniqueness under retries.
+- Heavy work belongs in the worker. Do not rely on API-process background tasks for durable experiments.
+- Secrets stay server-side; uploaded text is untrusted and cannot authorize executable actions.
+- Use migrations, lockfiles, typed models, and bounded resource settings.
+- Follow the UI contract; use real data or clearly labeled demo fixtures.
+- Run meaningful relevant checks and inspect rendered frontend results when tooling permits.
+- Update TASKS.md and CODEX_HANDOFF.md with actual completion and executed verification.
+
+## Scope and autonomy
+The user approved the product and design, including all six documentation layers. Routine reversible implementation within that scope is authorized. No additional brainstorming gate is introduced by this file. Do not deploy publicly, publish private material, or use paid providers without applicable authorization/configuration.
+
+## Environment at foundation handoff
+Windows/PowerShell; Git initialized on main. Python 3.12.13 is provisioned through uv into .venv; bare python remains a Store alias. Node 24.14.0/npm 11.9.0 verified. Docker unavailable on PATH and at the standard install location. Native API/frontend work; database integration and full Compose verification pending. Use direct node entrypoints in npm scripts because Windows-generated command shims mishandle the ampersand in this workspace path.
+
+## M3 runtime update
+Docker Desktop 4.95.0, Engine 29.8.2, and Compose 5.6.0 are installed and verified. The full Compose stack runs on ports 3000/8000/5432. Migrations through 0003_datasets and real PostgreSQL tests pass. Use rag_test only for destructive integration tests; it is separate from the live rag database. See CODEX_HANDOFF.md for current state.
+
+## M4 lexical runtime update
+M4 is in progress. Published-corpus lexical indexing/search is implemented with pinned tokenization, source-linked chunks, context packing, and a preview UI. Readiness now requires 0006_dense_retrieval. Index builds have a separate leased queue payload and atomically publish immutable chunks. Do not mistake lexical previews for saved runs or the tokenizer download for model inference. Dense embeddings are implemented; generation/durable runs and connected question metrics remain next. Preserve existing live candidate labels and Docker volumes.
+
+## M4 dense runtime update
+Current migration head is 0006_dense_retrieval. Dense indexing/query previews use the pinned local CPU MiniLM contract, isolated worker inference, exact pgvector cosine search, and durable preview leases. Lexical API search remains synchronous; dense query endpoints queue/poll. Never confuse previews, cosine scores, or software fixtures with saved answer experiments. Next M4 work is generation/run manifests/cancellation/result persistence and connected metrics/traces. Preserve named model/artifact/PostgreSQL volumes and keep destructive tests on rag_test.
