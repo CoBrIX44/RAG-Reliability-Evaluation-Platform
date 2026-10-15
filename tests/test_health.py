@@ -22,6 +22,8 @@ def test_liveness_remains_available_without_database_and_secrets_are_not_exposed
         assert client.get("/api/v1/capabilities").json()["retrieval_strategies"] == [
             "postgresql_lexical",
             "pgvector_exact_dense",
+            "hybrid_rrf",
+            "hybrid_rrf_rerank",
         ]
 
 

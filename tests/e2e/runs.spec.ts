@@ -97,3 +97,63 @@ test("cancellation is cooperative and preserves the run detail route", async ({ 
   await expect(page.getByRole("button", { name: "Cancel run", exact: true })).toHaveCount(0);
   await expect(page).toHaveURL(`/runs/${runId}`);
 });
+
+test("hybrid experiment saves candidate settings and distinguishes RRF, logits, and evidence scores", async ({ page }) => {
+  await fixtures(page);
+  const config = { retrieval_strategy: "hybrid_rerank", candidate_k: 8, rrf_k: 40 };
+  const hybridRun = { ...run, manifest_summary: { ...run.manifest_summary, config } };
+  const pipeline = {
+    fusion: { version: "equal-weight-rrf-v1" }, candidate_k: 8, rrf_k: 40,
+    lexical: [{ chunk_id: chunkId, rank: 1, score: 0.125 }],
+    dense: [{ chunk_id: chunkId, rank: 1, score: 0.6 }],
+    fused: [{ chunk_id: chunkId, rank: 1, score: 2 / 41 }],
+    reranker: { passage_ids: [chunkId], scores: [-2.75], pair_tokens: [20], metadata: { contract: { model_id: "Synthetic software reranker", revision: "e".repeat(40) } } },
+    timings: { lexical_wall_ms: 2, reranking_wall_ms: 10 },
+  };
+  const retrieval = { ...result.trace.retrieval, strategy: "hybrid-rrf-cross-encoder-v1", hits: [{ rank: 1, score: -2.75, chunk }], pipeline };
+  const hybridResult = { ...result, trace: { ...result.trace, retrieval, retrieval_candidates: { ...result.trace.retrieval, strategy: "hybrid-rrf-v1", pipeline: { ...pipeline, reranker: null } } } };
+  let body: Record<string, unknown> | null = null;
+  await page.route("**/api/platform/experiments", route => {
+    if (route.request().method() !== "POST") return route.fallback();
+    body = route.request().postDataJSON();
+    return route.fulfill({ status: 201, json: { id: experiment, name: "Synthetic hybrid", dataset_version_id: dataset, index_id: index, config } });
+  });
+  await page.route(`**/api/platform/experiments/${experiment}/runs`, route => route.fulfill({ status: 202, json: hybridRun }));
+  await page.route(`**/api/platform/runs/${runId}`, route => route.fulfill({ json: hybridRun }));
+  await page.route(`**/api/platform/runs/${runId}/results/${resultId}`, route => route.fulfill({ json: hybridResult }));
+  await page.goto("/experiments");
+  await page.getByLabel("Experiment name", { exact: true }).fill("Synthetic hybrid");
+  await page.getByLabel("Experiment retrieval strategy").selectOption("hybrid_rerank");
+  await expect(page.getByLabel("Ready index", { exact: false })).toHaveValue(index);
+  await page.getByLabel("Candidates per arm / reranker").fill("8");
+  await page.getByLabel("RRF rank constant").fill("40");
+  await page.getByRole("button", { name: "Start run", exact: true }).click();
+  await expect(page).toHaveURL(`/runs/${runId}`);
+  expect(body).toMatchObject(config);
+  await expect(page.getByRole("heading", { name: "Fusion and reranking", exact: true })).toBeVisible();
+  await expect(page.getByRole("region", { name: "Fusion and reranking table" })).toContainText("-2.7500");
+  await expect(page.getByText("Rank 1 · Cross-encoder logit -2.7500", { exact: true })).toBeVisible();
+  await expect(page.locator(".pipeline-trace")).toContainText("not probabilities or answer correctness");
+  await page.getByText("Retained candidates before reranking (1)", { exact: true }).click();
+  await expect(page.locator(".retained-candidates")).toContainText(chunk.text);
+  expect((await new AxeBuilder({ page }).withTags(["wcag2a", "wcag2aa", "wcag21aa"]).analyze()).violations).toEqual([]);
+  await page.screenshot({ path: "artifacts/hybrid-fixture-desktop.png", fullPage: true });
+  for (const width of [375, 768, 1024]) {
+    await page.setViewportSize({ width, height: 900 });
+    expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
+  }
+  await page.setViewportSize({ width: 375, height: 900 });
+  await page.screenshot({ path: "artifacts/hybrid-fixture-mobile.png", fullPage: true });
+});
+
+test("failed reranking exposes retained candidates with unavailable final ranks", async ({ page }) => {
+  await fixtures(page);
+  const failedResult = { ...result, state: "failed", trace: { ...result.trace, generation: null, retrieval: undefined, retrieval_scores: undefined, context_scores: undefined, retrieval_candidates: { ...result.trace.retrieval, strategy: "hybrid-rrf-v1", pipeline: { fusion: { version: "equal-weight-rrf-v1" }, candidate_k: 2, rrf_k: 60, lexical: [], dense: [{ chunk_id: chunkId, rank: 1, score: 0.6 }], fused: [{ chunk_id: chunkId, rank: 1, score: 1 / 61 }], reranker: null, timings: { lexical_wall_ms: 1 } } }, error: { stage: "reranking", code: "reranker_timeout", message: "Synthetic reranker timeout" } } };
+  await page.route(`**/api/platform/runs/${runId}/results/${resultId}`, route => route.fulfill({ json: failedResult }));
+  await page.goto(`/runs/${runId}`);
+  await expect(page.locator(".question-trace [role=alert]")).toContainText("reranker_timeout");
+  await expect(page.getByRole("region", { name: "Fusion and reranking table" })).toContainText("unavailable");
+  await page.getByText("Retained candidates before reranking (1)", { exact: true }).click();
+  await expect(page.locator(".retained-candidates")).toContainText(chunk.text);
+  expect(await page.locator(".retained-candidates script").count()).toBe(0);
+});

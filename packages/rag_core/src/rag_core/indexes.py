@@ -84,6 +84,7 @@ class SearchView(BaseModel):
     hits: list[SearchHit]
     context: PackedContext
     embedding: dict[str, object] | None = None
+    pipeline: dict[str, object] | None = None
 
 
 class IndexStore:
@@ -171,11 +172,15 @@ class IndexStore:
             row.available_at = session.execute(select(func.clock_timestamp())).scalar_one()
             return IndexView.model_validate(row)
 
-    def search(self, index_id: UUID, value: SearchInput) -> SearchView:
+    def search(
+        self, index_id: UUID, value: SearchInput, *, allow_dense_lexical: bool = False
+    ) -> SearchView:
         variant = self.get(index_id)
         if variant.state != "ready":
             raise PlatformError("index_not_ready", "Wait for the index build to finish.", 409)
-        if variant.config["retrieval"] == DENSE_STRATEGY:
+        # Dense chunks also have the same English tsvector/GIN search representation.
+        # Only the worker's hybrid pipeline opts in; public dense previews stay queued.
+        if variant.config["retrieval"] == DENSE_STRATEGY and not allow_dense_lexical:
             raise PlatformError(
                 "dense_preview_required", "Queue dense queries for worker execution.", 409
             )

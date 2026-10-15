@@ -2,6 +2,7 @@
 
 import contextlib
 import time
+from collections.abc import Callable
 from datetime import datetime, timedelta
 from threading import Event, Thread
 from typing import cast
@@ -15,7 +16,9 @@ from rag_core.dataset_schemas import QuestionInput
 from rag_core.embeddings import DENSE_STRATEGY, run_embeddings
 from rag_core.errors import LostLease, PlatformError
 from rag_core.generation import GenerationInput, generate, generation_contract, prepare_generation
+from rag_core.hybrid import fusion_contract, hybrid_retrieve
 from rag_core.indexes import IndexStore, SearchInput, SearchView
+from rag_core.reranking import prepare_reranker, reranker_contract
 from rag_core.retrieval_evaluation import score_retrieval
 from rag_core.run_models import QuestionResult, Run, RunAttempt
 from rag_core.runs import RunStore, execution_identity
@@ -223,9 +226,31 @@ class RunQueue(RunStore):
             row.lease_token = row.lease_expires_at = None
 
     def retrieve(
-        self, index_id: UUID, query: str, top_k: int, stop: Event, lost: Event
+        self,
+        index_id: UUID,
+        query: str,
+        top_k: int,
+        stop: Event,
+        lost: Event,
+        pipeline_config: dict[str, object] | None = None,
+        checkpoint: Callable[[SearchView], None] | None = None,
     ) -> SearchView:
         store = IndexStore(self.engine, self.settings)
+        config = pipeline_config or {}
+        if config.get("retrieval_strategy", "index") != "index":
+            return hybrid_retrieve(
+                store,
+                index_id,
+                query,
+                top_k,
+                int(str(config["candidate_k"])),
+                int(str(config["rrf_k"])),
+                config["retrieval_strategy"] == "hybrid_rerank",
+                self.settings,
+                stop,
+                lost,
+                checkpoint=checkpoint,
+            )
         value = SearchInput(query=query, top_k=top_k, context_tokens=0)
         if store.get(index_id).config["retrieval"] == DENSE_STRATEGY:
             encoded = run_embeddings([query], self.settings, stop, lost)
@@ -276,6 +301,15 @@ class RunQueue(RunStore):
                     "run_runtime_mismatch",
                     "Worker code, locks, or runtime differs from the frozen run.",
                 )
+            if (
+                config.get("retrieval_strategy", "index") != "index"
+                and config.get("fusion") != fusion_contract()
+            ):
+                raise PlatformError("fusion_contract_mismatch", "Frozen fusion policy differs.")
+            if config.get("retrieval_strategy") == "hybrid_rerank":
+                if config.get("reranker") != reranker_contract():
+                    raise PlatformError("reranker_contract_mismatch", "Frozen reranker differs.")
+                prepare_reranker(self.settings, stop, abort)
             prepare_generation(self.settings, stop, abort)
             index_id = UUID(str(manifest["index_id"]))
             questions = manifest["questions"]
@@ -315,8 +349,27 @@ class RunQueue(RunStore):
                     stage = "retrieval"
                     state = "succeeded"
                     try:
+
+                        def checkpoint_candidates(
+                            value: SearchView,
+                            checkpoint_trace: dict[str, object] = trace,
+                            checkpoint_attempt: UUID = attempt_id,
+                        ) -> None:
+                            nonlocal stage
+                            checkpoint_trace["retrieval_candidates"] = value.model_dump(
+                                mode="json", exclude={"context"}
+                            )
+                            self.checkpoint(run_id, token, checkpoint_attempt, checkpoint_trace)
+                            stage = "reranking"
+
                         retrieval = self.retrieve(
-                            index_id, question.text, int(config["top_k"]), stop, abort
+                            index_id,
+                            question.text,
+                            int(config["top_k"]),
+                            stop,
+                            abort,
+                            pipeline_config=config,
+                            checkpoint=checkpoint_candidates,
                         )
                         trace["retrieval"] = retrieval.model_dump(mode="json", exclude={"context"})
                         trace["retrieval_scores"] = score_retrieval(

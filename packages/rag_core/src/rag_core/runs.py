@@ -8,15 +8,18 @@ from pathlib import Path
 from typing import Literal
 from uuid import UUID
 
-from pydantic import BaseModel, ConfigDict, Field
+from pydantic import BaseModel, ConfigDict, Field, model_validator
 from sqlalchemy import Engine, func, select
 from sqlalchemy.orm import Session
 
 from rag_core.dataset_models import DatasetVersion
 from rag_core.dataset_schemas import QuestionInput
+from rag_core.embeddings import DENSE_STRATEGY
 from rag_core.errors import PlatformError
 from rag_core.generation import generation_contract
+from rag_core.hybrid import fusion_contract
 from rag_core.index_models import IndexVariant
+from rag_core.reranking import reranker_contract
 from rag_core.retrieval_evaluation import EVIDENCE_SCORING_VERSION
 from rag_core.run_models import Experiment, QuestionResult, Run, RunAttempt
 from rag_core.schemas import Page
@@ -59,6 +62,12 @@ def execution_identity(settings: Settings) -> dict[str, object]:
         "machine": platform.machine(),
         "generation_threads": settings.generation_threads,
         "generation_timeout_seconds": settings.generation_timeout_seconds,
+        "reranker_threads": settings.reranker_threads,
+        "reranker_batch_size": settings.reranker_batch_size,
+        "reranker_timeout_seconds": settings.reranker_timeout_seconds,
+        "embedding_threads": settings.embedding_threads,
+        "embedding_batch_size": settings.embedding_batch_size,
+        "model_timeout_seconds": settings.model_timeout_seconds,
     }
 
 
@@ -73,6 +82,15 @@ class ExperimentCreate(BaseModel):
     max_new_tokens: int = Field(default=128, ge=1, le=256)
     repeats: int = Field(default=1, ge=1, le=3)
     seed: int = Field(default=0, ge=0, le=2**31 - 4)
+    retrieval_strategy: Literal["index", "hybrid", "hybrid_rerank"] = "index"
+    candidate_k: int = Field(default=20, ge=1, le=50)
+    rrf_k: int = Field(default=60, ge=1, le=1000)
+
+    @model_validator(mode="after")
+    def candidates_cover_top_k(self) -> "ExperimentCreate":
+        if self.retrieval_strategy != "index" and self.candidate_k < self.top_k:
+            raise ValueError("Candidate depth must be at least the final top-k.")
+        return self
 
 
 class ExperimentView(BaseModel):
@@ -219,6 +237,12 @@ class RunStore:
                     "Dataset and ready index must share a corpus version.",
                     409,
                 )
+            if value.retrieval_strategy != "index" and index.config["retrieval"] != DENSE_STRATEGY:
+                raise PlatformError(
+                    "hybrid_requires_dense_index",
+                    "Hybrid retrieval requires a ready dense index from the dataset corpus.",
+                    409,
+                )
             snapshots = dataset.manifest["questions"]
             assert isinstance(snapshots, list)
             selected = [q for q in snapshots if q["content"]["split"] == value.split]
@@ -234,6 +258,10 @@ class RunStore:
                 retrieval=index.config,
                 evidence_scoring=EVIDENCE_SCORING_VERSION,
             )
+            if value.retrieval_strategy != "index":
+                config["fusion"] = fusion_contract()
+            if value.retrieval_strategy == "hybrid_rerank":
+                config["reranker"] = reranker_contract()
             fingerprint = digest({"request": value.model_dump(mode="json"), "config": config})
             previous = session.scalar(
                 select(Experiment).where(Experiment.fingerprint == fingerprint)

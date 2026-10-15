@@ -36,6 +36,8 @@ class WorkspaceStatus(BaseModel):
         "lexical_indexing",
         "dense_indexing",
         "experiment_runs",
+        "hybrid_retrieval",
+        "cross_encoder_reranking",
     ]
     generation_configured: bool
     judge_configured: bool
@@ -107,8 +109,15 @@ def create_app(
                 "lexical_indexing",
                 "dense_indexing",
                 "experiment_runs",
+                "hybrid_retrieval",
+                "cross_encoder_reranking",
             ],
-            "retrieval_strategies": ["postgresql_lexical", "pgvector_exact_dense"],
+            "retrieval_strategies": [
+                "postgresql_lexical",
+                "pgvector_exact_dense",
+                "hybrid_rrf",
+                "hybrid_rrf_rerank",
+            ],
             "metrics": ["retrieval_precision", "retrieval_recall", "context_recall"],
             "document_types": ["pdf", "html", "markdown", "text"],
         }

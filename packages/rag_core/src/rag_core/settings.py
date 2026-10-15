@@ -39,6 +39,9 @@ class Settings(BaseSettings):
     source_revision: str = "unrecorded"
     embedding_threads: int = Field(default=2, ge=1, le=8)
     embedding_batch_size: int = Field(default=16, ge=1, le=64)
+    reranker_threads: int = Field(default=2, ge=1, le=8)
+    reranker_batch_size: int = Field(default=8, ge=1, le=16)
+    reranker_timeout_seconds: int = Field(default=120, ge=1, le=1800)
     max_dense_chunks: int = Field(default=10_000, ge=1, le=10_000)
     embedding_model_id: str = ""
     embedding_model_revision: str = ""
