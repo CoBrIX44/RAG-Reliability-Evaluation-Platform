@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { AnswerEvaluation } from "@/components/answer-evaluation";
 import { useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import useSWR from "swr";
@@ -132,7 +133,7 @@ function RunDetail({ id, available }: { id: string; available: boolean }) {
 }
 
 function Metrics({ run }: { run: Run }) {
-  return <section className="run-metrics" aria-labelledby="metrics-title"><h2 id="metrics-title">Metrics and coverage</h2><p className="muted-text">Canonical source spans score retrieval before and after context packing. Answer evaluators arrive in M5. Energy, hardware cost, and provider cost are unavailable.</p>
+  return <section className="run-metrics" aria-labelledby="metrics-title"><h2 id="metrics-title">Metrics and coverage</h2><p className="muted-text">These metrics were recorded during run execution. Canonical source spans score retrieval before and after context packing. Post-hoc answer scores and scoring coverage are in each question’s Answer evaluation panel below. Energy, hardware cost, and provider cost are unavailable.</p>
     <div className="run-table-scroll" role="region" aria-label="Run metrics table" tabIndex={0}><table><thead><tr><th scope="col">Metric</th><th scope="col">Mean</th><th scope="col">Scored / applicable</th><th scope="col">Errors</th></tr></thead><tbody>{Object.entries(run.metrics).map(([key, metric]) => <tr key={key}><th scope="row">{metricNames[key] ?? key}</th><td>{metric.mean === null ? displayState(metric.state) : `${(metric.mean * 100).toFixed(1)}%`}</td><td>{metric.scored_count} / {metric.applicable_count ?? "unavailable"}</td><td>{metric.error_count}</td></tr>)}</tbody></table></div>
   </section>;
 }
@@ -145,6 +146,7 @@ function PipelineTrace({ retrieval, published }: { retrieval: Result["trace"]["r
   return <section className="pipeline-trace" aria-labelledby="pipeline-title"><h4 id="pipeline-title">Fusion and reranking</h4>
     <p className="muted-text">{pipeline.lexical.length} lexical + {pipeline.dense.length} dense candidates · {pipeline.fused.length} unique chunks · candidate depth {pipeline.candidate_k} · RRF constant {pipeline.rrf_k} · equal arm weights</p>
     <p className="muted-text">{reranker ? `Reranker: ${reranker.metadata.contract.model_id} @ ${reranker.metadata.contract.revision.slice(0, 8)}. Scores are raw logits, not probabilities or answer correctness.` : "RRF adds reciprocal ranks; a chunk contributes once per arm. No reranker output is available for this trace."}</p>
+    <p className="muted-text pipeline-scroll-hint">Scroll horizontally to see every ranking column.</p>
     <div className="run-table-scroll" role="region" aria-label="Fusion and reranking table" tabIndex={0}><table><thead><tr><th scope="col">Chunk</th><th scope="col">Lexical rank</th><th scope="col">Dense rank</th><th scope="col">RRF score</th><th scope="col">Reranker logit</th><th scope="col">Final rank</th></tr></thead><tbody>{pipeline.fused.map(candidate => {
       const position = reranker?.passage_ids.indexOf(candidate.chunk_id) ?? -1;
       const selected = retrieval.hits.find(hit => hit.chunk.id === candidate.chunk_id);
@@ -164,7 +166,8 @@ function QuestionTrace({ result, corpusVersion }: { result: Result; corpusVersio
   return <article className="question-trace" aria-labelledby="trace-title">
     <h3 id="trace-title">Question trace</h3><p className="trace-question">{question.text}</p><p className="muted-text">{question.topic} · {question.difficulty} · {question.split} · {question.answerable ? "Answerable" : "Unanswerable"} · reviewed by {question.reviewer}</p>
     {trace.error && <p className="connection-message warning" role="alert">{trace.error.stage}: {trace.error.code} — {trace.error.message}</p>}
-    <h4>Generated answer</h4>{answer ? <><pre className="answer-text">{answer.answer || "Empty model output"}</pre><p className="muted-text">{answer.input_tokens} input / {answer.output_tokens} output tokens · finish: {answer.finish_reason} · exact abstention marker: {answer.abstained ? "yes" : "no"}</p>{answer.finish_reason === "length" && <p className="connection-message warning">The answer reached its token limit and may be incomplete.</p>}<p className="muted-text">Recognized references: {answer.citations.join(", ") || "none"} · unknown references: {answer.unknown_citations.join(", ") || "none"}. Citation support has not been evaluated.</p></> : <p className="connection-message">Answer unavailable. Inspect the execution error and retained retrieval evidence.</p>}
+    <h4>Generated answer</h4>{answer ? <><pre className="answer-text">{answer.answer || "Empty model output"}</pre><p className="muted-text">{answer.input_tokens} input / {answer.output_tokens} output tokens · finish: {answer.finish_reason} · exact abstention marker: {answer.abstained ? "yes" : "no"}</p>{answer.finish_reason === "length" && <p className="connection-message warning">The answer reached its token limit and may be incomplete.</p>}<p className="muted-text">Recognized references: {answer.citations.join(", ") || "none"} · unknown references: {answer.unknown_citations.join(", ") || "none"}. Citation syntax alone does not establish support. Inspect answer evaluations below.</p></> : <p className="connection-message">Answer unavailable. Inspect the execution error and retained retrieval evidence.</p>}
+    {answer && <AnswerEvaluation result={result} />}
     <PipelineTrace retrieval={trace.retrieval ?? trace.retrieval_candidates} published={!!trace.retrieval} />
     {trace.retrieval_candidates && <details className="retained-candidates"><summary>Retained candidates before reranking ({trace.retrieval_candidates.hits.length})</summary><p className="muted-text">This checkpoint precedes reranking and does not establish a final retrieval score.</p>{trace.retrieval_candidates.hits.map(hit => <div className="trace-passage" key={hit.chunk.id}><strong>Fused candidate {hit.rank} · RRF {hit.score.toFixed(6)}</strong><pre>{hit.chunk.text}</pre>{hit.chunk.spans.map((span, i) => <div key={i}>{spanLink(span, `Candidate source ${span.section_id.slice(0, 8)}`)}</div>)}</div>)}</details>}
     <div className="trace-evidence-grid">

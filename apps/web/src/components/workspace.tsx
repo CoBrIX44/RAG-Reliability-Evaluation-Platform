@@ -68,7 +68,7 @@ export function Workspace({ section, initialRunId }: { section: Section; initial
         </div>
 
         <div className="foundation-notice"><span className="notice-label">LOCAL RELEASE</span>
-          <p>Upload documents, curate reviewed datasets, and run lexical or dense baselines with local CPU answers. Inspect saved retrieval metrics and question evidence.</p></div>
+          <p>Upload documents, curate reviewed datasets, and run lexical, dense, or hybrid retrieval with local CPU answers. Inspect saved retrieval metrics and question evidence.</p></div>
 
         {section === "experiments" && <>
           <ExperimentWorkspace available={dbReady && !!workspace?.capabilities.includes("experiment_runs")} configured={!!workspace?.generation_configured} workerReady={workspace?.database.worker_status === "ready"} initialRunId={initialRunId} />
@@ -99,13 +99,13 @@ export function Workspace({ section, initialRunId }: { section: Section; initial
             <ServiceRow title="FastAPI" detail="Application API and capability discovery" state={apiAvailable ? "Connected" : busy && !workspace ? "Checking" : "Unavailable"} ready={apiAvailable} />
             <ServiceRow title="PostgreSQL + pgvector" detail="Persistent data, vector support, and schema migrations" state={workspace ? workspace.database.status === "ready" ? error ? "Last known: ready" : "Ready" : "Unavailable" : "Not checked"} ready={dbReady} />
             <ServiceRow title="Python worker" detail="Durable ingestion, indexing, retrieval, and answer runs" state={workspace?.database.worker_status === "ready" ? error ? "Last known: ready" : "Ready" : workspace?.database.worker_status === "stale" ? "Heartbeat stale" : "Not connected"} ready={apiAvailable && workspace?.database.worker_status === "ready"} />
-            <ServiceRow title="Answer model" detail="Pinned Qwen2.5 0.5B on CPU; worker execution" state={workspace ? `${error ? "Last known: " : ""}${workspace.generation_configured ? "Configured" : "Not configured"}` : "Not checked"} ready={false} />
-            <ServiceRow title="Evaluation judge" detail="Optional model-assisted scoring; evaluation not enabled" state={workspace ? `${error ? "Last known: " : ""}${workspace.judge_configured ? "Configured" : "Not configured"}` : "Not checked"} ready={false} />
+            <ServiceRow title="Answer model" detail="Pinned Qwen2.5 0.5B on CPU; worker execution" state={workspace ? `${error ? "Last known: " : ""}${workspace.generation_configured ? "Configured" : "Not configured"}` : "Not checked"} ready={workspace?.judge_configured === true} />
+            <ServiceRow title="Evaluation judge" detail="Optional local self-judge; uncalibrated model estimates" state={workspace ? `${error ? "Last known: " : ""}${workspace.judge_configured ? "Configured" : "Not configured"}` : "Not checked"} ready={workspace?.judge_configured === true} />
           </dl>
           <div className="setup-instructions"><h3>Start your local environment</h3><p>From the project root, with Docker installed and your environment file prepared:</p>
             <pre><code>docker compose up --build</code></pre><p>For native development, start the API and dashboard in separate terminals:</p>
             <pre><code>uv run uvicorn rag_api.main:app --reload{"\n"}npm run dev</code></pre>
-            <p className="muted-text">Embedding and answer inference run locally when enabled. Model credentials stay on the server. Answer evaluators and judge execution arrive in M5.</p>
+            <p className="muted-text">Embedding and answer inference run locally when enabled. Model credentials stay on the server. Saved answers support versioned local judging and named human review.</p>
           </div>
         </section>}
         <footer className="workspace-footer"><span>RAG Observatory</span><span>Evidence first. Conclusions earned.</span></footer>

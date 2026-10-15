@@ -9,7 +9,7 @@ from sqlalchemy.exc import SQLAlchemyError
 
 from rag_core.settings import Settings
 
-SCHEMA_REVISION = "0007_experiment_runs"
+SCHEMA_REVISION = "0008_answer_evaluations"
 WORKER_FRESHNESS_SECONDS = 60
 
 

@@ -18,6 +18,7 @@ from starlette.responses import JSONResponse
 
 from rag_api.datasets import dataset_router
 from rag_api.documents import document_router
+from rag_api.evaluations import evaluation_router
 from rag_api.indexes import index_router
 from rag_api.limits import BodyLimit
 from rag_api.runs import run_router
@@ -38,6 +39,7 @@ class WorkspaceStatus(BaseModel):
         "experiment_runs",
         "hybrid_retrieval",
         "cross_encoder_reranking",
+        "answer_evaluation",
     ]
     generation_configured: bool
     judge_configured: bool
@@ -75,6 +77,7 @@ def create_app(
     application.include_router(dataset_router(engine, config))
     application.include_router(index_router(engine, config))
     application.include_router(run_router(engine, config))
+    application.include_router(evaluation_router(engine, config))
 
     @application.get("/api/v1/health/live")
     def live() -> dict[str, str]:
@@ -93,7 +96,7 @@ def create_app(
         return WorkspaceStatus(
             database=check(),
             generation_configured=config.local_generation_enabled,
-            judge_configured=bool(config.judge_provider and config.judge_model_id),
+            judge_configured=config.local_judge_enabled,
         )
 
     @application.get("/api/v1/capabilities")
@@ -111,6 +114,7 @@ def create_app(
                 "experiment_runs",
                 "hybrid_retrieval",
                 "cross_encoder_reranking",
+                "answer_evaluation",
             ],
             "retrieval_strategies": [
                 "postgresql_lexical",

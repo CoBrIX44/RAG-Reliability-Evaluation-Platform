@@ -271,3 +271,25 @@ summary { cursor: pointer; padding: 12px 0; min-height: 44px; }
 @media (max-width: 480px) { .experiment-form { grid-template-columns: 1fr; } .run-list-row, .run-progress { flex-direction: column; align-items: flex-start; padding: 16px; gap: 12px; } .question-trace { padding: 16px; } }
 
 .experiment-workspace button.text-link { border: 0; background: none; padding: 4px 0; font-family: inherit; font-size: 14px; line-height: 1.6; min-height: 44px; text-align: left; }
+.pipeline-trace .run-table-scroll table { min-width: 760px; overflow-wrap: normal; }
+.pipeline-trace .run-table-scroll th, .pipeline-trace .run-table-scroll td { white-space: nowrap; }
+.pipeline-scroll-hint { display: none; }
+@media (max-width: 900px) { .pipeline-scroll-hint { display: block; } }
+
+
+.answer-evaluation { border-block: 1px solid var(--border); padding-block: 24px; margin-block: 24px; }
+.evaluation-actions { display: flex; flex-wrap: wrap; gap: 12px; margin-block: 16px; }
+.evaluation-summary, .human-review-form, .evaluation-record { margin-block: 24px; }
+.evaluation-summary table { min-width: 660px; width: 100%; }
+.evaluation-summary th, .evaluation-summary td { padding: 12px; text-align: left; border-bottom: 1px solid var(--border); white-space: nowrap; }
+.evaluation-rubric dt { font-weight: 600; margin-top: 16px; }
+.evaluation-rubric dd { margin: 4px 0 0; line-height: 1.6; }
+.human-review-form fieldset { display: grid; min-width: 0; gap: 12px; border: 1px solid var(--border); padding: 16px; margin-block: 16px; }
+.human-review-form input:not([type=checkbox]), .human-review-form select, .human-review-form textarea { width: 100%; min-width: 0; }
+.human-review-form textarea { min-height: 96px; }
+.review-checkbox { display: flex; align-items: flex-start; gap: 12px; line-height: 1.6; padding-block: 8px; }
+.review-checkbox input { width: 20px; height: 20px; flex-shrink: 0; margin-top: 3px; }
+.evaluation-record summary { overflow-wrap: anywhere; }
+
+.human-review-form input:not([type=checkbox]), .human-review-form select, .human-review-form textarea { min-height: 44px; padding: 10px 12px; font: inherit; color: var(--text); background: var(--surface); border: 1px solid var(--border); border-radius: 4px; }
+.human-review-form textarea { resize: vertical; }

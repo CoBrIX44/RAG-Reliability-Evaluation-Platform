@@ -54,7 +54,7 @@ def test_absent_vector_extension_blocks_readiness() -> None:
     engine = MagicMock()
     connection = engine.connect.return_value.__enter__.return_value
     connection.scalar.side_effect = ["alembic_version", False]
-    connection.scalars.return_value = ["0007_experiment_runs"]
+    connection.scalars.return_value = ["0008_answer_evaluations"]
     assert inspect_database(engine).code == "vector_unavailable"
 
 
@@ -64,7 +64,7 @@ def test_worker_readiness_requires_a_recent_nonfuture_heartbeat(age: int, status
     connection = engine.connect.return_value.__enter__.return_value
     heartbeat = datetime.now(UTC) - timedelta(seconds=age)
     connection.scalar.side_effect = ["alembic_version", True, heartbeat]
-    connection.scalars.return_value = ["0007_experiment_runs"]
+    connection.scalars.return_value = ["0008_answer_evaluations"]
     result = inspect_database(engine)
     assert result.status == "ready"
     assert result.worker_status == status

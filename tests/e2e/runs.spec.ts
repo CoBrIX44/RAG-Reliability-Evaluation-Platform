@@ -64,6 +64,57 @@ test("saved partial run exposes unavailable metrics, context loss, safe source, 
   await page.screenshot({ path: "artifacts/run-fixture-mobile.png", fullPage: true });
 });
 
+test("answer review preserves an ambiguous submission and separates model disagreement from human labels", async ({ page }) => {
+  await fixtures(page);
+  const factJudgment = { facts: ["missing"], claims: [{ text: "Synthetic model answer", support: "unsupported", citations: ["P1"], citations_supported: false }], no_factual_claims: false, rationale: "Synthetic browser review only." };
+  const metric = (value: number) => ({ value, numerator: value, denominator: 1, state: "scored", reason: null });
+  const metrics = { answer_correctness: metric(1), faithfulness: metric(1), citation_support: metric(0), abstention_quality: metric(1) };
+  const model = { id: questionId, result_id: resultId, kind: "model", reviewer: null, manifest: { rubric: { version: "answer-evidence-v1" } }, manifest_hash: "e".repeat(64), state: "completed", output: { judgment: { ...factJudgment, facts: ["covered"] }, metrics }, attempts: 1, created_at: created };
+  let human: object | null = null;
+  let submissions = 0;
+  const keys: string[] = [];
+  await page.route("**/api/platform/evaluation-rubric", route => route.fulfill({ json: { local_judge_enabled: false, rubric: { version: "answer-evidence-v1", correctness: "Synthetic rubric. No real scores." } } }));
+  await page.route(`**/api/platform/runs/${runId}/evaluations`, route => route.fulfill({ json: { total_observations: 2, eligible_answers: 1, without_saved_answer: 1, selection: "latest-record-per-result-and-source-v1", sources: { model: {}, human: {} } } }));
+  await page.route(`**/api/platform/runs/${runId}/results/${resultId}/evaluations*`, route => route.fulfill({ json: { items: human ? [human, model] : [model], next_cursor: null } }));
+  await page.route(`**/api/platform/runs/${runId}/results/${resultId}/reviews`, async route => {
+    keys.push(route.request().headers()["idempotency-key"]);
+    const body = route.request().postDataJSON();
+    expect(body.reviewer).toBe("Synthetic browser reviewer");
+    expect(body.judgment).toEqual(factJudgment);
+    human = { ...model, id: dataset, kind: "human", reviewer: body.reviewer, output: { judgment: body.judgment, metrics: { ...metrics, faithfulness: metric(0), answer_correctness: metric(0) } }, attempts: 0 };
+    submissions++;
+    return submissions === 1 ? route.fulfill({ status: 503, json: { message: "Synthetic ambiguous review failure" } }) : route.fulfill({ status: 201, json: human });
+  });
+  await page.goto(`/runs/${runId}`);
+  await page.getByRole("button", { name: "Evaluate this answer", exact: true }).click();
+  await expect(page.getByRole("button", { name: "Run local judge", exact: true })).toBeDisabled();
+  await page.getByRole("button", { name: "Add human review", exact: true }).click();
+  await page.getByLabel("Reviewer name or label", { exact: true }).fill("Synthetic browser reviewer");
+  await page.getByLabel("Required fact 1:", { exact: false }).selectOption("missing");
+  await page.getByRole("button", { name: "Add factual claim", exact: true }).click();
+  await page.getByLabel("Exact answer excerpt", { exact: true }).fill("Synthetic model answer");
+  await page.getByLabel("Support in delivered evidence", { exact: true }).selectOption("unsupported");
+  await page.getByLabel("[P1]", { exact: true }).check();
+  await page.getByLabel("Review rationale", { exact: true }).fill("Synthetic browser review only.");
+  await page.getByLabel("I reviewed all facts, all answer claims, and the delivered evidence under this rubric.", { exact: true }).check();
+  await page.getByRole("button", { name: "Save human review", exact: true }).click();
+  await expect(page.locator(".human-review-form [role=alert]")).toContainText("Synthetic ambiguous review failure");
+  await expect(page.getByLabel("Review rationale", { exact: true })).toHaveValue("Synthetic browser review only.");
+  await page.getByRole("button", { name: "Save human review", exact: true }).click();
+  await expect(page.getByRole("status").filter({ hasText: "Review saved." })).toBeVisible();
+  expect(keys).toHaveLength(2);
+  expect(keys[0]).toBe(keys[1]);
+  await expect(page.getByRole("region", { name: "Answer assessment comparison" }).getByRole("row").filter({ hasText: "Faithfulness" })).toContainText("100.0 pp disagreement");
+  expect((await new AxeBuilder({ page }).withTags(["wcag2a", "wcag2aa", "wcag21aa"]).analyze()).violations).toEqual([]);
+  await page.screenshot({ path: "artifacts/evaluation-review-fixture-desktop.png", fullPage: true });
+  for (const width of [375, 768, 1024]) {
+    await page.setViewportSize({ width, height: 900 });
+    expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
+  }
+  await page.setViewportSize({ width: 375, height: 900 });
+  await page.screenshot({ path: "artifacts/evaluation-review-fixture-mobile.png", fullPage: true });
+});
+
 test("ambiguous submission preserves form and reuses its idempotency key", async ({ page }) => {
   await fixtures(page);
   let submissions = 0;
@@ -143,6 +194,11 @@ test("hybrid experiment saves candidate settings and distinguishes RRF, logits, 
     expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
   }
   await page.setViewportSize({ width: 375, height: 900 });
+  const rankingTable = page.getByRole("region", { name: "Fusion and reranking table" });
+  await rankingTable.focus();
+  await rankingTable.press("ArrowRight");
+  await expect.poll(() => rankingTable.evaluate(element => element.scrollLeft)).toBeGreaterThan(0);
+  expect(await rankingTable.locator("thead").evaluate(element => element.getBoundingClientRect().height)).toBeLessThan(80);
   await page.screenshot({ path: "artifacts/hybrid-fixture-mobile.png", fullPage: true });
 });
 
