@@ -38,7 +38,10 @@ def workflow(
     cleanup = create_database_engine(settings)
     with cleanup.begin() as connection:
         connection.execute(
-            text("TRUNCATE answer_evaluations,run_attempts,question_results,runs,experiments")
+            text(
+                "TRUNCATE export_jobs,comparisons,answer_evaluations,run_attempts,"
+                "question_results,runs,experiments"
+            )
         )
     cleanup.dispose()
     settings = settings.model_copy(update={"local_generation_enabled": True})

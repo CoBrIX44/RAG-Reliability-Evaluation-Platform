@@ -1,6 +1,8 @@
 "use client";
 
 import Link from "next/link";
+import { ExportButton } from "@/components/export-button";
+import { FailureExplorer } from "@/components/failure-explorer";
 import { AnswerEvaluation } from "@/components/answer-evaluation";
 import { useRef, useState } from "react";
 import { useRouter } from "next/navigation";
@@ -10,7 +12,7 @@ import { datasetSchema, datasetVersionSchema } from "@/lib/datasets";
 import { indexSchema } from "@/lib/indexes";
 import { attemptSchema, displayState, experimentSchema, metricNames, resultSchema, resultSummarySchema, runSchema, terminal, strategyLabel, rankingLabel, type Result, type Run } from "@/lib/runs";
 
-export function ExperimentWorkspace({ available, configured, workerReady, initialRunId }: { available: boolean; configured: boolean; workerReady: boolean; initialRunId?: string }) {
+export function ExperimentWorkspace({ available, configured, workerReady, initialRunId, initialResultId, failureRunId }: { available: boolean; configured: boolean; workerReady: boolean; initialRunId?: string; initialResultId?: string; failureRunId?: string }) {
   const router = useRouter();
   const [name, setName] = useState("");
   const [datasetId, setDatasetId] = useState("");
@@ -24,6 +26,8 @@ export function ExperimentWorkspace({ available, configured, workerReady, initia
   const [output, setOutput] = useState(128);
   const [repeats, setRepeats] = useState(1);
   const [seed, setSeed] = useState(0);
+  const [cacheCondition, setCacheCondition] = useState("uncontrolled");
+  const [measurementNotes, setMeasurementNotes] = useState("");
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState("");
   const [offset, setOffset] = useState(0);
@@ -40,8 +44,9 @@ export function ExperimentWorkspace({ available, configured, workerReady, initia
   const selectedIndex = readyIndexes.find(item => item.id === indexId) ?? readyIndexes[0];
   const loadError = versions.error || indexes.error || runs.error || experiments.error;
 
+  if (failureRunId) return <FailureExplorer runId={failureRunId} available={available} />;
   return <section className="experiment-workspace" aria-labelledby="experiment-title">
-    {initialRunId ? <><Link className="text-link" href="/experiments">← All experiments</Link><RunDetail key={initialRunId} id={initialRunId} available={available} /></> : <>
+    {initialRunId ? <><Link className="text-link" href="/experiments">← All experiments</Link><RunDetail key={initialRunId} id={initialRunId} available={available} initialResultId={initialResultId} /></> : <>
       <div className="section-topline"><h2 id="experiment-title">Run an experiment</h2><span className="outline-tag">Local CPU baseline</span></div>
       <p className="retrieval-intro">Freeze a reviewed dataset and a ready index. Compare an index baseline with hybrid rank fusion or cross-encoder reranking while keeping the local answer model and evidence budget fixed.</p>
       {!available && <p className="connection-message warning" role="status">Runs need PostgreSQL and the current API. <Link href="/settings">Check workspace setup.</Link></p>}
@@ -52,7 +57,7 @@ export function ExperimentWorkspace({ available, configured, workerReady, initia
       {available && !versions.isLoading && versions.data?.length === 0 && <p className="connection-message">Publish a reviewed dataset in <Link className="text-link" href="/datasets">Datasets</Link> to enable a run. Candidate questions cannot be run.</p>}
       <form className="experiment-form" onSubmit={event => { event.preventDefault(); setBusy(true); setError(""); void (async () => {
         try {
-          const payload = { name, dataset_version_id: selectedDataset?.id, index_id: selectedIndex?.id, split, top_k: topK, context_tokens: budget, max_new_tokens: output, repeats, seed, retrieval_strategy: retrievalStrategy, candidate_k: candidateK, rrf_k: rrfK };
+          const payload = { name, dataset_version_id: selectedDataset?.id, index_id: selectedIndex?.id, split, top_k: topK, context_tokens: budget, max_new_tokens: output, repeats, seed, cache_condition: cacheCondition, measurement_notes: measurementNotes, retrieval_strategy: retrievalStrategy, candidate_k: candidateK, rrf_k: rrfK };
           const fingerprint = JSON.stringify(payload);
           if (submission.current?.fingerprint !== fingerprint) submission.current = { fingerprint, key: crypto.randomUUID() };
           const experiment = experimentSchema.parse(await requestJSON("experiments", { method: "POST", headers: { "Content-Type": "application/json" }, body: fingerprint }));
@@ -80,7 +85,9 @@ export function ExperimentWorkspace({ available, configured, workerReady, initia
           <div className="field"><label htmlFor="experiment-output">Maximum answer tokens</label><input id="experiment-output" type="number" min={1} max={256} required value={output} disabled={busy} onChange={event => setOutput(Number(event.target.value))} /></div>
           <div className="field"><label htmlFor="experiment-repeats">Repeats per question</label><input id="experiment-repeats" type="number" min={1} max={3} required value={repeats} disabled={busy} onChange={event => setRepeats(Number(event.target.value))} /></div>
           <div className="field"><label htmlFor="experiment-seed">Base seed</label><input id="experiment-seed" type="number" min={0} max={2147483644} required value={seed} disabled={busy} onChange={event => setSeed(Number(event.target.value))} /></div>
-        </div><p className="muted-text">Greedy CPU generation. Repeats are fresh executions with seed + repeat; they do not create new independent questions. Evidence uses the answer tokenizer; the full prompt is checked against a 2,048-token limit.</p></details>
+          <div className="field"><label htmlFor="experiment-cache">Cache condition · operator declaration</label><select id="experiment-cache" value={cacheCondition} disabled={busy} onChange={event => setCacheCondition(event.target.value)}><option value="uncontrolled">Uncontrolled</option><option value="operator_cold_cache">Operator prepared cold cache</option><option value="operator_warm_cache">Operator prepared warm cache</option></select></div>
+          <div className="field"><label htmlFor="experiment-measurement">Measurement preparation notes</label><textarea id="experiment-measurement" maxLength={1000} required={cacheCondition !== "uncontrolled"} value={measurementNotes} disabled={busy} onChange={event => setMeasurementNotes(event.target.value)} /></div>
+        </div><p className="muted-text">Cache preparation is your declaration and is not automatically verified. Answer models load in fresh CPU processes per call. Do not label cache conditions as controlled without preparing and documenting them.</p><p className="muted-text">Greedy CPU generation. Repeats are fresh executions with seed + repeat; they do not create new independent questions. Evidence uses the answer tokenizer; the full prompt is checked against a 2,048-token limit.</p></details>
         <button className="button primary" disabled={busy || !available || !configured || !selectedDataset || !selectedIndex}>{busy ? "Submitting…" : "Start run"}</button>
       </form>
       <div className="section-topline"><h2>Recent experiment runs</h2><span className="muted-text">Persisted results · page {Math.floor(offset / 20) + 1}</span></div>
@@ -95,8 +102,8 @@ export function ExperimentWorkspace({ available, configured, workerReady, initia
   </section>;
 }
 
-function RunDetail({ id, available }: { id: string; available: boolean }) {
-  const [selected, setSelected] = useState("");
+function RunDetail({ id, available, initialResultId }: { id: string; available: boolean; initialResultId?: string }) {
+  const [selected, setSelected] = useState(initialResultId ?? "");
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState("");
   const run = useSWR(available ? `runs/${id}` : null, async path => runSchema.parse(await requestJSON(path)), { refreshInterval: data => data && terminal(data.state) ? 0 : 1500, shouldRetryOnError: false });
@@ -119,7 +126,7 @@ function RunDetail({ id, available }: { id: string; available: boolean }) {
       {row.error_message && <p className="connection-message warning" role="alert">{row.error_code}: {row.error_message} Completed results remain available.</p>}
       <p className="muted-text">{strategyLabel(row.manifest_summary.config.retrieval_strategy)} · Corpus {row.manifest_summary.corpus_version_id.slice(0, 8)} · dataset {row.manifest_summary.dataset_version_id.slice(0, 8)} · {row.attempts} worker claim(s)</p>
       <p><a className="text-link" href={`/api/platform/runs/${id}/manifest`} download={`run-${id}.json`}>Download frozen run manifest</a></p>
-      <Metrics run={row} />
+      <Link className="text-link" href={`/runs/${id}/failures`}>Open failure explorer</Link><ExportButton kind="run" id={id} enabled={terminal(row.state)} /><Metrics run={row} />
       <section className="question-results" aria-labelledby="questions-title"><div className="section-topline"><h2 id="questions-title">Question results</h2><span className="muted-text">Frozen question revision · repeat</span></div>
         {results.isLoading && <p role="status">Loading question results…</p>}
         {results.data && !results.data.length && <p className="connection-message">No question results have been published yet. Checkpoints appear below while the worker executes.</p>}
@@ -156,26 +163,27 @@ function PipelineTrace({ retrieval, published }: { retrieval: Result["trace"]["r
   </section>;
 }
 
-function QuestionTrace({ result, corpusVersion }: { result: Result; corpusVersion: string }) {
+export function QuestionTrace({ result, corpusVersion, readOnly = false, demoSources }: { result: Result; corpusVersion: string; readOnly?: boolean; demoSources?: Record<string, { id: string; heading_path: string[]; text: string; document_name?: string; source: { format: string; page?: number } }> }) {
   const [source, setSource] = useState<{ section: string; start: number; end: number } | null>(null);
-  const original = useSWR(source ? `corpus-versions/${corpusVersion}/sections/${source.section}` : null, async path => sectionSchema.parse(await requestJSON(path)), { shouldRetryOnError: false });
+  const original = useSWR(source && !demoSources ? `corpus-versions/${corpusVersion}/sections/${source.section}` : null, async path => sectionSchema.parse(await requestJSON(path)), { shouldRetryOnError: false });
+  const sourceData = source && demoSources ? demoSources[source.section] : original.data;
   const trace = result.trace, question = trace.question.content, answer = trace.generation;
   function spanLink(span: { section_id: string; start_offset: number; end_offset: number }, label: string) {
     return <button className="text-link" onClick={() => setSource({ section: span.section_id, start: span.start_offset, end: span.end_offset })}>{label} · {span.start_offset}–{span.end_offset}</button>;
   }
   return <article className="question-trace" aria-labelledby="trace-title">
-    <h3 id="trace-title">Question trace</h3><p className="trace-question">{question.text}</p><p className="muted-text">{question.topic} · {question.difficulty} · {question.split} · {question.answerable ? "Answerable" : "Unanswerable"} · reviewed by {question.reviewer}</p>
+    <h3 id="trace-title">Question trace</h3><p className="trace-question">{question.text}</p><p className="muted-text">{question.topic} · {question.difficulty} · {question.split} · {question.answerable ? "Answerable" : "Unanswerable"} · {readOnly ? "synthetic fixture annotations" : `reviewed by ${question.reviewer}`}</p>
     {trace.error && <p className="connection-message warning" role="alert">{trace.error.stage}: {trace.error.code} — {trace.error.message}</p>}
-    <h4>Generated answer</h4>{answer ? <><pre className="answer-text">{answer.answer || "Empty model output"}</pre><p className="muted-text">{answer.input_tokens} input / {answer.output_tokens} output tokens · finish: {answer.finish_reason} · exact abstention marker: {answer.abstained ? "yes" : "no"}</p>{answer.finish_reason === "length" && <p className="connection-message warning">The answer reached its token limit and may be incomplete.</p>}<p className="muted-text">Recognized references: {answer.citations.join(", ") || "none"} · unknown references: {answer.unknown_citations.join(", ") || "none"}. Citation syntax alone does not establish support. Inspect answer evaluations below.</p></> : <p className="connection-message">Answer unavailable. Inspect the execution error and retained retrieval evidence.</p>}
-    {answer && <AnswerEvaluation result={result} />}
+    <h4>{readOnly ? "Illustrative answer" : "Generated answer"}</h4>{answer ? <><pre className="answer-text">{answer.answer || "Empty model output"}</pre><p className="muted-text">{answer.input_tokens ?? "unavailable"} input / {answer.output_tokens ?? "unavailable"} output tokens · finish: {readOnly ? "not executed (fixture)" : answer.finish_reason} · exact abstention marker: {answer.abstained ? "yes" : "no"}</p>{answer.finish_reason === "length" && <p className="connection-message warning">The answer reached its token limit and may be incomplete.</p>}<p className="muted-text">Recognized references: {answer.citations.join(", ") || "none"} · unknown references: {answer.unknown_citations.join(", ") || "none"}. Citation syntax alone does not establish support. {readOnly ? "No answer-quality assessment was performed in this fixture." : "Inspect answer evaluations below."}</p></> : <p className="connection-message">Answer unavailable. Inspect the execution error and retained retrieval evidence.</p>}
+    {answer && !readOnly && <AnswerEvaluation result={result} />}
     <PipelineTrace retrieval={trace.retrieval ?? trace.retrieval_candidates} published={!!trace.retrieval} />
     {trace.retrieval_candidates && <details className="retained-candidates"><summary>Retained candidates before reranking ({trace.retrieval_candidates.hits.length})</summary><p className="muted-text">This checkpoint precedes reranking and does not establish a final retrieval score.</p>{trace.retrieval_candidates.hits.map(hit => <div className="trace-passage" key={hit.chunk.id}><strong>Fused candidate {hit.rank} · RRF {hit.score.toFixed(6)}</strong><pre>{hit.chunk.text}</pre>{hit.chunk.spans.map((span, i) => <div key={i}>{spanLink(span, `Candidate source ${span.section_id.slice(0, 8)}`)}</div>)}</div>)}</details>}
     <div className="trace-evidence-grid">
       <section aria-labelledby="retrieved-title"><h4 id="retrieved-title">Retrieved passages</h4><p className="muted-text">Recall: {trace.retrieval_scores?.recall == null ? "unavailable / not applicable" : `${(trace.retrieval_scores.recall * 100).toFixed(1)}%`} · {trace.retrieval?.returned_count ?? 0} passages before packing</p>{trace.retrieval?.hits.map(hit => <div className="trace-passage" key={hit.chunk.id}><strong>Rank {hit.rank} · {rankingLabel(trace.retrieval?.strategy)} {hit.score.toFixed(4)}</strong><pre>{hit.chunk.text}</pre>{hit.chunk.spans.map((span, i) => <div key={i}>{spanLink(span, `Original source ${span.section_id.slice(0, 8)}`)}</div>)}</div>)}{trace.retrieval?.hits.length === 0 && <p>No passages retrieved.</p>}</section>
-      <section aria-labelledby="context-title"><h4 id="context-title">Delivered context</h4>{answer ? <><p className="muted-text">{answer.context.token_count}/{answer.context.token_budget} evidence tokens · recall {trace.context_scores?.recall == null ? "unavailable / not applicable" : `${(trace.context_scores.recall * 100).toFixed(1)}%`}</p><p className="muted-text">{answer.context.truncated_chunk_ids.length} truncated · {answer.context.omitted_chunk_ids.length} omitted</p>{answer.context.passages.map((passage, i) => <div className="trace-passage" key={passage.id}><strong>[P{i + 1}] · {passage.token_count} answer-tokenizer tokens</strong><pre>{passage.text}</pre>{passage.spans.map((span, j) => <div key={j}>{spanLink(span, `Delivered source ${span.section_id.slice(0, 8)}`)}</div>)}</div>)}{!answer.context.passages.length && <p>No evidence delivered.</p>}</> : <p>Delivered context unavailable.</p>}</section>
+      <section aria-labelledby="context-title"><h4 id="context-title">Delivered context</h4>{answer ? <><p className="muted-text">{answer.context.token_count}/{answer.context.token_budget} evidence tokens · recall {trace.context_scores?.recall == null ? "unavailable / not applicable" : `${(trace.context_scores.recall * 100).toFixed(1)}%`}</p><p className="muted-text">{answer.context.truncated_chunk_ids.length} truncated · {answer.context.omitted_chunk_ids.length} omitted</p>{answer.context.passages.map((passage, i) => <div className="trace-passage" key={passage.id}><strong>[P{i + 1}] · {passage.token_count} {readOnly ? "illustrative tokens" : "answer-tokenizer tokens"}</strong><pre>{passage.text}</pre>{passage.spans.map((span, j) => <div key={j}>{spanLink(span, `Delivered source ${span.section_id.slice(0, 8)}`)}</div>)}</div>)}{!answer.context.passages.length && <p>No evidence delivered.</p>}</> : <p>Delivered context unavailable.</p>}</section>
     </div>
     <section className="gold-evidence" aria-labelledby="gold-title"><h4 id="gold-title">Gold evidence and reference answer</h4><pre>{question.reference_answer}</pre>{question.required_facts.map((fact, i) => <p key={i}>Required fact {i + 1}: {fact}</p>)}{question.evidence_groups.map((group, i) => <div key={i}><strong>Fact {group.fact_index + 1}</strong>{group.alternatives.map((alternative, j) => <div key={j}><p className="muted-text">Accepted alternative {j + 1} · all spans required</p>{alternative.spans.map((span, k) => <div key={k}>{spanLink(span, `Gold source ${span.section_id.slice(0, 8)}`)}</div>)}</div>)}</div>)}{!question.evidence_groups.length && <p>No positive gold evidence for this question.</p>}</section>
-    {source && <section className="source-section" aria-label="Original canonical source"><div className="section-topline"><h4>Original canonical source</h4><button className="button subtle" onClick={() => setSource(null)}>Close source</button></div>{original.isLoading && <p role="status">Loading source…</p>}{original.error && <p role="alert">Could not load the original source. <button className="text-link" onClick={() => { void original.mutate(); }}>Retry source</button></p>}{original.data && <><p className="muted-text">{original.data.document_name ?? "Published source"} · {original.data.heading_path.join(" / ")} · {original.data.source.format}{original.data.source.page ? ` page ${original.data.source.page}` : ""} · section {source.section} · Unicode offsets {source.start}–{source.end}</p><pre className="source-text">{Array.from(original.data.text).slice(0, source.start).join("")}<mark>{Array.from(original.data.text).slice(source.start, source.end).join("")}</mark>{Array.from(original.data.text).slice(source.end).join("")}</pre></>}</section>}
-    <details><summary>Executed prompt, runtime, timings, and attempts</summary>{answer && <><p className="muted-text">Prompt SHA-256: {answer.prompt_hash}</p><pre>{answer.prompt}</pre><pre>{JSON.stringify(answer.metadata, null, 2)}</pre></>}<p className="muted-text">Query embedding metadata</p><pre>{JSON.stringify(trace.retrieval?.embedding ?? { state: "not_applicable" }, null, 2)}</pre><p className="muted-text">Stage wall times in milliseconds; generation includes model hashing/loading. Shared preparation and queue time are outside these question timings.</p><pre>{JSON.stringify(trace.timings, null, 2)}</pre><ul>{result.attempts.map(attempt => <li key={attempt.id}>Attempt {attempt.ordinal}: {attempt.state}{attempt.error_code ? ` · ${attempt.error_code}` : ""}</li>)}</ul></details>
+    {source && <section className="source-section" aria-label="Original canonical source"><div className="section-topline"><h4>Original canonical source</h4><button className="button subtle" onClick={() => setSource(null)}>Close source</button></div>{original.isLoading && <p role="status">Loading source…</p>}{original.error && <p role="alert">Could not load the original source. <button className="text-link" onClick={() => { void original.mutate(); }}>Retry source</button></p>}{sourceData && <><p className="muted-text">{sourceData.document_name ?? "Published source"} · {sourceData.heading_path.join(" / ")} · {sourceData.source.format}{sourceData.source.page ? ` page ${sourceData.source.page}` : ""} · section {source.section} · Unicode offsets {source.start}–{source.end}</p><pre className="source-text">{Array.from(sourceData.text).slice(0, source.start).join("")}<mark>{Array.from(sourceData.text).slice(source.start, source.end).join("")}</mark>{Array.from(sourceData.text).slice(source.end).join("")}</pre></>}</section>}
+    <details><summary>{readOnly ? "Fixture prompt, metadata, and annotations" : "Executed prompt, runtime, timings, and attempts"}</summary>{answer && <><p className="muted-text">Prompt SHA-256: {answer.prompt_hash}</p><pre>{answer.prompt}</pre><pre>{JSON.stringify(answer.metadata, null, 2)}</pre></>}<p className="muted-text">Query embedding metadata</p><pre>{JSON.stringify(trace.retrieval?.embedding ?? { state: "not_applicable" }, null, 2)}</pre><p className="muted-text">Stage wall times in milliseconds; generation includes model hashing/loading. Shared preparation and queue time are outside these question timings.</p><pre>{JSON.stringify(trace.timings, null, 2)}</pre><ul>{result.attempts.map(attempt => <li key={attempt.id}>Attempt {attempt.ordinal}: {attempt.state}{attempt.error_code ? ` · ${attempt.error_code}` : ""}</li>)}</ul></details>
   </article>;
 }

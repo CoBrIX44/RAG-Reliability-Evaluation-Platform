@@ -22,7 +22,7 @@ test("empty workspace explains capability limits and every destination works", a
   await expect(page.getByRole("button", { name: "Create dataset" })).toBeDisabled();
   await expect(page.getByText("Dataset curation needs PostgreSQL", { exact: false })).toBeVisible();
   await page.getByRole("link", { name: "Comparisons", exact: true }).click();
-  await expect(page.getByText("Paired comparisons arrive in M5.", { exact: false })).toBeVisible();
+  await expect(page.getByText("Comparisons need the current API and PostgreSQL.", { exact: false })).toBeVisible();
 });
 
 test("connection errors are actionable and refresh recovers", async ({ page }) => {

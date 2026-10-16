@@ -1,6 +1,6 @@
 # RAG Reliability & Evaluation Platform
 
-Status: approved design; M1-M4 implemented and locally verified, including ingestion, reviewed datasets, lexical/dense retrieval, saved local CPU runs and question traces. M5 retrieval variants and versioned answer evaluation/local judge/human review are implemented; paired/bootstrap/timing/cost analysis and M6-M7 remain. No research benchmark results exist. See TASKS.md.
+Status: approved design; M1-M4 implemented and locally verified, including ingestion, reviewed datasets, lexical/dense retrieval, saved local CPU runs and question traces. M5 retrieval, answer evaluation/review, paired/bootstrap and timing/cost-accounting workflows are implemented; M6 charts, subgroup filters, failure explorer, evidence ZIPs and the offline read-only demo are implemented and locally verified. M7 benchmark/delivery remains. No research benchmark results exist. See TASKS.md.
 
 ## Problem and purpose
 Researchers need to distinguish retrieval failures from generation failures and compare RAG methods using the same documents, questions, and scoring protocol. This product provides document ingestion, curated datasets, reproducible experiment execution, comparison dashboards, and evidence-level failure analysis.

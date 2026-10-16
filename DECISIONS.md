@@ -86,3 +86,12 @@ Persist source-linked fusion candidates before reranking. If reranking fails or 
 
 ## 2026-10-15 - Independent answer assessments
 Use a versioned built-in rubric frozen in each evaluation manifest. Keep post-hoc model jobs and explicit human reviews separate from immutable original question results. New keys append attempts/reviews; latest-per-source read projections include failures rather than silently falling back to older scores. This preserves provenance and exposes disagreement/coverage. Use the already approved free local Qwen weights for an opt-in experimental judge adapter with a separate bounded prompt and strict validation. Its small size/self-judge dependence limits calibration; the live malformed response is retained as failed, not repaired into a score. No new paid provider or benchmark/human label is authorized or invented.
+
+
+## 2026-10-15 - Freeze paired analyses and resample groups
+Persist independently leased comparison snapshots so later reviews cannot change past statistics. Use all-repeat question means and whole split-group percentile bootstrap; unequal-sized groups retain question-weighted estimation, not equal group weights. Strict controlled/coverage mismatches block inference; explicit exploratory analyses keep warnings/exclusions, and scoring-policy mismatches never silently mix. Require two groups for an interval and record insufficient sample status. Observe timing/usage from existing immutable evidence; unknown billing/local compute cost stays null. Operator cache conditions are recorded declarations rather than claimed measurements. This implements M5 software capability while reserving real curated/controlled research execution for M7.
+
+## 2026-10-15: M6 immutable subgroups and evidence archives
+Topic/difficulty selections create new frozen paired analyses rather than mutate saved reports. Recompute selected timing samples while retaining a separately labeled full-run ledger. Accessible charts retain equivalent tables; unavailable quality is never drawn at zero.
+
+Use a seventh leased worker queue and schema 0010_exports for bounded, checksummed ZIPs. Freeze source/result/evaluation membership at submission; pending scores do not appear later. Comparison bundles use selected evaluations and attempts terminal at the comparison cutoff. Include canonical text/chunks/vectors and matching code/lock bytes; explicitly disclose missing historical bytes and excluded binaries/weights. Keep exact source/result deep links and provide a standalone offline synthetic demo with no submission capabilities.

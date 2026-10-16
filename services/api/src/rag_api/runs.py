@@ -1,8 +1,9 @@
-from typing import Annotated
+from typing import Annotated, Literal
 from uuid import UUID
 
-from fastapi import APIRouter, Header
+from fastapi import APIRouter, Header, Query
 from pydantic import BaseModel, ConfigDict
+from rag_core.diagnostics import diagnostics
 from rag_core.runs import (
     AttemptView,
     ExperimentCreate,
@@ -26,6 +27,27 @@ class RunSubmit(BaseModel):
 def run_router(engine: Engine, settings: Settings) -> APIRouter:
     router = APIRouter(prefix="/api/v1")
     store = RunStore(engine, settings)
+
+    @router.get("/runs/{run_id}/diagnostics")
+    def inspect_failures(
+        run_id: UUID,
+        source: Literal["human", "model"] = "human",
+        topic: Annotated[str, Query(max_length=120)] = "",
+        difficulty: Literal["", "easy", "medium", "hard"] = "",
+        issue: Annotated[str, Query(max_length=80)] = "",
+        limit: Limit = 100,
+        cursor: Cursor = 0,
+    ) -> dict[str, object]:
+        return diagnostics(
+            engine,
+            run_id,
+            source=source,
+            topic=topic,
+            difficulty=difficulty,
+            issue=issue,
+            limit=limit,
+            cursor=cursor,
+        )
 
     @router.get("/experiments", response_model=Page[ExperimentView])
     def experiments(limit: Limit = 100, cursor: Cursor = 0) -> Page[ExperimentView]:

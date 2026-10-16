@@ -3,6 +3,7 @@
 import contextlib
 import hashlib
 import json
+import time
 from datetime import datetime, timedelta
 from threading import Event, Thread
 from typing import Literal
@@ -341,6 +342,7 @@ class IndexQueue(IndexStore):
         chunks: list[Chunk],
         tokenizer: PinnedTokenizer,
         encoded: EmbeddingOutput | None = None,
+        build_elapsed_ms: float | None = None,
     ) -> None:
         with Session(self.engine) as session, session.begin():
             row = self.owned(session, index_id, token)
@@ -403,6 +405,8 @@ class IndexQueue(IndexStore):
                 "chunk_count": len(chunks),
                 "config": row.config,
             }
+            if build_elapsed_ms is not None:
+                row.manifest["build_elapsed_ms"] = build_elapsed_ms
             if encoded:
                 row.manifest["embedding"] = encoded.metadata
             row.chunk_count, row.state = len(chunks), "ready"
@@ -421,6 +425,7 @@ class IndexQueue(IndexStore):
             row.lease_token = row.lease_expires_at = None
 
     def process(self, index_id: UUID, token: UUID, stop: Event) -> None:
+        started = time.monotonic()
         finished, lost = Event(), Event()
 
         def keep_alive() -> None:
@@ -471,7 +476,14 @@ class IndexQueue(IndexStore):
                     [chunk.text for chunk in chunks], self.settings, stop, lost, allow_download=True
                 )
             if not stop.is_set() and not lost.is_set():
-                self.complete(index_id, token, chunks, tokenizer, encoded)
+                self.complete(
+                    index_id,
+                    token,
+                    chunks,
+                    tokenizer,
+                    encoded,
+                    build_elapsed_ms=(time.monotonic() - started) * 1000,
+                )
         except LostLease:
             pass
         except Exception as error:

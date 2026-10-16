@@ -15,6 +15,7 @@ from pydantic import BaseModel, ConfigDict, Field
 from rag_core.answer_evaluation import RUBRIC, Judgment, validate_judgment
 from rag_core.errors import LostLease, PlatformError
 from rag_core.generation import generation_contract
+from rag_core.processes import hidden_window_flags
 from rag_core.settings import Settings
 
 JUDGE_PROMPT = (
@@ -121,7 +122,7 @@ def run_judge_child(
             stdin=subprocess.DEVNULL,
             stdout=subprocess.DEVNULL,
             stderr=subprocess.DEVNULL,
-            creationflags=subprocess.CREATE_NO_WINDOW if os.name == "nt" else 0,
+            creationflags=hidden_window_flags(),
         )
         started = time.monotonic()
         try:

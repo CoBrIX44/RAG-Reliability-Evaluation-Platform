@@ -67,3 +67,14 @@ Keep the worker's four-CPU/4-GiB bounds and never run a worker against rag_test.
 
 ## Answer-evaluation upgrade
 Migration head is now 0008_answer_evaluations. Build all Python services including the separate migrate image: `docker compose build api worker migrate web`, then `docker compose up -d`. Stale migrate images leave new API/worker readiness at schema_mismatch; rebuilding only api/worker is insufficient. Preserve named volumes. `.env.example` keeps LOCAL_JUDGE_ENABLED=false; enable only for optional uncalibrated local model estimates, with matching API/worker source and settings. The judge uses cached pinned Qwen weights offline, generation thread/timeout bounds, 4096 input/768 output tokens and no tools/paid provider. Human review needs PostgreSQL but not the judge. Never reset immutable runs/evaluations after an upgrade; use a new key for a new execution. Unknown local compute cost remains unavailable.
+
+
+## Paired-comparison upgrade
+Migration head is 0009_comparisons. Build api, worker, migrate and web together, then start Compose; preserve all named volumes and existing immutable data. Worker now rotates six durable queues, including bounded bootstrap analysis. `.env` currently declares 3091827-dirty for new submissions; older saved manifests retain their original identities. No new dependency/provider credential is required. Keep API/worker execution identity matched for analysis/recovery. Cached model weights, source uploads and published snapshots are unchanged. Comparison snapshots/reports survive restarts; new reviews require a new comparison key to enter a report. Operator cold/warm cache notes do not automatically manage OS/model caches, and unknown local cost stays unavailable.
+
+## M6 upgrade and evidence artifacts
+Rebuild api, worker, migrate and web together, then run docker compose up -d. Readiness requires 0010_exports; keep API/worker execution identities and settings matched. Preserve all named PostgreSQL, artifact and model volumes. Do not use down -v or prune for an upgrade.
+
+MAX_EXPORT_BYTES defaults to 209715200 (200 MiB uncompressed) and is bounded to 1 GiB; archives are also capped at 20,000 entries. Matching API/worker caps are frozen into jobs. Oversized jobs fail visibly without publishing partial output. ZIP generation belongs to the worker, with retries and stale-lease fencing; downloads stream from the retained artifact volume.
+
+Verify the downloaded ZIP SHA-256 against output.sha256 and each entry against checksums.json. Bundles include potentially private raw prompts, answers and full canonical corpus/index evidence; retain them locally under the existing trusted-workspace policy. They omit uploaded binaries/model weights. provenance/availability.json lists missing or changed historical code instead of substituting current bytes. Service restart persistence is verified; complete backup/restore and controlled performance measurements remain M7.

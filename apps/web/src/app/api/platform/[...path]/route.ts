@@ -5,9 +5,11 @@ const allowed = /^(corpora(?:\/[0-9a-f-]{36}(?:\/(?:documents|versions))?)?|docu
 async function proxy(request: NextRequest, context: { params: Promise<{ path: string[] }> }) {
   const { path } = await context.params;
   const target = path.join("/");
-  const runRoute = /^(experiments(?:\/[0-9a-f-]{36}\/runs)?|runs(?:\/[0-9a-f-]{36}(?:\/(?:cancel|manifest|attempts|evaluations|results(?:\/[0-9a-f-]{36})?))?)?)$/i.test(target);
+  const runRoute = /^(experiments(?:\/[0-9a-f-]{36}\/runs)?|runs(?:\/[0-9a-f-]{36}(?:\/(?:cancel|manifest|attempts|diagnostics|evaluations|results(?:\/[0-9a-f-]{36})?))?)?)$/i.test(target);
   const evaluationRoute = /^(evaluation-rubric|runs\/[0-9a-f-]{36}\/results\/[0-9a-f-]{36}\/(?:evaluations|reviews))$/i.test(target);
-  if (!evaluationRoute && !runRoute && !/^dense-searches\/[0-9a-f-]{36}(?:\/retry)?$/i.test(target) && !allowed.test(target) && !/^indexes(?:\/[0-9a-f-]{36}(?:\/(?:retry|search|dense-searches))?)?$/i.test(target)) return NextResponse.json({ message: "Route not found." }, { status: 404 });
+  const comparisonRoute = /^comparisons(?:\/facets|\/[0-9a-f-]{36}(?:\/manifest)?)?$/i.test(target);
+  const exportRoute = /^exports(?:\/latest|\/[0-9a-f-]{36}(?:\/download)?)?$/i.test(target);
+  if (!exportRoute && !comparisonRoute && !evaluationRoute && !runRoute && !/^dense-searches\/[0-9a-f-]{36}(?:\/retry)?$/i.test(target) && !allowed.test(target) && !/^indexes(?:\/[0-9a-f-]{36}(?:\/(?:retry|search|dense-searches))?)?$/i.test(target)) return NextResponse.json({ message: "Route not found." }, { status: 404 });
   const origin = request.headers.get("origin");
   const expectedOrigin = `${request.nextUrl.protocol}//${request.headers.get("host") ?? request.nextUrl.host}`;
   if (["POST", "PATCH"].includes(request.method) && origin && origin !== expectedOrigin) {
@@ -26,6 +28,7 @@ async function proxy(request: NextRequest, context: { params: Promise<{ path: st
     };
     if (["POST", "PATCH"].includes(request.method)) { options.body = request.body; options.duplex = "half"; }
     const response = await fetch(url, options);
+    if (response.ok && target.endsWith("/download")) return new NextResponse(response.body, { headers: { "Content-Type": "application/zip", "Content-Disposition": response.headers.get("content-disposition") ?? "attachment", "X-Content-Type-Options": "nosniff", "Cache-Control": "private, no-store" } });
     if (response.ok && target.endsWith("/export")) return new NextResponse(response.body, {
       headers: { "Content-Type": "application/x-ndjson", "Content-Disposition": response.headers.get("content-disposition") ?? "attachment" },
     });

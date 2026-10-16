@@ -16,9 +16,11 @@ from sqlalchemy.exc import SQLAlchemyError
 from starlette.exceptions import HTTPException
 from starlette.responses import JSONResponse
 
+from rag_api.comparisons import comparison_router
 from rag_api.datasets import dataset_router
 from rag_api.documents import document_router
 from rag_api.evaluations import evaluation_router
+from rag_api.exports import export_router
 from rag_api.indexes import index_router
 from rag_api.limits import BodyLimit
 from rag_api.runs import run_router
@@ -40,6 +42,9 @@ class WorkspaceStatus(BaseModel):
         "hybrid_retrieval",
         "cross_encoder_reranking",
         "answer_evaluation",
+        "paired_comparisons",
+        "evidence_exports",
+        "failure_explorer",
     ]
     generation_configured: bool
     judge_configured: bool
@@ -78,6 +83,8 @@ def create_app(
     application.include_router(index_router(engine, config))
     application.include_router(run_router(engine, config))
     application.include_router(evaluation_router(engine, config))
+    application.include_router(comparison_router(engine, config))
+    application.include_router(export_router(engine, config))
 
     @application.get("/api/v1/health/live")
     def live() -> dict[str, str]:
@@ -115,6 +122,9 @@ def create_app(
                 "hybrid_retrieval",
                 "cross_encoder_reranking",
                 "answer_evaluation",
+                "paired_comparisons",
+                "evidence_exports",
+                "failure_explorer",
             ],
             "retrieval_strategies": [
                 "postgresql_lexical",

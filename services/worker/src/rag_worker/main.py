@@ -5,9 +5,11 @@ import logging
 import signal
 from threading import Event
 
+from rag_core.comparisons import ComparisonQueue
 from rag_core.database import create_database_engine, inspect_database, record_worker_heartbeat
 from rag_core.dense_searches import DenseSearchQueue
 from rag_core.evaluations import EvaluationQueue
+from rag_core.exports import ExportQueue
 from rag_core.indexes import IndexQueue
 from rag_core.jobs import IngestionQueue
 from rag_core.run_worker import RunQueue
@@ -33,6 +35,8 @@ def main() -> int:
     previews = DenseSearchQueue(engine, settings)
     runs = RunQueue(engine, settings)
     evaluations = EvaluationQueue(engine, settings)
+    comparisons = ComparisonQueue(engine, settings)
+    exports = ExportQueue(engine, settings)
     next_queue = 0
     for signum in (signal.SIGINT, signal.SIGTERM):
         signal.signal(signum, lambda _signum, _frame: stop.set())
@@ -49,7 +53,15 @@ def main() -> int:
                 try:
                     record_worker_heartbeat(engine)
                     # Rotate queue priority to keep each kind of durable work eligible.
-                    all_processors = (queue, indexes, previews, runs, evaluations)
+                    all_processors = (
+                        queue,
+                        indexes,
+                        previews,
+                        runs,
+                        evaluations,
+                        comparisons,
+                        exports,
+                    )
                     processors = all_processors[next_queue:] + all_processors[:next_queue]
                     for processor in processors:
                         if claim := processor.claim():

@@ -18,6 +18,7 @@ from pydantic import BaseModel, ConfigDict, Field, model_validator
 from rag_core.chunking import Chunk
 from rag_core.context import PackedContext
 from rag_core.errors import LostLease, PlatformError
+from rag_core.processes import hidden_window_flags
 from rag_core.settings import Settings
 
 MODEL_ID = "Qwen/Qwen2.5-0.5B-Instruct"
@@ -154,7 +155,7 @@ def run_generation_child(
             stdin=subprocess.DEVNULL,
             stdout=subprocess.DEVNULL,
             stderr=subprocess.DEVNULL,
-            creationflags=subprocess.CREATE_NO_WINDOW if os.name == "nt" else 0,
+            creationflags=hidden_window_flags(),
         )
         started = time.monotonic()
         try:

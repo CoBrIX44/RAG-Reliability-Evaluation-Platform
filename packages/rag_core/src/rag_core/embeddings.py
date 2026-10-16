@@ -15,6 +15,7 @@ from threading import Event
 from pydantic import BaseModel, ConfigDict, Field, model_validator
 
 from rag_core.errors import LostLease, PlatformError
+from rag_core.processes import hidden_window_flags
 from rag_core.settings import Settings
 from rag_core.tokenization import BASELINE_TOKENIZER_ID, BASELINE_TOKENIZER_REVISION
 
@@ -157,7 +158,7 @@ def run_embeddings(
             stdin=subprocess.DEVNULL,
             stdout=subprocess.DEVNULL,
             stderr=subprocess.DEVNULL,
-            creationflags=subprocess.CREATE_NO_WINDOW if os.name == "nt" else 0,
+            creationflags=hidden_window_flags(),
         )
         started = time.monotonic()
         try:

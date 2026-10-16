@@ -6,6 +6,7 @@ import useSWR from "swr";
 import { Icon } from "@/components/icon";
 import { DocumentWorkspace } from "@/components/documents";
 import { DatasetWorkspace } from "@/components/datasets";
+import { ComparisonWorkspace } from "@/components/comparisons";
 import { ExperimentWorkspace } from "@/components/experiments";
 import { RetrievalWorkspace } from "@/components/retrieval";
 import { sections, workspaceSchema, type Section, type WorkspaceStatus } from "@/lib/workspace";
@@ -18,7 +19,7 @@ const copy: Record<Section, { title: string; description: string }> = {
   settings: { title: "Workspace setup", description: "Check the services that power your local research environment." },
 };
 
-export function Workspace({ section, initialRunId }: { section: Section; initialRunId?: string }) {
+export function Workspace({ section, initialRunId, initialComparisonId, initialResultId, failureRunId }: { section: Section; initialRunId?: string; initialComparisonId?: string; initialResultId?: string; failureRunId?: string }) {
   const { data, error, isLoading, isValidating, mutate } = useSWR<WorkspaceStatus>("/api/workspace", fetchWorkspace, {
     refreshInterval: 15_000,
     shouldRetryOnError: false,
@@ -28,7 +29,7 @@ export function Workspace({ section, initialRunId }: { section: Section; initial
   const [menuOpen, setMenuOpen] = useState(false);
   const apiAvailable = workspace !== null && !error;
   const dbReady = apiAvailable && workspace.database.status === "ready";
-  const current = copy[section];
+  const current = failureRunId ? { title: "Run diagnostics", description: "Inspect frozen answers, retrieval coverage, and evaluation signals." } : copy[section];
 
   return <div className="app-shell">
     <a className="skip-link" href="#main">Skip to main content</a>
@@ -53,7 +54,7 @@ export function Workspace({ section, initialRunId }: { section: Section; initial
         <strong>PostgreSQL documentation</strong><p>Versioned sources.<br />Evidence-grounded answers.</p>
         <span className="outline-tag">Local workspace</span>
       </div>
-      <div className="sidebar-footer"><span className="tiny-mark">RO</span><span>Local baselines<small>v0.1.0</small></span></div>
+      <div className="sidebar-footer"><span className="tiny-mark">RO</span><span>Local workspace<small>v0.1.0</small></span></div>
     </aside>
 
     <div className="main-shell">
@@ -67,13 +68,13 @@ export function Workspace({ section, initialRunId }: { section: Section; initial
           {section !== "settings" && <Link className={`button ${(section === "documents" || section === "datasets" || section === "experiments") ? "subtle" : "primary"}`} href="/settings">View setup<Icon name="arrow" /></Link>}
         </div>
 
-        <div className="foundation-notice"><span className="notice-label">LOCAL RELEASE</span>
-          <p>Upload documents, curate reviewed datasets, and run lexical, dense, or hybrid retrieval with local CPU answers. Inspect saved retrieval metrics and question evidence.</p></div>
+        {!initialRunId && !initialComparisonId && !failureRunId && <div className="foundation-notice"><span className="notice-label">LOCAL RELEASE</span>
+          <p><Link className="text-link" href="/demo">Explore the read-only demo</Link>. Upload documents, curate reviewed datasets, and run lexical, dense, or hybrid retrieval with local CPU answers. Inspect saved retrieval metrics and question evidence.</p></div>}
 
         {section === "experiments" && <>
-          <ExperimentWorkspace available={dbReady && !!workspace?.capabilities.includes("experiment_runs")} configured={!!workspace?.generation_configured} workerReady={workspace?.database.worker_status === "ready"} initialRunId={initialRunId} />
-          {!initialRunId && <RetrievalWorkspace available={dbReady && !!workspace?.capabilities.includes("lexical_indexing")} workerReady={workspace?.database.worker_status === "ready"} />}
-          {!initialRunId && <section className="workflow" aria-labelledby="workflow-title"><div className="section-topline"><h2 id="workflow-title">From source to finding</h2><span className="muted-text">The research workflow</span></div>
+          <ExperimentWorkspace available={dbReady && !!workspace?.capabilities.includes("experiment_runs")} configured={!!workspace?.generation_configured} workerReady={workspace?.database.worker_status === "ready"} initialRunId={initialRunId} initialResultId={initialResultId} failureRunId={failureRunId} />
+          {!initialRunId && !failureRunId && <RetrievalWorkspace available={dbReady && !!workspace?.capabilities.includes("lexical_indexing")} workerReady={workspace?.database.worker_status === "ready"} />}
+          {!initialRunId && !failureRunId && <section className="workflow" aria-labelledby="workflow-title"><div className="section-topline"><h2 id="workflow-title">From source to finding</h2><span className="muted-text">The research workflow</span></div>
             <div className="workflow-steps">
               <WorkflowStep number="01" title="Prepare the evidence" text="Freeze a document corpus and annotate the passages that support each question." href="/documents" icon="documents" />
               <WorkflowStep number="02" title="Run controlled experiments" text="Keep the questions and answer model fixed. Change the retrieval strategy." href="/datasets" icon="experiments" />
@@ -85,9 +86,7 @@ export function Workspace({ section, initialRunId }: { section: Section; initial
 
         {section === "documents" && <DocumentWorkspace available={dbReady && !!workspace?.capabilities.includes("document_ingestion")} workerReady={workspace?.database.worker_status === "ready"} />}
         {section === "datasets" && <DatasetWorkspace available={dbReady && !!workspace?.capabilities.includes("dataset_curation")} />}
-        {section === "comparisons" && <Placeholder icon="comparisons" title="Find the difference that matters."
-          text="Paired comparisons will separate retrieval quality, answer correctness, faithfulness, latency, and cost. Missing scores will remain visible."
-          detail="Paired comparisons arrive in M5. Saved runs and per-question evidence are available in Experiments." />}
+        {section === "comparisons" && <ComparisonWorkspace available={dbReady && !!workspace?.capabilities.includes("paired_comparisons")} workerReady={workspace?.database.worker_status === "ready"} initialId={initialComparisonId} />}
 
         {section === "settings" && <section className="setup-section" aria-labelledby="services-title">
           <div className="section-topline"><h2 id="services-title">Service connections</h2>
@@ -125,11 +124,6 @@ function WorkflowStep({ number, title, text, href, icon }: { number: string; tit
     <h3>{title}</h3><p>{text}</p><Link className="step-link" href={href}>{icon === "documents" ? "Documents" : icon === "experiments" ? "Evaluation datasets" : "Comparisons"}<Icon name="arrow" /></Link></article>;
 }
 
-function Placeholder({ icon, title, text, detail }: { icon: Section; title: string; text: string; detail: string }) {
-  return <section className="table-frame placeholder"><div className="empty-state"><span className="empty-icon"><Icon name={icon} /></span>
-    <h2>{title}</h2><p>{text}</p><p className="placeholder-detail">{detail}</p>
-    <Link className="text-link" href="/settings">Check workspace setup<Icon name="arrow" /></Link></div></section>;
-}
 
 function ServiceRow({ title, detail, state, ready }: { title: string; detail: string; state: string; ready: boolean }) {
   return <div className="service-row"><dt><strong>{title}</strong><span>{detail}</span></dt><dd className={ready ? "service-state ready" : "service-state"}>

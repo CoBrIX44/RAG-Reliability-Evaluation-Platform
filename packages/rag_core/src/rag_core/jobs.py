@@ -2,7 +2,6 @@
 
 import contextlib
 import json
-import os
 import subprocess
 import sys
 import time
@@ -17,6 +16,7 @@ from rag_core.database import record_worker_heartbeat
 from rag_core.errors import LostLease, PlatformError
 from rag_core.extraction import EXTRACTOR_VERSION
 from rag_core.models import Document, DocumentRevision, Job, SourceSection
+from rag_core.processes import hidden_window_flags
 from rag_core.schemas import Extraction
 from rag_core.settings import Settings
 from rag_core.storage import BlobStore
@@ -210,7 +210,7 @@ class IngestionQueue:
                     command,
                     stdout=subprocess.DEVNULL,
                     stderr=subprocess.DEVNULL,
-                    creationflags=subprocess.CREATE_NO_WINDOW if os.name == "nt" else 0,
+                    creationflags=hidden_window_flags(),
                 )
                 deadline = time.monotonic() + self.settings.extraction_timeout_seconds
                 try:

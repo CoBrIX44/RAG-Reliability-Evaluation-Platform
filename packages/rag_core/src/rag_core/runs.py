@@ -82,12 +82,20 @@ class ExperimentCreate(BaseModel):
     max_new_tokens: int = Field(default=128, ge=1, le=256)
     repeats: int = Field(default=1, ge=1, le=3)
     seed: int = Field(default=0, ge=0, le=2**31 - 4)
+    cache_condition: Literal["uncontrolled", "operator_cold_cache", "operator_warm_cache"] = (
+        "uncontrolled"
+    )
+    measurement_notes: str = Field(default="", max_length=1000)
     retrieval_strategy: Literal["index", "hybrid", "hybrid_rerank"] = "index"
     candidate_k: int = Field(default=20, ge=1, le=50)
     rrf_k: int = Field(default=60, ge=1, le=1000)
 
     @model_validator(mode="after")
     def candidates_cover_top_k(self) -> "ExperimentCreate":
+        if self.cache_condition != "uncontrolled" and not self.measurement_notes.strip():
+            raise ValueError(
+                "Describe the operator cache preparation; it is not automatically verified."
+            )
         if self.retrieval_strategy != "index" and self.candidate_k < self.top_k:
             raise ValueError("Candidate depth must be at least the final top-k.")
         return self
@@ -208,7 +216,7 @@ def metrics_summary(
             "applicable_count": None,
             "scored_count": 0,
             "error_count": 0,
-            "reason": "Answer evaluators arrive in M5; no score is inferred.",
+            "reason": "Post-hoc answer assessments are separate evaluation records.",
         }
     return summary
 
@@ -253,6 +261,14 @@ class RunStore:
             config = value.model_dump(
                 mode="json", exclude={"name", "dataset_version_id", "index_id"}
             )
+            config["measurement"] = {
+                "version": "operator-cache-declaration-v1",
+                "cache_condition": value.cache_condition,
+                "notes": value.measurement_notes,
+                "verified_automatically": False,
+                "model_lifecycle": "fresh-model-child-per-call",
+                "question_timing_excludes": "queue and shared model preparation",
+            }
             config.update(
                 generation=generation_contract(),
                 retrieval=index.config,

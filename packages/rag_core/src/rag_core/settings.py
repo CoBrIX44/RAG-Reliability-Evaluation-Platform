@@ -24,6 +24,7 @@ class Settings(BaseSettings):
     extraction_timeout_seconds: int = Field(default=60, ge=1, le=600)
     max_extracted_characters: int = Field(default=2_000_000, ge=100, le=20_000_000)
     max_pdf_pages: int = Field(default=1000, ge=1, le=10_000)
+    max_export_bytes: int = Field(default=209_715_200, ge=1024, le=1_073_741_824)
     max_run_questions: int = Field(default=1000, gt=0, le=10_000)
     max_jsonl_bytes: int = Field(default=10_485_760, gt=0, le=52_428_800)
     worker_concurrency: Literal[1] = 1
