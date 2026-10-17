@@ -6,6 +6,14 @@ A research-oriented full-stack platform for uploading technical documents, build
 
 First benchmark: a frozen PostgreSQL documentation release. Lexical/dense search, hybrid RRF, cross-encoder reranking and fixed-token/section chunking are implemented. Metrics: retrieval precision/recall, correctness, faithfulness, citation support, abstention, latency, and cost.
 
+## Project workflow
+
+![RAG Observatory workflow: upload documents, publish a corpus, prepare indexes and reviewed datasets, freeze experiments, retrieve evidence, pack context, generate answers, inspect metrics, compare and export.](docs/assets/project-workflow.png)
+
+Index preparation and dataset curation independently use the published corpus, then join in an immutable experiment manifest. Heavy retrieval and inference execute in the durable worker; the dashboard exposes saved traces, comparisons, and evidence exports. Answer assessments are optional and separate from retrieval metrics; unavailable scores remain unavailable.
+
+This diagram describes the implemented workflow, not completion of the ongoing M7 benchmark or validation of answer quality. [Open the editable vector diagram](docs/assets/project-workflow.svg) · [Read the architecture](ARCHITECTURE.md).
+
 ## Reading order
 1. PRD.md, USER_FLOWS.md, REQUIREMENTS.md — product and scope.
 2. DESIGN_SYSTEM.md, ARCHITECTURE.md, API_SPEC.md, DATA_MODEL.md — design contracts.
