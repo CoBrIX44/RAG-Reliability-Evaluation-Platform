@@ -1,0 +1,106 @@
+{
+  "schema": "pg18-experiment-proposal-v1",
+  "status": "dataset-bound-configuration-proposal-not-executed",
+  "corpus_version_id": "99d7fb4a-1d33-4417-b40e-7f36aa485c02",
+  "dataset_version_id": "c68dbf7c-4f98-4431-b789-4d9fdd11a811",
+  "execution_gate": [
+    "150 explicitly source-reviewed questions with human/AI provenance and curator limitations reported",
+    "audited source/paraphrase groups",
+    "published immutable dataset with frozen development/test split",
+    "development-selected configuration locked before test execution",
+    "matching recorded source/lock/runtime/model hashes"
+  ],
+  "chunking": [
+    {
+      "strategy": "fixed",
+      "max_tokens": 240,
+      "overlap_tokens": 32
+    },
+    {
+      "strategy": "section",
+      "max_tokens": 240,
+      "overlap_tokens": 32
+    }
+  ],
+  "retrieval": [
+    {
+      "label": "lexical",
+      "index_retrieval": "lexical",
+      "retrieval_strategy": "index"
+    },
+    {
+      "label": "dense",
+      "index_retrieval": "dense",
+      "retrieval_strategy": "index"
+    },
+    {
+      "label": "hybrid",
+      "index_retrieval": "dense",
+      "retrieval_strategy": "hybrid"
+    },
+    {
+      "label": "hybrid_rerank",
+      "index_retrieval": "dense",
+      "retrieval_strategy": "hybrid_rerank"
+    }
+  ],
+  "controlled_run_settings": {
+    "top_k": 5,
+    "context_tokens": 1024,
+    "max_new_tokens": 128,
+    "repeats": 3,
+    "seed": 0,
+    "candidate_k": 20,
+    "rrf_k": 60,
+    "cache_condition": "uncontrolled"
+  },
+  "repeat_interpretation": "The pinned local generator uses greedy decoding. Repeats retain run/latency variation but are not independent new questions or proof of stochastic answer variation.",
+  "primary_comparison": {
+    "baseline": "section/dense",
+    "candidate": "section/hybrid_rerank",
+    "split": "test",
+    "outcome": "answer_correctness",
+    "assessment_source": "explicitly selected and frozen; never mix human/model policies",
+    "interval": "paired 95% whole-split-group percentile bootstrap after averaging all expected repeats per question",
+    "seed": 0,
+    "resamples": 1000
+  },
+  "secondary_comparisons": [
+    "section/hybrid versus section/dense"
+  ],
+  "exploratory_comparisons": [
+    "lexical versus dense",
+    "fixed versus section within each retrieval strategy",
+    "topic/difficulty subgroups"
+  ],
+  "scoring_gate": "Quality requires valid explicit answer assessments. Failed judge output remains unavailable/error-counted. If local judging cannot be validated, primary correctness remains incomplete until genuine human assessments are recorded.",
+  "reporting": [
+    "planned/applicable/scored/error/unavailable counts",
+    "all exclusions and controls",
+    "pre-packing and delivered evidence recall separately",
+    "paired effects and eligible cluster counts",
+    "p50/p95 and observed usage with cache/runtime caveats",
+    "local financial/energy cost unavailable unless measured",
+    "multiple-comparison and purposeful-subset limitations"
+  ],
+  "execution": {
+    "auto_submit": false,
+    "paid_providers": false,
+    "observations_completed": 0
+  },
+  "curation_policy": {
+    "owner_authorized_ai_review": true,
+    "human_validation_claim": "Only explicitly recorded human reviews; AI source review is not independent human validation",
+    "require_actual_source_review": true
+  },
+  "dataset_manifest_hash": "f857d3b849ee33858262614e9af5eaeedbb1e6057ea7ad483e98b996d8082ccf",
+  "split_manifest": "SPLIT_MANIFEST.json",
+  "development_selection_status": "Eight development-only qualification runs submitted and processing; one repeat each. Final settings not yet locked; held-out runs not submitted.",
+  "development_campaign": {
+    "protocol": "DEVELOPMENT_PLAN.md",
+    "observed_status": "DEVELOPMENT_STATUS.md",
+    "planned_observations": 840,
+    "submitted_cells": 8,
+    "stage": "running-not-complete"
+  }
+}

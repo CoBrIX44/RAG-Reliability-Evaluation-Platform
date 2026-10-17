@@ -48,6 +48,7 @@ def main() -> int:
             return 0 if health.status == "ready" else 1
         logger.info("Ingestion, retrieval, and experiment worker started.")
         while not stop.is_set():
+            processed = False
             health = inspect_database(engine)
             if health.status == "ready":
                 try:
@@ -66,6 +67,7 @@ def main() -> int:
                     for processor in processors:
                         if claim := processor.claim():
                             processor.process(*claim, stop)
+                            processed = True
                             break
                     next_queue = (next_queue + 1) % len(all_processors)
                 except SQLAlchemyError:
@@ -78,7 +80,8 @@ def main() -> int:
                     return 1
             if args.once:
                 return 0
-            stop.wait(settings.worker_poll_seconds)
+            if not processed:
+                stop.wait(settings.worker_poll_seconds)
     finally:
         engine.dispose()
     return 0

@@ -58,6 +58,7 @@ class QuestionInput(BaseModel):
     split: Literal["unassigned", "development", "test"] = "unassigned"
     split_group: str = Field(default="", max_length=160)
     review_status: Literal["candidate", "reviewed"] = "candidate"
+    review_source: Literal["human", "ai"] = "human"
     reviewer: str = Field(default="", max_length=160)
 
     @model_validator(mode="after")

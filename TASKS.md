@@ -57,8 +57,8 @@ M4 gate passed: actual pinned local CPU runs from the owner-reviewed published d
 - [x] Rendered UI/accessibility/responsive verification.
 
 ## M7 Benchmark and delivery
-- [ ] Select numbered PostgreSQL release and record corpus provenance/license.
-- [ ] Curate 150 reviewed questions, freeze grouped split, publish dataset card.
+- [x] Select numbered PostgreSQL release and record corpus provenance/license.
+- [x] Curate150 source-reviewed questions, freeze grouped split, publish dataset card (10 human/140 AI).
 - [ ] Run controlled experiments and export evidence-backed report.
 - [ ] Verify backup/restore, operations guide, and final handoff.
 
@@ -107,3 +107,205 @@ Inspected actual failed GitHub logs for runs38744323560 (3091827),38737446756 (6
 Added rag_core/processes.py with a sys.platform statement guard recognized by mypy and reused it in all five launchers. Windows retains CREATE_NO_WINDOW; other platforms return0. Removed the now-unused jobs.py os import. CI explicitly checks both --platform linux and --platform win32. Upgraded checkout/setup-node from v4 to v5, verified both v5 action manifests declare node24, and pinned all three jobs to ubuntu-24.04 to avoid the moving ubuntu-latest image notice. Application Node24.14.0 and existing lockfiles are unchanged.
 
 Verification after the final fix: Ruff passes,113 Python files already formatted; strict mypy passes for both Linux and Windows targets (90 source files each);135 non-integration tests pass,51 integration tests deselected; CI YAML/runner assertions and git diff --check pass. Docker engine was unavailable during this correction, so database integration/Compose checks were not rerun; prior M6 checks remain historical. No new GitHub workflow execution, commit or push was performed. All prior M5/M6 uncommitted work is preserved. Historical failed runs retain their old commit; a push containing the correction is needed to verify a new remote run. Do not rerun old commits expecting this local fix to apply.
+
+## M7 source/first-review slice - 2026-10-16
+- [x] Acquire pinned PostgreSQL 18.0 subset, license, checksums, exclusions and published lineage.
+- [x] Prepare/import10 source-linked unreviewed draft candidates and owner-facing review pack.
+- [x] Verify repeat import, source linkage, honest UI and worker backlog/idle behavior.
+- [ ] Obtain150 actual human-reviewed labels; audit groups/leakage and freeze split.
+- [ ] Execute/export controlled benchmark and answer-review/calibration sample.
+- [x] Verify isolated Docker database/artifact/model backup and restore.
+- [ ] Complete benchmark report and final delivery.
+
+M7 first-slice checks:192 Python tests passed with no skips/warnings on disposable real PostgreSQL rag_test, including4 new offline synthetic archive integrity/path/member-limit/idempotency tests and2 worker backlog/idle-poll tests. After the test import typing correction, all6 new tests passed again. Ruff and formatting pass (118 files), strict mypy passes for Linux and Windows targets (93 source files each), ESLint/both TypeScript projects pass. Matching api/worker/migrate and web production builds/startup pass; all four services healthy at schema 0010_exports.25 production Chromium tests pass. Actual research draft screen inspected at desktop/mobile, with honest publication/review badge and no375px page overflow; no browser mutation or review was submitted.
+
+Actual API import/re-import resolves the same40-document corpus version 99d7fb4a-1d33-4417-b40e-7f36aa485c02 and10-candidate datasetaee91608-6a2b-4f6f-afa4-dcf4c10d0021 without duplicating membership. Import polling was interrupted by the planned API image restart; rerun completed via existing checksum/provenance guards. Candidate spans resolve uniquely within published revisions. Live state confirms zero reviews, all splits unassigned, zero published research dataset versions. All prior6 runs/5 results/5 attempts/1 failed judge/3 comparisons/1 export remain exactly unchanged after service recreation, and the earlier evidence ZIP bytes/checksums still match. No benchmark inference, human label, paid call or research conclusion was created. Evidence: ignored artifacts/m7-live-preparation.json, m7-final-pytest.txt, m7-final-browser.txt, m7-final-mypy-linux.txt, m7-verified-mypy-win32.txt and m7-candidates screenshots. Complete backup/restore is not yet verified.
+
+## M7 backup/restore continuation - 2026-10-16
+Implemented scripts/backup_workspace.py and rag_core/backup.py for private, checksummed Docker workspace snapshots and isolated restore rehearsal. Backup stops API/worker while capturing a custom PostgreSQL dump and artifact/model bytes, then restarts them in finally. It retains runtime.env privately, exact service-image archives, source/locks (including dirty files), and local research receipts. Internal model-cache symlinks become regular archived bytes; escaping links are rejected. Snapshot scope excludes rag_test and separate native caches. No live or named volume is deleted.
+
+Actual backup data/backups/m7-20261016-01 completed:248 recorded files totaling4,175,852,875 bytes, plus the manifest/report. Restore used an internal network, unique disposable PostgreSQL container with1 GiB tmpfs, no host ports and no worker. The saved image archive loaded successfully, PostgreSQL custom dump restored transactionally, and all23 public tables matched complete frozen row counts/SHA-256 values.83 artifact files (2,388,669 bytes) and86 model-cache files (3,535,868,678 bytes) matched per-entry hashes. Restored API readiness passed;41 original document hashes,1 completed evidence-export download, all6 saved runs and3 comparisons verified. Temporary containers/network were removed only after ownership checks; restored files remain under ignored data/restore-checks for inspection. All four live services are healthy, and the previous6 runs/5 results/5 attempts/1 failed judge/3 comparisons/1 export remain exactly unchanged.
+
+Final full Python suite:199 passed/no skips/warnings on disposable rag_test, including7 new synthetic backup integrity/path/inventory tests. Ruff/format pass (final formatter123 files), strict mypy passes for Linux and Windows targets (95 source files). No frontend code changed in this backup continuation; the prior25 Chromium pass remains the latest browser verification. No benchmark inference, new human review, research dataset publication, paid call, commit or push occurred. Backup files contain private configuration/data and stay ignored/local. Proof is data/backups/m7-20261016-01/restore-report.json (bound to backup-manifest.json hash), artifacts/m7-backup-{create,restore,pytest}.txt and m7-backup-mypy-{linux,win32}.txt. This verifies same-machine Docker restore, not offsite/machine-loss recovery or historical inference replay.
+
+Prepared research/postgresql-18.0/EXPERIMENT_PLAN.json: a DRAFT, unexecuted8-cell proposal across fixed/section chunking and lexical/dense/hybrid/reranked retrieval, using240-token chunks/32 overlap, top-k5,1024 context tokens,128 output tokens and3 greedy repeats. All8 proposed cells validate against current IndexCreate/ExperimentCreate models. Dataset version remains null and auto_submit=false. Primary proposal is section/hybrid_rerank versus section/dense test-set correctness, with whole-group bootstrap and explicit assessment-source gates; secondary/exploratory comparisons and deterministic-repeat/failed-judge limitations are recorded. This is not a preregistered final test design or an executed benchmark.
+
+M7 is still incomplete:10 authored candidates remain unreviewed/unassigned, with no published research dataset. Owner chose individual review in Datasets. Do not infer blanket review from “move forward.” Continue real annotation toward150 questions, group/leakage audit and split freeze before controlled experiment execution and final report. BACKUP_RESTORE.md now provides the exact backup/rehearsal/recovery scope and commands.
+
+## M7 curation progress
+- [x] Record explicit owner review of the original10 unchanged gold questions.
+- [x] Save separately approved expected abstentions for both original unanswerable items.
+- [x] Add20 source-linked candidate questions without modifying reviewed records.
+- [x] Add/test read-only curation audit and receipt-based append workflow.
+- [ ] Review the20 new candidates; expand toward150 reviewed questions before split freeze.
+
+## M7 recorded review and second batch - 2026-10-16
+The owner explicitly stated “ive reviewed them so lets continue to the next step.” Once Docker was restored, the live database still had all 10 original questions as candidates, with content exactly equal to the original batch receipt. Recorded that explicit attestation against those unchanged question/fact/evidence records as Project owner (existing session reviewer label), using revision-checked PATCH. This is a conversation-supplied gold-label review, not a claim that the owner had already saved review status in the UI. Local review-attestation-01.json retains the quote, scope, prior/content hashes, saved revisions and recording timestamps. No model-answer assessment was created.
+
+Two original unanswerable items had blank reference fields. Requested review of new expected-abstention text; the owner explicitly approved “The provided corpus and question do not contain enough information to determine that” for both. Saved exactly that text with reviewed status and retained abstention-review-01.json. The first post-review audit now has no review/reference/evidence/duplicate gaps; its only blockers are unassigned splits and the 150-question target. Do not apply this approval to future candidates.
+
+Added 20 authored candidates in candidates-batch-02.json to the SAME dataset aee91608-6a2b-4f6f-afa4-dcf4c10d0021. It retains the initial UI name PostgreSQL 18.0 benchmark candidates — batch 01; no replacement dataset was created. All 20 new records are candidate/unassigned/blank-reviewer. Existing 10 records remain byte-for-byte unchanged during append. Repeating the append command resolves its receipt and creates no duplicates, preserving later human edits. Four new questions require evidence from multiple documents; another uses multiple sections of one document. Evidence quotes are exact, whitespace-normalized matches mapped back to canonical Unicode code-point offsets, not chunk IDs.
+
+Current draft:30 questions,10 reviewed/20 candidates,24 proposed answerable/6 proposed unanswerable,6 per topic,10 each easy/medium/hard; all30 splits unassigned, no published research version. Audit groups these into25 conservative components by declared group/shared source document/exact duplicates, and explicitly requires manual paraphrase/cross-reference and unanswerability checks. Current issues are20 missing new reviews,30 unassigned splits,1 sample-target gap. Group components are proposals, not an automatic split or proof of semantic independence. HTML navigation boilerplate remains in source-v1; record this as a retrieval limitation rather than rewriting the frozen corpus.
+
+New read-only scripts/audit_benchmark.py validates the live draft against the frozen corpus and checks draft_revision before/after reading. It records full question snapshot/hash and separate issue counts; it never writes labels or splits. scripts/append_review_batch.py imports bounded batches through the existing atomic JSONL API, validates corpus/quote lineage, records a batch hash/UUID receipt, and refuses silent edits to existing content. See research README for commands. Original batch specifications remain historical candidate proposals; current review state is in PostgreSQL and explicit attestation receipts.
+
+Final full suite:207 Python tests pass, no skips/warnings, on disposable real PostgreSQL rag_test. Eight new independent tests cover document-level split leakage across different sections, missing review/reference/span/target issues, normalized duplicate/foreign lineage rejection, manual-check disclosure, and exact Unicode offsets/ambiguous quote rejection. Ruff/format pass; strict mypy passes Linux and Windows targets (99 source files). Actual app inspection verifies the new three-fact/two-document savepoint candidate, rendered canonical quotes, unchecked review state and no375px page overflow; no browser submission was made. No frontend code changed this continuation; prior25 Chromium suite remains historical, with this additional actual read-only browser check. Evidence: data/research/postgresql-18.0/{review-attestation-01,abstention-review-01,review-batch-02,curation-audit-03,curation-audit-04}.json and ignored artifacts/m7-review-{pytest,mypy-linux,mypy-win32}.txt plus batch02 browser/screenshots.
+
+M7 remains incomplete. Next review the20 Candidate items in the existing dataset, then author/review the remaining120 toward150 total. Do not freeze a10- or30-question research benchmark or run the planned test matrix prematurely. No new inference, quality-score claim, answer review, publication, commit or push occurred. The verified m7-20261016-01 backup predates these owner reviews/new candidates; take a fresh checkpoint backup before final experiment execution/delivery. Current operator/audit helpers postdate deployed images; rebuild matching services and a truthful revision before new benchmark runs.
+
+## M7 AI-review continuation
+- [x] Apply owner-authorized AI source review to20 candidates, with seven source/rubric corrections.
+- [x] Preserve human/AI provenance in API, JSONL, frozen gold snapshots, audit and UI.
+- [x] Build/verify all four frozen-corpus indexes and lexical/dense chunk-universe parity.
+- [ ] Source-review120 additional questions, then audit/freeze groups and execute the benchmark.
+
+## M7 owner-authorized AI source review and indexes - 2026-10-16
+Owner explicitly instructed “you review yourself and then continue with next step.” Applied this as authorization for AI source review, not a human attestation. Research protocol now targets150 explicitly source-reviewed questions with disclosed reviewer provenance; the earlier150-human-review requirement is superseded for this owner-authorized workflow. Never claim these AI reviews are independent human validation. Existing10 owner-reviewed question rows are exactly unchanged.
+
+Actually inspected all20 batch02 candidates against frozen canonical passages and context. Saved seven content/evidence corrections: clarify the unanswerable orders-count question assumes its table exists; replace generic savepoint-definition gold with the rollback action actually asked; add the expression-index definition as joint evidence and scope to non-null text; directly annotate index-only visibility obligations instead of generic MVCC evidence; reword two parameter-specific questions because source-v1 drops their definition-term names; add the missing VACUUM FULL compaction fact to its rubric. The 20 AI review records/rationales and before/after content are retained in data/research/postgresql-18.0/ai-source-review-02.json. This is same-assistant authorship and source review, not independent annotation or an application judge run. Four missing-instance-data questions remain unanswerable based on underdetermination; do not describe that as exhaustive semantic proof of corpus absence.
+
+Added typed review_source=human|ai to QuestionInput JSON (default human for existing legacy records). No SQL migration or existing published-snapshot rewrite. Provenance survives immutable publication/JSONL export/import. The frontend preserves AI source on save, labels AI versus Human reviews, and leaves its human-attestation box unchecked for AI records. A user must explicitly check it and enter a reviewer to record a human review. The audit separately counts human_reviewed_count/ai_reviewed_count. Actual UI shows10 Human/20 AI reviews with correct unchecked human attestation and no375/768/1024px page overflow. Current30-question audit has only30 unassigned splits and the150-sample-target gap;26 conservative source components, still requiring relatedness/paraphrase audit. No research dataset has been published.
+
+Prepared the four planned240-token/32-overlap indexes through the existing durable worker:
+- fixed lexical e364f1f2-d3e0-45a3-bb54-2ba9beac0849:647 chunks
+- fixed dense 3f2535e5-c20b-4d38-996f-870df84d294c:647 chunks
+- section lexical d0374982-a5fa-45b9-9b82-e4df2550452c:2119 chunks
+- section dense ad61d00a-4a17-4c35-a7ba-a4698bae5ad2:2119 chunks
+
+Exact ordinal/text/token-count/canonical-span hashes match between lexical/dense indexes for each strategy. Hybrid/reranking reuse the appropriate dense index's chunk universe. Repeating scripts/prepare_benchmark_indexes.py resolves the same ready IDs; no duplicates or answer runs are submitted. Actual pinned local CPU embedding inference ran for these builds. No paid provider, answer generation, model-answer evaluation or comparison run was submitted. Index preparation and question source review are not benchmark accuracy results.
+
+Final209 Python tests pass/no skips/warnings against disposable real PostgreSQL rag_test; new tests verify human/AI audit separation and AI provenance through publication/export/import. All26 production Chromium tests pass, including a new synthetic provenance flow proving an AI save remains AI until explicit human review is saved. Ruff/format, strict mypy Linux/Windows99 source files, ESLint and both TypeScript projects pass. Matching api/worker/migrate/web production images build/start; all four services healthy at0010_exports. An initial frontend build caught a Windows encoding mistake in this edit; corrected UTF-8/line endings and the final build passes. Actual source-review editor visually inspected. No new research-answer scores are claimed. All previous6 runs/5 results/5 attempts/1 failed judge/3 comparisons/1 export remain exactly unchanged and the older ZIP hash still matches.
+
+Evidence: ignored artifacts/m7-ai-final-{pytest,mypy-linux,mypy-win32}.txt, m7-ai-review-browser.txt, m7-ai-review-editor{,-mobile}.png, m7-index-parity.json; data/research/postgresql-18.0/{ai-source-review-02,curation-audit-06,index-preparation}.json. Current source/gold/index work is uncommitted, SOURCE_REVISION863b267-dirty. The older verified backup predates these labels/indexes; refresh at the next completed curation checkpoint. No split freeze, dataset publication, research winner or final M7 completion. Next author/source-review the remaining120 questions under the authorized AI workflow, keep human/AI counts explicit, audit relatedness/groups, freeze the split, then execute the controlled plan and report its limitations. Do not ask the owner to manually review every new candidate again; do perform real source review for every AI-reviewed label.
+
+## M7 frozen benchmark curation - 2026-10-16
+This section supersedes historical30-question/unassigned status.
+- [x] Author and individually AI-source-review120 additional questions; preserve existing gold.
+- [x] Audit related-source families and negative contexts; freeze105/45 grouped split.
+- [x] Publish immutable150-question version, retain exact human/AI provenance and export JSONL.
+- [x] Preserve source-review timestamps for split-only edits; test human and AI cases.
+- [ ] Measure/select development configurations before held-out test execution.
+- [ ] Execute planned comparisons, assess answers honestly and write the controlled report.
+- [ ] Refresh/verify this checkpoint backup and finish delivery verification.
+
+Published local research dataset version **c68dbf7c-4f98-4431-b789-4d9fdd11a811**, manifest SHA-256 **f857d3b849ee33858262614e9af5eaeedbb1e6057ea7ad483e98b996d8082ccf**, contains150 source-reviewed questions:10 human/140 AI,120 answerable/30 unanswerable,30 per topic. Gold source spans cover37 of the40 frozen source documents.16 questions have multiple required facts; only2 require multiple source documents. Difficulty is subjective:19 easy/80 medium/51 hard, not an equal-count quota.
+
+Frozen grouped split:105 development questions in15 groups and45 test questions in8 groups (23 total). Development topics: SQL20,transactions23,indexes21,configuration22,troubleshooting19; test: SQL10,transactions7,indexes9,configuration8,troubleshooting11. Development has19 unanswerable/7 human reviews; test has11 unanswerable/3 human reviews. Whole groups take precedence over exact per-topic or answerability ratios. No retrieval/answer output was used for split selection.
+
+See research/postgresql-18.0/CURATION_REVIEW.md and SPLIT_MANIFEST.json for grouping, deterministic selection and limitations. All negative cases concern missing instance-specific information; this does not validate corpus-absence technical questions or calibrated abstention. Same assistant authored/reviewed140 labels and performed grouping: no independent human validation, human answer review or research accuracy claim. No benchmark answer run or assessment has been submitted. Development configuration selection and the controlled report remain pending.
+
+
+User stopped work2026-10-16. Dataset curation/publication complete; new checkpoint02 backup created, isolated verification interrupted/unverified. Resume from CODEX_HANDOFF user stop checkpoint; no automatic continuation.
+
+
+## M7 development preparation continuation
+- [x] Prepare/validate eight development-only requests without inference submission.
+- [x] Add deterministic retry keys, manifest receipts and status operator.
+- [x] Add/test exact-image reuse and bounded restore commands.
+- [ ] Recover Docker engine, finish checkpoint02 restore verification and rebuild matching Python images.
+- [ ] Submit/inspect section/dense development baseline, then qualify remaining cells.
+
+Latest offline suite172 passed;54 integration tests deliberately deselected while Docker recovery is pending. No benchmark answer run or score exists. See latest CODEX_HANDOFF for actual commands and owner restart status.
+
+
+## M7 live execution checkpoint - 2026-10-16
+- [x] Recover Docker and verify checkpoint02 restore with exact tables/files/API checks.
+- [x] Rebuild matching Python services; pass full226-test database suite.
+- [x] Submit/inspect development dense baseline and queue the other seven cells.
+- [x] Verify all eight manifests select development only and retain retry identity.
+- [ ] Finish840 planned development observations; inspect errors and lock final controls.
+- [ ] Execute held-out matrix and valid explicit answer evaluation, then controlled report/export.
+- [ ] Refresh post-experiment backup and complete delivery.
+
+Campaign is running in the durable worker, not complete. See DEVELOPMENT_STATUS.md and uv run python -m scripts.prepare_development_runs status for live state. Preserve matching images/source identity while unfinished. No research accuracy finding or human answer review has been invented.
+
+## M7 resumable completion work - 2026-10-16
+
+- [x] Implement/test a single-process operator that checks complete development qualification before freezing and submitting unchanged held-out controls.
+- [x] Implement retained keys/manifests, real unreviewed answer-case preparation, exploratory comparisons, checked worker exports, actual report and post-experiment restore orchestration.
+- [x] Launch controller and verify live waiting_for_development state; baseline52/105 succeeds,0 fails at inspection.
+- [x] Run239 Python tests against rag_test; Ruff/format139 files and Linux/Windows typing103 files pass.
+- [ ] Complete840 development observations and qualify all eight cells.
+- [ ] Execute1,080 held-out observations after controls freeze; inspect real failures and coverage.
+- [ ] Complete actual comparisons/evidence report and generated-answer assessments/calibration with truthful provenance.
+- [ ] Verify post-experiment backup and final handoff; M7 remains incomplete.
+
+Operator implementation is not execution evidence. See DEVELOPMENT_PLAN.md and private completion/state.json for recovery/live progress. Frozen Python runtime identity is unchanged. Keep local CPU worker and Docker running; shared-host/cache timing is uncontrolled.
+
+## M7 recovery and operator hardening - 2026-10-17
+
+- [x] Inspect saved progress/processes:226 successful development observations/0 failures at last receipt; native controller absent, live API unavailable.
+- [x] Attempt Docker startup and identify actual inaccessible Secrets Engine socket failure; retain all images/data/volumes.
+- [x] Add exact prepared-request verification and bounded transient API retry states;20 focused controller tests and Ruff/format pass.
+- [ ] Resume existing services and controller after owner's Windows/Docker restart; verify actual database progress before reporting updated counts.
+
+No held-out experiment, new answer assessment or completed M7 report is claimed. Full integration verification awaits the engine.
+
+## M7 Docker recovery continuation - 2026-10-17
+Docker engine29.8.2 subsequently recovered; all four existing services are healthy without image rebuild/replacement. API/worker execution identity both match source hash1123f6e613ba27ca7a9b1a97bbabe3159d6d074e1d101c8db8fbff041cda0f5e/revision863b267-dirty. Live progress verified228/840 successful development observations,0 failures, with fixed/dense resuming its existing run. No duplicate development or held-out runs were submitted. Native controller restarted at10:14:17 UTC with launcher PID30516; check private controller-process.json/actual command line rather than assuming historical PID ownership. Logs artifacts/m7-completion-watch-20261017{,-error}.txt.
+
+Actual completed section/dense and fixed/lexical runs each retain105 successful results/86 applicable scored retrieval cases. DEVELOPMENT_DIAGNOSTICS.md reports descriptive retrieval coverage with confounding/known-evidence limitations. A deterministic30-trace development sample is retained privately with null reviewers/judgments;0 parsed citations/0 exact markers and1 output-limit hit are execution diagnostics, not quality scores. No answer evaluation was recorded.
+
+20 focused controller tests and192 offline tests pass (54 integration tests deselected in that offline command). Follow-up real rag_test integration and Linux/Windows typing are being checked separately; do not infer completion from their launch. No frozen runtime source, images, gold labels or immutable historical results were changed. M7 remains IN PROGRESS; machine/Docker must stay awake for the remaining sequential inference.
+
+## M7 recovery verification completed - 2026-10-17
+Executed192 offline tests (54 integration deselected) and54 real PostgreSQL integration tests (192 offline deselected): all246 tests pass across the two commands; integration duration109.23 seconds. Strict mypy Linux/Windows both pass103 source files after correcting a synthetic HTTPError fixture's header type. Ruff/format pass for the changed controller/test files. No runtime core source/image rebuild or new frontend verification. Integration log: artifacts/m7-recovery-integration-20261017.txt.
+
+Controller PID30516 is active, error log empty, phase waiting_for_development. Last observed 2026-10-17T10:19:22.046945+00:00: 237/840 development successes,0 failures, no held-out submissions. Existing worker advances after Docker recovery. M7 is still incomplete: remaining development qualification, held-out execution, actual answer assessment/calibration/report/exports and final recovery rehearsal remain. See research/postgresql-18.0/DEVELOPMENT_DIAGNOSTICS.md for actual completed-run diagnostics and limitations.
+
+## Owner-selected exploratory delivery scope - 2026-10-17
+The owner explicitly selected: “Deliver an exploratory report with answer quality unvalidated.” This supersedes the earlier human-answer-calibration completion gate for M7 delivery only. DELIVERY_SCOPE.json records the exact choice; the report must retain unavailable correctness/faithfulness/citation-support/abstention-quality metrics, no human calibration, and primary factual-accuracy hypothesis not established. Retrieval results never become answer-accuracy findings. Future validated accuracy research still needs valid assessments and independent calibration.
+
+The frozen150-question gold,105/45 split, eight development configurations and full1,080-observation held-out matrix are unchanged. Before test submission the controller freezes this delivery scope with the controls. It may mark M7 completed_exploratory only after all eight135-observation held-out runs and all eight comparisons complete, all requested ZIPs verify, the actual report is written and manifest-bound isolated recovery passes. It then appends truthful final handoff/status from the terminal receipt. No current completion is claimed; inference is still running.
+
+Added actual hardware/resource observations and an unreviewed30-case development answer guide. The controller report includes observed stage p50/p95/counts with unavailable values preserved and raw accounting retained.27 focused operator tests pass, including failed/partial/missing-scope delivery rejection, timing-unit conversion and guarded/idempotent final handoff preserving owner notes. No new core source/image identity, answer judgment, paid provider, public deployment or Git commit/push.
+
+## M7 scoped controller launch verified - 2026-10-17
+Owner-selected exploratory-retrieval scope is active. Latest operator source includes guarded final documentation/checkbox updates, unavailable-preserving stage timing report and scoped completion checks.27 focused controller tests pass; Ruff/format and strict Linux/Windows typing of the changed test file pass. The earlier full246-test database verification remains historical; do not claim a newly executed253-test full suite. No runtime core source/image change.
+
+Replaced only the native controller after verifying its exact PIDs/command lines; inference worker was not restarted. Active launcher PID34512 at 2026-10-17T10:27:03.7685979Z; logs D:\RAG Reliability & Evaluation Platform\artifacts\m7-final-scope-watch-20261017.txt and error counterpart, error log empty. Verified 250/840 successful development observations,0 failures, phase waiting_for_development, no held-out submissions. Proof artifacts/m7-scoped-controller-verification.json binds operator/scope hashes. The controller can finish the authorized exploratory delivery after actual remaining execution/export/recovery, but M7 is not complete now. Estimated remaining inference roughly10.5 hours from a30-case median, excluding later work and slower configurations; not a guarantee. Keep Docker/machine running and preserve frozen worker identity.
+
+## Frontend refresh in parallel with M7 - 2026-10-17
+The owner requested all six named taste/UI skills for UI/UX/fonts. Read the supplied/local skills and project contract; retained product workflows and rejected marketing-only AIDA/hero/GSAP suggestions. Updated DESIGN_SYSTEM.md. UI now uses bundled licensed Outfit +IBM Plex Mono (~62KB), green/graphite semantic light/dark themes, persisted appearance control, less repetitive shell copy, saved runs before configuration, page-scoped run filtering, focus-aware New experiment shortcut, and expandable retrieval/workflow tools. API contracts, form field names/order, source evidence, human/AI provenance and unavailable metrics remain intact. No Python source/image, package-lock or uv.lock change. Docker benchmark services were not restarted.
+
+Native dev preview3001 was visually inspected with actual read-only data at1440/1024/768/375, light/dark screenshots and real-font loading. Added theme/filter accessibility flows and updated retrieval disclosure tests/alternate-port origin handling. Earlier E2E run had27/28 pass; remaining shortcut-focus bug was fixed by preventing the anchor default and moving focus/scroll explicitly. A subsequent dev-server test run encountered repeated navigation/recompilation and was stopped; it is not a passing suite. Current production build and ESLint/TypeScript checks pass. Calculated text/action/control contrast meets relevant token thresholds. Final production browser rerun remains pending.
+
+Automatic approval review rejected starting the production preview server (only reason returned: blocked by policy). Asked the owner to run npm.cmd run start --workspace @rag/web -- --port3001 (use separate --port 3001 arguments). The native dev server was stopped to build; it is currently not the live preview. Do not claim final28-test success or final production visual inspection until actually executed. No public deployment/commit/push. Benchmark controller continues independently; shared-host frontend checks are uncontrolled load, not controlled latency research.
+
+## Frontend refresh final verification - 2026-10-17
+- [x] Bundle Outfit400-700 and IBM Plex Mono400/500 locally with licenses/source hashes; zero runtime external-font requests.
+- [x] Apply coherent light/dark semantic themes, persisted/system appearance, updated hierarchy/spacing, saved-run filtering, accessible configuration shortcut and restrained disclosures.
+- [x] Preserve routes, navigation names, field order, API behavior, real/missing metrics and review provenance.
+- [x] Production build and npm check (ESLint +both TypeScript projects) pass.
+- [x] All28 Chromium checks pass on the production preview in13.1 seconds, including new theme persistence/axe and run-filter/shortcut tests.
+- [x] Inspect actual read-only light/dark UI at375/768/1024/1440; additional five real pages ×two themes ×four widths have no page overflow, page errors or external font requests.
+- [x] Reconfirm Python source identity1123f6e613ba27ca7a9b1a97bbabe3159d6d074e1d101c8db8fbff041cda0f5e, unchanged package-lock/uv.lock and continuing benchmark controller (315 successful development observations/0 failures at inspection).
+
+The owner started the built production frontend at http://127.0.0.1:3001 after automatic approval review blocked agent startup. Final production browser/visual checks are now complete; that earlier block no longer prevents verification. Port3000 remains the older Docker frontend, and API/worker/database/images were not restarted/rebuilt. The owner-started3001 process should remain open for this preview. Any future source edits require a native frontend rebuild/restart to appear there; do not rebuild frozen Python experiment services. No public deployment, commit or push.
+
+Evidence: artifacts/ui-refresh-{light-desktop,dark-desktop,dark-375,dark-768,dark-1024,datasets-dark}.png, ui-refresh-live-verification.json, ui-theme-contrast.json. Seven-axis heuristic self-review: purity4/5, task clarity4/5, typography4/5, spacing4/5, feedback4/5, keyboard/accessibility4/5, responsive behavior4/5. This is an implementation self-review, not independent usability research or blanket accessibility certification. Earlier browser failures uncovered/fixed real tablet overflow, theme-interpolation contrast and shortcut focus; the final28-test run passes. M7 itself is still running under the chosen exploratory scope.
+
+## Landing page — 2026-10-17
+- [x] Add `/` landing with Instrument Serif/Ostrich Sans, local licensed fonts, and a clearly synthetic actual demo image. Keep workspace at `/experiments`.
+- [x] Integrate exact Lenis1.3.27/GSAP3.15.0 with reduced motion and route cleanup.
+- [x] Verify production build, npm check, and all30 Chromium tests (13.0s), including mobile/theme axe checks, no landing API calls and Lenis teardown.
+- [x] Keep frozen API/worker images and running benchmark untouched. Root frontend package-lock changes are explicitly authorized for this task; old copy retained privately.
+
+Landing follow-up hook triage: removed only the redundant3px colored left border from .run-progress (globals.css); retained its existing1px semantic outline and explicit state/count text. No suppression added. Other pre-existing workspace accents are outside this single-finding task.
+
+## Integrated landing and live frontend — 2026-10-17
+Owner approved the landing and requested integration with the actual project. Fixed demo Local workspace and404 Open experiments links to /experiments. Web standalone Docker runtime now copies public assets; the actual synthetic demo JPEG returns200 in the container. Built only web, then applied docker compose up -d --no-deps web. Main local URL http://localhost:3000 now serves the landing and updated research workspace; native preview ports are no longer needed for normal use. API/worker/database IDs and creation times are unchanged (before snapshot in artifacts/frontend-integration-services-before.json). No backend/image/volume changes or research data mutations.
+
+Executed npm check and real Docker standalone build successfully. All31 Chromium checks pass against Docker3000 in15.1s. Added landing→workspace→home round-trip check and corrected404/demo link assertions. Separate GET-only live smoke traversed landing/demo/workspace/documents/datasets/comparisons/settings with actual API, PostgreSQL and worker ready, saved run rows loaded, no page errors or desktop overflow. Visually inspected real loaded workspace and landing. Evidence artifacts/frontend-integration-live.json and integrated-real-{experiments,landing}.png.
+
+M7 controller34512 remains active:412/840 development successes at inspection; held-out execution/report/export/final recovery still pending. Do not label M7 finished or retrieval scores answer accuracy. Shared-host frontend build activity is uncontrolled load and does not establish controlled latency. Current host/frontend lock differs from frozen API/worker lock by authorized Lenis/GSAP addition.
+
+## Workspace identity and motion delivered — 2026-10-17
+Owner requested matching actual project pages to the approved landing. Shared local Instrument Serif/Ostrich Sans now replace Outfit for workspace prose/headings and navigation/labels respectively; technical evidence/SQL/IDs retain Plex Mono. Added workspace-editorial.css for paper/ink/rust light/dark tokens, readable type, restrained outlines, underlined active nav and mobile adjustments. Shared app/fonts.ts prevents duplicate font definitions. Updated actual synthetic demo screenshot to match current styling.
+
+WorkspaceMotion adds GSAP heading movement and Lenis scrolling per route; ticker/context/Lenis are destroyed on route changes/unmount or dynamic reduced-motion changes. Nested evidence/SQL panes, sidebar and form controls preserve native scrolling. Live result rows are never animated. Initial accessibility tests found opacity-animation contrast failures; fixed by removing opacity entirely, preserving full text contrast through transitions. Mobile subtitle crowding was removed.
+
+Verified npm check and Docker standalone web build. Final32 Chromium tests pass on Docker3000 in14.8s, including new workspace route/reduced-motion/font/cleanup checks and all existing provenance/forms/trace/axe flows. Live GET-only visual/layout audit covers five pages ×four widths375/768/1024/1440 ×two themes. Representative real desktop/mobile experiments and datasets inspected. No page overflow in audit; evidence artifacts/editorial-layout-audit.json and editorial-*.png.
+
+Only web was rebuilt/replaced with --no-deps. API96f206e0aecc, worker223c2fc3546c and db9c40de4d14f3 remain the same healthy containers. M7 controller continues waiting_for_development; no Python source/image/experiment/review changes in this frontend task. Latest UI is http://localhost:3000/experiments. Native3001/3002 previews are historical builds and should not be used for this change. No deployment, commit, push or new dependency changes.

@@ -9,7 +9,7 @@ const readyStatus = {
 
 test("empty workspace explains capability limits and every destination works", async ({ page }) => {
   await page.route("**/api/workspace", (route) => route.fulfill({ json: readyStatus }));
-  await page.goto("/");
+  await page.goto("/experiments");
   await expect(page.getByRole("heading", { name: "Experiments", exact: true })).toBeVisible();
   await expect(page.getByRole("button", { name: "Start run", exact: true })).toBeDisabled();
   await page.getByRole("link", { name: "View setup" }).click();
@@ -43,7 +43,7 @@ test("mobile navigation and keyboard skip link work without page overflow", asyn
   await page.setViewportSize({ width: 375, height: 812 });
   await page.emulateMedia({ reducedMotion: "reduce" });
   await page.route("**/api/workspace", (route) => route.fulfill({ json: readyStatus }));
-  await page.goto("/");
+  await page.goto("/experiments");
   await page.keyboard.press("Tab");
   await expect(page.getByRole("link", { name: "Skip to main content" })).toBeFocused();
   await page.keyboard.press("Enter");
@@ -58,7 +58,7 @@ test("mobile navigation and keyboard skip link work without page overflow", asyn
 
 test("core pages have no serious accessibility violations", async ({ page }) => {
   await page.route("**/api/workspace", (route) => route.fulfill({ json: readyStatus }));
-  for (const path of ["/", "/settings", "/documents", "/datasets"]) {
+  for (const path of ["/experiments", "/settings", "/documents", "/datasets"]) {
     await page.goto(path);
     await expect(page.getByText("API connected", { exact: true })).toBeVisible();
     const results = await new AxeBuilder({ page }).withTags(["wcag2a", "wcag2aa", "wcag21aa"]).analyze();
@@ -69,5 +69,24 @@ test("core pages have no serious accessibility violations", async ({ page }) => 
 test("unknown routes return a useful 404", async ({ page }) => {
   const response = await page.goto("/missing-page");
   expect(response?.status()).toBe(404);
-  await expect(page.getByRole("link", { name: "Open experiments" })).toBeVisible();
+  await expect(page.getByRole("link", { name: "Open experiments" })).toHaveAttribute("href", "/experiments");
+});
+
+test("appearance respects the system, persists explicit choice, and remains accessible", async ({ page }) => {
+  await page.route("**/api/workspace", route => route.fulfill({ json: readyStatus }));
+  await page.emulateMedia({ colorScheme: "dark", reducedMotion: "reduce" });
+  await page.goto("/settings");
+  await expect(page.getByText("API connected", { exact: true })).toBeVisible();
+  await expect(page.getByLabel("Color theme")).toHaveValue("system");
+  for (const mode of ["light", "dark"]) {
+    await page.getByLabel("Color theme").selectOption(mode);
+    await expect(page.locator("html")).toHaveAttribute("data-theme", mode);
+    const result = await new AxeBuilder({ page }).withTags(["wcag2a", "wcag2aa", "wcag21aa"]).analyze();
+    expect(result.violations).toEqual([]);
+  }
+  await page.reload();
+  await expect(page.getByLabel("Color theme")).toHaveValue("dark");
+  await page.getByLabel("Color theme").selectOption("system");
+  await page.emulateMedia({ colorScheme: "light" });
+  await expect(page.locator("html")).toHaveAttribute("data-theme", "system");
 });

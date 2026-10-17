@@ -41,7 +41,7 @@ Completed originals may remain unreferenced if a database commit has an unknown 
 ## Backup and restore
 Back up PostgreSQL and artifact storage as one consistent application snapshot; coordinate writes or use a documented snapshot procedure. Retain manifest hashes and encryption/access controls appropriate to local documents. Verify restore into a clean environment, reapply compatible migrations, and check corpus/run lineage plus blob existence. Never describe an untested backup as verified.
 
-Backup/restore has not been exercised. Document and experiment/result persistence are implemented; a full backup/restore is still unverified.
+The current Docker workspace backup/restore has now been exercised in isolation; see BACKUP_RESTORE.md and the M7 verification record below. Offsite/machine-loss recovery and separate native installations are not verified.
 
 ## Remote hosting gate
 Before binding to a public interface: authentication/authorization, TLS, secure cookies where applicable, restricted CORS, protected uploads/downloads, quotas, secret management, logging policy, backups, and retention/deletion controls. The initial local trust model does not protect a shared public workspace.
@@ -78,3 +78,14 @@ Rebuild api, worker, migrate and web together, then run docker compose up -d. Re
 MAX_EXPORT_BYTES defaults to 209715200 (200 MiB uncompressed) and is bounded to 1 GiB; archives are also capped at 20,000 entries. Matching API/worker caps are frozen into jobs. Oversized jobs fail visibly without publishing partial output. ZIP generation belongs to the worker, with retries and stale-lease fencing; downloads stream from the retained artifact volume.
 
 Verify the downloaded ZIP SHA-256 against output.sha256 and each entry against checksums.json. Bundles include potentially private raw prompts, answers and full canonical corpus/index evidence; retain them locally under the existing trusted-workspace policy. They omit uploaded binaries/model weights. provenance/availability.json lists missing or changed historical code instead of substituting current bytes. Service restart persistence is verified; complete backup/restore and controlled performance measurements remain M7.
+
+## M7 preparation commands and state
+See research/postgresql-18.0/README.md for pinned acquisition, resumable API import and candidate-review commands. Preserve data/research/postgresql-18.0 (source archive/HTML, workspace-binding.json and review receipts) alongside all named volumes. Source originals are also stored through normal ingestion. Operator import can be rerun after an API restart/ambiguous response: it validates corpus provenance, deduplicates original bytes and resolves the same published snapshot. Do not auto-edit reviewed questions or silently select different source content.
+
+For this continuation, main is863b267; the private local .env SOURCE_REVISION was updated to863b267-dirty for future M7 submissions and matching API/worker services were recreated. Published older manifests retain their original identities. On the next code checkpoint, update the declared revision consistently before new experiments. Schema remains0010_exports. Full backup/restore validation remains pending; source acquisition and retained evidence ZIPs are not substitutes for a complete backup.
+
+## Verified M7 backup/restore
+Use BACKUP_RESTORE.md for the implemented operator commands. The real local snapshot data/backups/m7-20261016-01 restores all23 public tables exactly,83 artifact files and86 model-cache files, with schema/API/read/download checks. It includes private runtime.env and exact Docker images, source/locks and local research. It is a point-in-time trusted local backup, not a public artifact. Keep the original live volumes. Verification uses isolated disposable targets and never starts a worker. Final backup/restore proof and limits are in CODEX_HANDOFF.md; independent offsite loss recovery remains outside the performed check.
+
+## Frontend-only updates during a frozen campaign
+For frontend-only changes, use `docker compose build web` then `docker compose up -d --no-deps web`. This replaces only the local web container, preserving API/worker images, database and model/artifact volumes. Do not use the older all-service rebuild instructions during unfinished frozen experiments. The standalone runtime must copy both .next/static and apps/web/public (the landing demo image lives there). Open http://localhost:3000/ for the landing; /experiments for the real workspace.

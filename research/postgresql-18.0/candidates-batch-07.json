@@ -1,0 +1,499 @@
+[
+  {
+    "topic": "troubleshooting",
+    "difficulty": "medium",
+    "text": "Are EXPLAIN cost estimates measured in milliseconds?",
+    "answerable": true,
+    "reference_answer": "No. Planner costs use arbitrary units determined by planner cost parameters.",
+    "required_facts": [
+      "No. Planner costs use arbitrary units determined by planner cost parameters."
+    ],
+    "evidence_specs": [
+      {
+        "fact_index": 0,
+        "filename": "using-explain.html",
+        "quote": "The costs are measured in arbitrary units determined by the planner's cost parameters"
+      }
+    ],
+    "author": "Codex; AI-authored and AI source-reviewed, not independent human validation",
+    "unanswerability_rationale": null,
+    "source_review_rationale": "Cost units must not be confused with actual-time measurements in EXPLAIN ANALYZE.",
+    "candidate_id": "pg18-b07-01"
+  },
+  {
+    "topic": "troubleshooting",
+    "difficulty": "medium",
+    "text": "Does the cost shown for an upper plan node include its child nodes?",
+    "answerable": true,
+    "reference_answer": "Yes. An upper plan node cost includes all its children.",
+    "required_facts": [
+      "Yes. An upper plan node cost includes all its children."
+    ],
+    "evidence_specs": [
+      {
+        "fact_index": 0,
+        "filename": "using-explain.html",
+        "quote": "the cost of an upper-level node includes the cost of all its child nodes."
+      }
+    ],
+    "author": "Codex; AI-authored and AI source-reviewed, not independent human validation",
+    "unanswerability_rationale": null,
+    "source_review_rationale": "This prevents double-counting costs by naively summing every displayed node.",
+    "candidate_id": "pg18-b07-02"
+  },
+  {
+    "topic": "troubleshooting",
+    "difficulty": "medium",
+    "text": "Does the EXPLAIN rows estimate mean rows scanned or rows emitted by a node?",
+    "answerable": true,
+    "reference_answer": "It estimates rows emitted, not all rows scanned or processed.",
+    "required_facts": [
+      "It estimates rows emitted, not all rows scanned or processed."
+    ],
+    "evidence_specs": [
+      {
+        "fact_index": 0,
+        "filename": "using-explain.html",
+        "quote": "The rows value is a little tricky because it is not the number of rows processed or scanned by the plan node, but rather the number emitted by the node."
+      }
+    ],
+    "author": "Codex; AI-authored and AI source-reviewed, not independent human validation",
+    "unanswerability_rationale": null,
+    "source_review_rationale": "Retains the filtered-versus-scanned distinction explicitly stated by the manual.",
+    "candidate_id": "pg18-b07-03"
+  },
+  {
+    "topic": "troubleshooting",
+    "difficulty": "hard",
+    "text": "For a plan node executed repeatedly, how are actual time and rows displayed, and how is total node time obtained?",
+    "answerable": true,
+    "reference_answer": "loops counts executions; actual time and rows are per-execution averages. Multiply average time by loops to obtain total node time.",
+    "required_facts": [
+      "loops counts executions; actual time and rows are per-execution averages.",
+      "Multiply average time by loops to obtain total node time."
+    ],
+    "evidence_specs": [
+      {
+        "fact_index": 0,
+        "filename": "using-explain.html",
+        "quote": "the loops value reports the total number of executions of the node, and the actual time and rows values shown are averages per-execution."
+      },
+      {
+        "fact_index": 1,
+        "filename": "using-explain.html",
+        "quote": "Multiply by the loops value to get the total time actually spent in the node."
+      }
+    ],
+    "author": "Codex; AI-authored and AI source-reviewed, not independent human validation",
+    "unanswerability_rationale": null,
+    "source_review_rationale": "Reviewed nested-loop context; does not multiply estimated costs or claim nested totals can be added without overlap.",
+    "candidate_id": "pg18-b07-04"
+  },
+  {
+    "topic": "troubleshooting",
+    "difficulty": "hard",
+    "text": "Does EXPLAIN ANALYZE include network transmission time, and can its own measurement overhead affect timings?",
+    "answerable": true,
+    "reference_answer": "Network transmission costs are not included. EXPLAIN ANALYZE can add significant timing measurement overhead.",
+    "required_facts": [
+      "Network transmission costs are not included.",
+      "EXPLAIN ANALYZE can add significant timing measurement overhead."
+    ],
+    "evidence_specs": [
+      {
+        "fact_index": 0,
+        "filename": "using-explain.html",
+        "quote": "First, since no output rows are delivered to the client, network transmission costs are not included."
+      },
+      {
+        "fact_index": 1,
+        "filename": "using-explain.html",
+        "quote": "the measurement overhead added by EXPLAIN ANALYZE can be significant"
+      }
+    ],
+    "author": "Codex; AI-authored and AI source-reviewed, not independent human validation",
+    "unanswerability_rationale": null,
+    "source_review_rationale": "Both limitations are explicit; serialization conversion has its own option and is not conflated with network time.",
+    "candidate_id": "pg18-b07-05"
+  },
+  {
+    "topic": "troubleshooting",
+    "difficulty": "medium",
+    "text": "Why can row estimates change between repeated ANALYZE operations on the same table?",
+    "answerable": true,
+    "reference_answer": "ANALYZE uses randomized sampling, so row estimates can vary between runs.",
+    "required_facts": [
+      "ANALYZE uses randomized sampling, so row estimates can vary between runs."
+    ],
+    "evidence_specs": [
+      {
+        "fact_index": 0,
+        "filename": "using-explain.html",
+        "quote": "it can change after each ANALYZE command, because the statistics produced by ANALYZE are taken from a randomized sample of the table."
+      }
+    ],
+    "author": "Codex; AI-authored and AI source-reviewed, not independent human validation",
+    "unanswerability_rationale": null,
+    "source_review_rationale": "A sampling limitation, not proof that a query or its table necessarily changed.",
+    "candidate_id": "pg18-b07-06"
+  },
+  {
+    "topic": "troubleshooting",
+    "difficulty": "medium",
+    "text": "Does autovacuum ever issue VACUUM FULL?",
+    "answerable": true,
+    "reference_answer": "No. Autovacuum never issues VACUUM FULL.",
+    "required_facts": [
+      "No. Autovacuum never issues VACUUM FULL."
+    ],
+    "evidence_specs": [
+      {
+        "fact_index": 0,
+        "filename": "routine-vacuuming.html",
+        "quote": "The autovacuum daemon attempts to work this way, and in fact will never issue VACUUM FULL ."
+      }
+    ],
+    "author": "Codex; AI-authored and AI source-reviewed, not independent human validation",
+    "unanswerability_rationale": null,
+    "source_review_rationale": "The source explicitly says never; standard vacuum behavior is covered by a different existing question.",
+    "candidate_id": "pg18-b07-07"
+  },
+  {
+    "topic": "troubleshooting",
+    "difficulty": "medium",
+    "text": "Why are old row versions not immediately removed by UPDATE or DELETE?",
+    "answerable": true,
+    "reference_answer": "MVCC requires retaining an old row version while another transaction could still see it.",
+    "required_facts": [
+      "MVCC requires retaining an old row version while another transaction could still see it."
+    ],
+    "evidence_specs": [
+      {
+        "fact_index": 0,
+        "filename": "routine-vacuuming.html",
+        "quote": "the row version must not be deleted while it is still potentially visible to other transactions."
+      }
+    ],
+    "author": "Codex; AI-authored and AI source-reviewed, not independent human validation",
+    "unanswerability_rationale": null,
+    "source_review_rationale": "The source explains retention rather than treating all deleted tuples as immediately reclaimable.",
+    "candidate_id": "pg18-b07-08"
+  },
+  {
+    "topic": "troubleshooting",
+    "difficulty": "hard",
+    "text": "Do updates in table partitions automatically trigger ANALYZE of a rarely changed parent?",
+    "answerable": true,
+    "reference_answer": "No. Changes in partitions or inheritance children do not trigger parent analysis; manually ANALYZE the parent to keep whole-tree statistics current.",
+    "required_facts": [
+      "No. Changes in partitions or inheritance children do not trigger parent analysis; manually ANALYZE the parent to keep whole-tree statistics current."
+    ],
+    "evidence_specs": [
+      {
+        "fact_index": 0,
+        "filename": "routine-vacuuming.html",
+        "quote": "Tuples changed in partitions and inheritance children do not trigger analyze on the parent table. If the parent table is empty or rarely changed, it may never be processed by autovacuum, and the statistics for the inheritance tree as a whole won't be collected. It is necessary to run ANALYZE on the parent table manually in order to keep the statistics up to date."
+      }
+    ],
+    "author": "Codex; AI-authored and AI source-reviewed, not independent human validation",
+    "unanswerability_rationale": null,
+    "source_review_rationale": "The paragraph gives the specific parent/child exception; not a claim autovacuum ignores the partitions themselves.",
+    "candidate_id": "pg18-b07-09"
+  },
+  {
+    "topic": "troubleshooting",
+    "difficulty": "medium",
+    "text": "Can autovacuum maintain temporary tables?",
+    "answerable": true,
+    "reference_answer": "No. Temporary tables require appropriate VACUUM and ANALYZE through session SQL commands.",
+    "required_facts": [
+      "No. Temporary tables require appropriate VACUUM and ANALYZE through session SQL commands."
+    ],
+    "evidence_specs": [
+      {
+        "fact_index": 0,
+        "filename": "routine-vacuuming.html",
+        "quote": "Temporary tables cannot be accessed by autovacuum. Therefore, appropriate vacuum and analyze operations should be performed via session SQL commands."
+      }
+    ],
+    "author": "Codex; AI-authored and AI source-reviewed, not independent human validation",
+    "unanswerability_rationale": null,
+    "source_review_rationale": "The source explicitly states autovacuum cannot access temporary tables.",
+    "candidate_id": "pg18-b07-10"
+  },
+  {
+    "topic": "troubleshooting",
+    "difficulty": "hard",
+    "text": "Can anti-wraparound autovacuum run even when autovacuum is disabled?",
+    "answerable": true,
+    "reference_answer": "Yes. Autovacuum is invoked for sufficiently old unfrozen XIDs even if nominally disabled.",
+    "required_facts": [
+      "Yes. Autovacuum is invoked for sufficiently old unfrozen XIDs even if nominally disabled."
+    ],
+    "evidence_specs": [
+      {
+        "fact_index": 0,
+        "filename": "routine-vacuuming.html",
+        "quote": "autovacuum is invoked on any table that might contain unfrozen rows with XIDs older than the age specified by the configuration parameter autovacuum_freeze_max_age . (This will happen even if autovacuum is disabled.)"
+      }
+    ],
+    "author": "Codex; AI-authored and AI source-reviewed, not independent human validation",
+    "unanswerability_rationale": null,
+    "source_review_rationale": "This is the safety exception, not ordinary threshold-driven vacuuming.",
+    "candidate_id": "pg18-b07-11"
+  },
+  {
+    "topic": "troubleshooting",
+    "difficulty": "medium",
+    "text": "What maintenance command rebuilds indexes when periodic rebuilding is warranted?",
+    "answerable": true,
+    "reference_answer": "REINDEX rebuilds indexes when periodic rebuilding is warranted.",
+    "required_facts": [
+      "REINDEX rebuilds indexes when periodic rebuilding is warranted."
+    ],
+    "evidence_specs": [
+      {
+        "fact_index": 0,
+        "filename": "routine-reindex.html",
+        "quote": "In some situations it is worthwhile to rebuild indexes periodically with the REINDEX command or a series of individual rebuilding steps."
+      }
+    ],
+    "author": "Codex; AI-authored and AI source-reviewed, not independent human validation",
+    "unanswerability_rationale": null,
+    "source_review_rationale": "A command-identification question, not a recommendation to rebuild every index routinely.",
+    "candidate_id": "pg18-b07-12"
+  },
+  {
+    "topic": "troubleshooting",
+    "difficulty": "hard",
+    "text": "For REINDEX, how does CONCURRENTLY change the lock required relative to the default?",
+    "answerable": true,
+    "reference_answer": "Default REINDEX needs ACCESS EXCLUSIVE; CONCURRENTLY uses SHARE UPDATE EXCLUSIVE.",
+    "required_facts": [
+      "Default REINDEX needs ACCESS EXCLUSIVE; CONCURRENTLY uses SHARE UPDATE EXCLUSIVE."
+    ],
+    "evidence_specs": [
+      {
+        "fact_index": 0,
+        "filename": "routine-reindex.html",
+        "quote": "REINDEX can be used safely and easily in all cases. This command requires an ACCESS EXCLUSIVE lock by default, hence it is often preferable to execute it with its CONCURRENTLY option, which requires only a SHARE UPDATE EXCLUSIVE lock."
+      }
+    ],
+    "author": "Codex; AI-authored and AI source-reviewed, not independent human validation",
+    "unanswerability_rationale": null,
+    "source_review_rationale": "Both documented lock names retained; this does not claim concurrent rebuild has zero blocking.",
+    "candidate_id": "pg18-b07-13"
+  },
+  {
+    "topic": "troubleshooting",
+    "difficulty": "medium",
+    "text": "Why can a B-tree index retain inefficiently used space after many deletions?",
+    "answerable": true,
+    "reference_answer": "A page with only a few remaining keys stays allocated, even though completely empty B-tree pages can be reused.",
+    "required_facts": [
+      "A page with only a few remaining keys stays allocated, even though completely empty B-tree pages can be reused."
+    ],
+    "evidence_specs": [
+      {
+        "fact_index": 0,
+        "filename": "routine-reindex.html",
+        "quote": "B-tree index pages that have become completely empty are reclaimed for re-use. However, there is still a possibility of inefficient use of space: if all but a few index keys on a page have been deleted, the page remains allocated."
+      }
+    ],
+    "author": "Codex; AI-authored and AI source-reviewed, not independent human validation",
+    "unanswerability_rationale": null,
+    "source_review_rationale": "Added empty-page rule as joint evidence below; distinguishes sparse pages from fully empty pages.",
+    "candidate_id": "pg18-b07-14"
+  },
+  {
+    "topic": "troubleshooting",
+    "difficulty": "hard",
+    "text": "Do cumulative statistics views update immediately for a transaction still in progress?",
+    "answerable": true,
+    "reference_answer": "No. Displayed cumulative totals can lag behind active work.",
+    "required_facts": [
+      "No. Displayed cumulative totals can lag behind active work."
+    ],
+    "evidence_specs": [
+      {
+        "fact_index": 0,
+        "filename": "monitoring-stats.html",
+        "quote": "so a query or transaction still in progress does not affect the displayed totals and the displayed information lags behind actual activity."
+      }
+    ],
+    "author": "Codex; AI-authored and AI source-reviewed, not independent human validation",
+    "unanswerability_rationale": null,
+    "source_review_rationale": "The surrounding paragraph distinguishes current-query track_activities information, which is not subject to the same lag.",
+    "candidate_id": "pg18-b07-15"
+  },
+  {
+    "topic": "troubleshooting",
+    "difficulty": "hard",
+    "text": "How can a transaction discard its cached statistics snapshot to request fresh statistics?",
+    "answerable": true,
+    "reference_answer": "Call pg_stat_clear_snapshot() to discard the cached snapshot or values.",
+    "required_facts": [
+      "Call pg_stat_clear_snapshot() to discard the cached snapshot or values."
+    ],
+    "evidence_specs": [
+      {
+        "fact_index": 0,
+        "filename": "monitoring-stats.html",
+        "quote": "You can invoke pg_stat_clear_snapshot() to discard the current transaction's statistics snapshot or cached values (if any)."
+      }
+    ],
+    "author": "Codex; AI-authored and AI source-reviewed, not independent human validation",
+    "unanswerability_rationale": null,
+    "source_review_rationale": "The function discards a snapshot, not the collected global counters; subsequent access rebuilds or recaches according to mode.",
+    "candidate_id": "pg18-b07-16"
+  },
+  {
+    "topic": "troubleshooting",
+    "difficulty": "hard",
+    "text": "Can PostgreSQL I/O statistics alone distinguish a physical disk read from an operating-system page-cache hit?",
+    "answerable": true,
+    "reference_answer": "No. The statistics do not distinguish physical disk fetches from kernel page-cache hits.",
+    "required_facts": [
+      "No. The statistics do not distinguish physical disk fetches from kernel page-cache hits."
+    ],
+    "evidence_specs": [
+      {
+        "fact_index": 0,
+        "filename": "monitoring-stats.html",
+        "quote": "they do not differentiate between data which had to be fetched from disk and that which already resided in the kernel page cache."
+      }
+    ],
+    "author": "Codex; AI-authored and AI source-reviewed, not independent human validation",
+    "unanswerability_rationale": null,
+    "source_review_rationale": "The full paragraph recommends combining PostgreSQL views with OS utilities; no false physical-I/O attribution.",
+    "candidate_id": "pg18-b07-17"
+  },
+  {
+    "topic": "troubleshooting",
+    "difficulty": "hard",
+    "text": "Are pg_stat_replication lag times predictions of how long a standby will take to catch up?",
+    "answerable": true,
+    "reference_answer": "No. They are not catch-up-time predictions.",
+    "required_facts": [
+      "No. They are not catch-up-time predictions."
+    ],
+    "evidence_specs": [
+      {
+        "fact_index": 0,
+        "filename": "monitoring-stats.html",
+        "quote": "The reported lag times are not predictions of how long it will take for the standby to catch up with the sending server assuming the current rate of replay."
+      }
+    ],
+    "author": "Codex; AI-authored and AI source-reviewed, not independent human validation",
+    "unanswerability_rationale": null,
+    "source_review_rationale": "The source explicitly rejects that common interpretation; not another generic latency question.",
+    "candidate_id": "pg18-b07-18"
+  },
+  {
+    "topic": "troubleshooting",
+    "difficulty": "medium",
+    "text": "Why should an application test SQLSTATE rather than localized error text?",
+    "answerable": true,
+    "reference_answer": "SQLSTATE codes are less likely to change across releases and are unaffected by error-message localization.",
+    "required_facts": [
+      "SQLSTATE codes are less likely to change across releases and are unaffected by error-message localization."
+    ],
+    "evidence_specs": [
+      {
+        "fact_index": 0,
+        "filename": "errcodes-appendix.html",
+        "quote": "The error codes are less likely to change across PostgreSQL releases, and also are not subject to change due to localization of error messages."
+      }
+    ],
+    "author": "Codex; AI-authored and AI source-reviewed, not independent human validation",
+    "unanswerability_rationale": null,
+    "source_review_rationale": "Both stability and localization reasons are directly present in the error-code introduction.",
+    "candidate_id": "pg18-b07-19"
+  },
+  {
+    "topic": "troubleshooting",
+    "difficulty": "medium",
+    "text": "How do the first two and last three characters of SQLSTATE divide its meaning?",
+    "answerable": true,
+    "reference_answer": "The first two characters identify the error class; the last three identify a specific condition within it.",
+    "required_facts": [
+      "The first two characters identify the error class; the last three identify a specific condition within it."
+    ],
+    "evidence_specs": [
+      {
+        "fact_index": 0,
+        "filename": "errcodes-appendix.html",
+        "quote": "According to the standard, the first two characters of an error code denote a class of errors, while the last three characters indicate a specific condition within that class. Thus, an application that does not recognize the specific error code might still be able to infer what to do from the error class."
+      }
+    ],
+    "author": "Codex; AI-authored and AI source-reviewed, not independent human validation",
+    "unanswerability_rationale": null,
+    "source_review_rationale": "The five-character structure is source-defined; no unsupported code lookup or runtime diagnosis.",
+    "candidate_id": "pg18-b07-20"
+  },
+  {
+    "topic": "troubleshooting",
+    "difficulty": "medium",
+    "text": "What is my current buffer-cache hit ratio when no statistics counters or monitoring output are supplied?",
+    "answerable": false,
+    "reference_answer": "The provided corpus and question do not contain enough information to determine that.",
+    "required_facts": [],
+    "evidence_specs": [],
+    "author": "Codex; AI-authored and AI source-reviewed, not independent human validation",
+    "unanswerability_rationale": "The manual describes views that can calculate a ratio, but supplies no counters for this installation. A numeric current ratio cannot be inferred.",
+    "source_review_rationale": "The manual describes views that can calculate a ratio, but supplies no counters for this installation. A numeric current ratio cannot be inferred.",
+    "audit_context_sections": [
+      "d84322ef-0ac8-527e-9d9a-873efc763aaf"
+    ],
+    "candidate_id": "pg18-b07-21"
+  },
+  {
+    "topic": "troubleshooting",
+    "difficulty": "medium",
+    "text": "Which table is currently most bloated in my database when no relation sizes, tuple statistics or table names are provided?",
+    "answerable": false,
+    "reference_answer": "The provided corpus and question do not contain enough information to determine that.",
+    "required_facts": [],
+    "evidence_specs": [],
+    "author": "Codex; AI-authored and AI source-reviewed, not independent human validation",
+    "unanswerability_rationale": "Maintenance guidance does not reveal live table measurements or relative bloat in this database. There is no basis to identify a table.",
+    "source_review_rationale": "Maintenance guidance does not reveal live table measurements or relative bloat in this database. There is no basis to identify a table.",
+    "audit_context_sections": [
+      "bfdc6cf6-e6e4-500f-aeaf-c845a745aed1",
+      "35e3207d-3882-59d5-b7dd-c5436da40b2a"
+    ],
+    "candidate_id": "pg18-b07-22"
+  },
+  {
+    "topic": "troubleshooting",
+    "difficulty": "medium",
+    "text": "Exactly how many seconds remain until my standby catches up when no WAL positions, throughput or workload are given?",
+    "answerable": false,
+    "reference_answer": "The provided corpus and question do not contain enough information to determine that.",
+    "required_facts": [],
+    "evidence_specs": [],
+    "author": "Codex; AI-authored and AI source-reviewed, not independent human validation",
+    "unanswerability_rationale": "No replication observations are supplied, and the manual explicitly says reported lag is not a catch-up-time prediction. An exact remaining time is undetermined.",
+    "source_review_rationale": "No replication observations are supplied, and the manual explicitly says reported lag is not a catch-up-time prediction. An exact remaining time is undetermined.",
+    "audit_context_sections": [
+      "a0ccdf13-2293-59d0-9968-40eb691e96b1"
+    ],
+    "candidate_id": "pg18-b07-23"
+  },
+  {
+    "topic": "troubleshooting",
+    "difficulty": "medium",
+    "text": "Which operating-system disk device is saturated by my database right now when no OS or PostgreSQL monitoring observations are supplied?",
+    "answerable": false,
+    "reference_answer": "The provided corpus and question do not contain enough information to determine that.",
+    "required_facts": [],
+    "evidence_specs": [],
+    "author": "Codex; AI-authored and AI source-reviewed, not independent human validation",
+    "unanswerability_rationale": "PostgreSQL I/O counters alone do not distinguish the OS cache from disk, and no observations at all are supplied. A specific currently saturated device cannot be identified.",
+    "source_review_rationale": "PostgreSQL I/O counters alone do not distinguish the OS cache from disk, and no observations at all are supplied. A specific currently saturated device cannot be identified.",
+    "audit_context_sections": [
+      "d84322ef-0ac8-527e-9d9a-873efc763aaf"
+    ],
+    "candidate_id": "pg18-b07-24"
+  }
+]

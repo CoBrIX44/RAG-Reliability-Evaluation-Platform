@@ -1,0 +1,488 @@
+[
+  {
+    "topic": "indexes",
+    "difficulty": "easy",
+    "text": "Which index access method does CREATE INDEX choose by default?",
+    "answerable": true,
+    "reference_answer": "CREATE INDEX defaults to B-tree.",
+    "required_facts": [
+      "CREATE INDEX defaults to B-tree."
+    ],
+    "evidence_specs": [
+      {
+        "fact_index": 0,
+        "filename": "indexes-types.html",
+        "quote": "By default, the CREATE INDEX command creates B-tree indexes, which fit the most common situations."
+      }
+    ],
+    "author": "Codex; AI-authored and AI source-reviewed, not independent human validation",
+    "unanswerability_rationale": null,
+    "source_review_rationale": "The default is directly named in the overview; this differs from the existing uniqueness-supported-method question.",
+    "candidate_id": "pg18-b05-01"
+  },
+  {
+    "topic": "indexes",
+    "difficulty": "medium",
+    "text": "What comparison class can Hash indexes handle?",
+    "answerable": true,
+    "reference_answer": "Hash indexes handle only simple equality comparisons.",
+    "required_facts": [
+      "Hash indexes handle only simple equality comparisons."
+    ],
+    "evidence_specs": [
+      {
+        "fact_index": 0,
+        "filename": "indexes-types.html",
+        "quote": "Hence, such indexes can only handle simple equality comparisons."
+      }
+    ],
+    "author": "Codex; AI-authored and AI source-reviewed, not independent human validation",
+    "unanswerability_rationale": null,
+    "source_review_rationale": "Read the preceding hash-code explanation; range or ordering support must not be inferred.",
+    "candidate_id": "pg18-b05-02"
+  },
+  {
+    "topic": "indexes",
+    "difficulty": "medium",
+    "text": "What property of table values makes BRIN indexes especially effective?",
+    "answerable": true,
+    "reference_answer": "BRIN is most effective when column values correlate well with physical row order.",
+    "required_facts": [
+      "BRIN is most effective when column values correlate well with physical row order."
+    ],
+    "evidence_specs": [
+      {
+        "fact_index": 0,
+        "filename": "indexes-types.html",
+        "quote": "Thus, they are most effective for columns whose values are well-correlated with the physical order of the table rows."
+      }
+    ],
+    "author": "Codex; AI-authored and AI source-reviewed, not independent human validation",
+    "unanswerability_rationale": null,
+    "source_review_rationale": "The preceding sentence describes physical block-range summaries; not a universal index recommendation.",
+    "candidate_id": "pg18-b05-03"
+  },
+  {
+    "topic": "indexes",
+    "difficulty": "medium",
+    "text": "Why are GIN indexes appropriate for arrays with queries about specific component values?",
+    "answerable": true,
+    "reference_answer": "GIN is an inverted index with separate entries for component values, supporting queries for specific components.",
+    "required_facts": [
+      "GIN is an inverted index with separate entries for component values, supporting queries for specific components."
+    ],
+    "evidence_specs": [
+      {
+        "fact_index": 0,
+        "filename": "indexes-types.html",
+        "quote": "GIN indexes are \u201c inverted indexes \u201d which are appropriate for data values that contain multiple component values, such as arrays. An inverted index contains a separate entry for each component value, and can efficiently handle queries that test for the presence of specific component values."
+      }
+    ],
+    "author": "Codex; AI-authored and AI source-reviewed, not independent human validation",
+    "unanswerability_rationale": null,
+    "source_review_rationale": "The component-entry mechanism and intended query type are both in the source.",
+    "candidate_id": "pg18-b05-04"
+  },
+  {
+    "topic": "indexes",
+    "difficulty": "medium",
+    "text": "For a B-tree indexed column, can IS NULL and IS NOT NULL conditions use an index search?",
+    "answerable": true,
+    "reference_answer": "Yes. IS NULL and IS NOT NULL conditions can use a B-tree index.",
+    "required_facts": [
+      "Yes. IS NULL and IS NOT NULL conditions can use a B-tree index."
+    ],
+    "evidence_specs": [
+      {
+        "fact_index": 0,
+        "filename": "indexes-types.html",
+        "quote": "Constructs equivalent to combinations of these operators, such as BETWEEN and IN , can also be implemented with a B-tree index search. Also, an IS NULL or IS NOT NULL condition on an index column can be used with a B-tree index."
+      }
+    ],
+    "author": "Codex; AI-authored and AI source-reviewed, not independent human validation",
+    "unanswerability_rationale": null,
+    "source_review_rationale": "The fact is possibility, not a guarantee the cost-based planner selects that index.",
+    "candidate_id": "pg18-b05-05"
+  },
+  {
+    "topic": "indexes",
+    "difficulty": "hard",
+    "text": "For the documented B-tree skip-scan example on (x,y) with only y constrained, what x distribution can favor skip scan?",
+    "answerable": true,
+    "reference_answer": "Few distinct x values can make repeated searches skip most of the index and favor skip scan.",
+    "required_facts": [
+      "Few distinct x values can make repeated searches skip most of the index and favor skip scan."
+    ],
+    "evidence_specs": [
+      {
+        "fact_index": 0,
+        "filename": "indexes-multicolumn.html",
+        "quote": "This approach is generally only taken when there are so few distinct x values that the planner expects the scan to skip over most of the index"
+      }
+    ],
+    "author": "Codex; AI-authored and AI source-reviewed, not independent human validation",
+    "unanswerability_rationale": null,
+    "source_review_rationale": "Uses the PostgreSQL18 skip-scan paragraph; does not repeat an outdated absolute leftmost-column rule.",
+    "candidate_id": "pg18-b05-06"
+  },
+  {
+    "topic": "indexes",
+    "difficulty": "medium",
+    "text": "Does a multicolumn GIN index favor its first key column over later ones for search effectiveness?",
+    "answerable": true,
+    "reference_answer": "No. GIN search effectiveness is the same regardless of which indexed columns the query conditions use.",
+    "required_facts": [
+      "No. GIN search effectiveness is the same regardless of which indexed columns the query conditions use."
+    ],
+    "evidence_specs": [
+      {
+        "fact_index": 0,
+        "filename": "indexes-multicolumn.html",
+        "quote": "A multicolumn GIN index can be used with query conditions that involve any subset of the index's columns. Unlike B-tree or GiST, index search effectiveness is the same regardless of which index column(s) the query conditions use."
+      }
+    ],
+    "author": "Codex; AI-authored and AI source-reviewed, not independent human validation",
+    "unanswerability_rationale": null,
+    "source_review_rationale": "Index-type-specific statement, not generalized to B-tree or GiST.",
+    "candidate_id": "pg18-b05-07"
+  },
+  {
+    "topic": "indexes",
+    "difficulty": "medium",
+    "text": "When can multiple BRIN indexes on one table be useful instead of a single multicolumn BRIN index?",
+    "answerable": true,
+    "reference_answer": "They allow different pages_per_range storage parameters.",
+    "required_facts": [
+      "They allow different pages_per_range storage parameters."
+    ],
+    "evidence_specs": [
+      {
+        "fact_index": 0,
+        "filename": "indexes-multicolumn.html",
+        "quote": "The only reason to have multiple BRIN indexes instead of one multicolumn BRIN index on a single table is to have a different pages_per_range storage parameter."
+      }
+    ],
+    "author": "Codex; AI-authored and AI source-reviewed, not independent human validation",
+    "unanswerability_rationale": null,
+    "source_review_rationale": "The answer follows the stated design distinction rather than making up workload measurements.",
+    "candidate_id": "pg18-b05-08"
+  },
+  {
+    "topic": "indexes",
+    "difficulty": "medium",
+    "text": "How are nulls treated by default in a unique index, and what does NULLS NOT DISTINCT change?",
+    "answerable": true,
+    "reference_answer": "By default multiple nulls are allowed; NULLS NOT DISTINCT makes nulls compare equal for uniqueness.",
+    "required_facts": [
+      "By default multiple nulls are allowed; NULLS NOT DISTINCT makes nulls compare equal for uniqueness."
+    ],
+    "evidence_specs": [
+      {
+        "fact_index": 0,
+        "filename": "indexes-unique.html",
+        "quote": "By default, null values in a unique column are not considered equal, allowing multiple nulls in the column. The NULLS NOT DISTINCT option modifies this and causes the index to treat nulls as equal."
+      }
+    ],
+    "author": "Codex; AI-authored and AI source-reviewed, not independent human validation",
+    "unanswerability_rationale": null,
+    "source_review_rationale": "The option and default are explicitly contrasted; ordinary SQL null equality is not being redefined.",
+    "candidate_id": "pg18-b05-09"
+  },
+  {
+    "topic": "indexes",
+    "difficulty": "medium",
+    "text": "When does a multicolumn unique index reject duplicate rows?",
+    "answerable": true,
+    "reference_answer": "It rejects duplicates when all indexed columns are equal, subject to the index null policy.",
+    "required_facts": [
+      "It rejects duplicates when all indexed columns are equal, subject to the index null policy."
+    ],
+    "evidence_specs": [
+      {
+        "fact_index": 0,
+        "filename": "indexes-unique.html",
+        "quote": "A multicolumn unique index will only reject cases where all indexed columns are equal in multiple rows."
+      }
+    ],
+    "author": "Codex; AI-authored and AI source-reviewed, not independent human validation",
+    "unanswerability_rationale": null,
+    "source_review_rationale": "Scope includes the null-policy caveat from the same paragraph; not independent uniqueness for each column.",
+    "candidate_id": "pg18-b05-10"
+  },
+  {
+    "topic": "indexes",
+    "difficulty": "easy",
+    "text": "Must a separate unique index be created manually for a primary key or unique constraint?",
+    "answerable": true,
+    "reference_answer": "No. PostgreSQL automatically creates the unique index that enforces the primary key or unique constraint.",
+    "required_facts": [
+      "No. PostgreSQL automatically creates the unique index that enforces the primary key or unique constraint."
+    ],
+    "evidence_specs": [
+      {
+        "fact_index": 0,
+        "filename": "indexes-unique.html",
+        "quote": "PostgreSQL automatically creates a unique index when a unique constraint or primary key is defined for a table. The index covers the columns that make up the primary key or unique constraint (a multicolumn index, if appropriate), and is the mechanism that enforces the constraint."
+      }
+    ],
+    "author": "Codex; AI-authored and AI source-reviewed, not independent human validation",
+    "unanswerability_rationale": null,
+    "source_review_rationale": "Direct automatic-enforcement behavior; no claim redundant indexes improve performance.",
+    "candidate_id": "pg18-b05-11"
+  },
+  {
+    "topic": "indexes",
+    "difficulty": "hard",
+    "text": "Can a partial unique index enforce uniqueness only for rows satisfying its predicate?",
+    "answerable": true,
+    "reference_answer": "Yes. It enforces uniqueness among rows satisfying the predicate without constraining other rows.",
+    "required_facts": [
+      "Yes. It enforces uniqueness among rows satisfying the predicate without constraining other rows."
+    ],
+    "evidence_specs": [
+      {
+        "fact_index": 0,
+        "filename": "indexes-partial.html",
+        "quote": "A third possible use for partial indexes does not require the index to be used in queries at all. The idea here is to create a unique index over a subset of a table, as in Example 11.3 . This enforces uniqueness among the rows that satisfy the index predicate, without constraining those that do not."
+      }
+    ],
+    "author": "Codex; AI-authored and AI source-reviewed, not independent human validation",
+    "unanswerability_rationale": null,
+    "source_review_rationale": "Different from the existing partial-index membership definition; asks scoped constraint behavior.",
+    "candidate_id": "pg18-b05-12"
+  },
+  {
+    "topic": "indexes",
+    "difficulty": "hard",
+    "text": "What must the planner recognize about a query condition before using a partial index?",
+    "answerable": true,
+    "reference_answer": "The planner must recognize that the query WHERE condition implies the partial-index predicate.",
+    "required_facts": [
+      "The planner must recognize that the query WHERE condition implies the partial-index predicate."
+    ],
+    "evidence_specs": [
+      {
+        "fact_index": 0,
+        "filename": "indexes-partial.html",
+        "quote": "To be precise, a partial index can be used in a query only if the system can recognize that the WHERE condition of the query mathematically implies the predicate of the index."
+      }
+    ],
+    "author": "Codex; AI-authored and AI source-reviewed, not independent human validation",
+    "unanswerability_rationale": null,
+    "source_review_rationale": "This is a necessary usability condition, not sufficient proof of cost-based selection.",
+    "candidate_id": "pg18-b05-13"
+  },
+  {
+    "topic": "indexes",
+    "difficulty": "hard",
+    "text": "For CREATE UNIQUE INDEX ON tab(x) INCLUDE(y), is uniqueness enforced on x alone or on the pair (x,y)?",
+    "answerable": true,
+    "reference_answer": "Uniqueness applies to x alone, not to the combination of x and y.",
+    "required_facts": [
+      "Uniqueness applies to x alone, not to the combination of x and y."
+    ],
+    "evidence_specs": [
+      {
+        "fact_index": 0,
+        "filename": "indexes-index-only-scans.html",
+        "quote": "the uniqueness condition applies to just column x , not to the combination of x and y ."
+      }
+    ],
+    "author": "Codex; AI-authored and AI source-reviewed, not independent human validation",
+    "unanswerability_rationale": null,
+    "source_review_rationale": "Inspected the preceding CREATE UNIQUE INDEX example and non-key payload explanation; the requested uniqueness rule is the direct explanatory span.",
+    "candidate_id": "pg18-b05-14"
+  },
+  {
+    "topic": "indexes",
+    "difficulty": "hard",
+    "text": "Why can GIN not perform index-only scans?",
+    "answerable": true,
+    "reference_answer": "A GIN entry typically holds only part of the original value, so it cannot reconstruct the complete value required by an index-only scan.",
+    "required_facts": [
+      "A GIN entry typically holds only part of the original value, so it cannot reconstruct the complete value required by an index-only scan."
+    ],
+    "evidence_specs": [
+      {
+        "fact_index": 0,
+        "filename": "indexes-index-only-scans.html",
+        "quote": "As a counterexample, GIN indexes cannot support index-only scans because each index entry typically holds only part of the original data value."
+      }
+    ],
+    "author": "Codex; AI-authored and AI source-reviewed, not independent human validation",
+    "unanswerability_rationale": null,
+    "source_review_rationale": "The explanation is about reconstructing the indexed value, rather than the separate visibility-map limitation.",
+    "candidate_id": "pg18-b05-15"
+  },
+  {
+    "topic": "indexes",
+    "difficulty": "medium",
+    "text": "For expression indexes, when are indexed expressions computed versus reused?",
+    "answerable": true,
+    "reference_answer": "Expressions are computed on insertion and non-HOT updates, and reused without recomputation during indexed searches.",
+    "required_facts": [
+      "Expressions are computed on insertion and non-HOT updates, and reused without recomputation during indexed searches."
+    ],
+    "evidence_specs": [
+      {
+        "fact_index": 0,
+        "filename": "indexes-expressional.html",
+        "quote": "Index expressions are relatively expensive to maintain, because the derived expression(s) must be computed for each row insertion and non-HOT update . However, the index expressions are not recomputed during an indexed search, since they are already stored in the index."
+      }
+    ],
+    "author": "Codex; AI-authored and AI source-reviewed, not independent human validation",
+    "unanswerability_rationale": null,
+    "source_review_rationale": "The non-HOT qualification is preserved; not every update recomputes an indexed expression.",
+    "candidate_id": "pg18-b05-16"
+  },
+  {
+    "topic": "indexes",
+    "difficulty": "medium",
+    "text": "During ordinary index creation, can reads and writes continue on the target table?",
+    "answerable": true,
+    "reference_answer": "Ordinary index creation allows reads but blocks writes until the build finishes.",
+    "required_facts": [
+      "Ordinary index creation allows reads but blocks writes until the build finishes."
+    ],
+    "evidence_specs": [
+      {
+        "fact_index": 0,
+        "filename": "indexes-intro.html",
+        "quote": "By default, PostgreSQL allows reads ( SELECT statements) to occur on the table in parallel with index creation, but writes ( INSERT , UPDATE , DELETE ) are blocked until the index build is finished."
+      }
+    ],
+    "author": "Codex; AI-authored and AI source-reviewed, not independent human validation",
+    "unanswerability_rationale": null,
+    "source_review_rationale": "Question explicitly excludes concurrent creation, whose caveats are outside this requested contract.",
+    "candidate_id": "pg18-b05-17"
+  },
+  {
+    "topic": "indexes",
+    "difficulty": "medium",
+    "text": "Why should unused indexes be removed even though PostgreSQL updates them automatically?",
+    "answerable": true,
+    "reference_answer": "Keeping indexes synchronized adds overhead to data modification. Indexes can prevent heap-only tuples, so seldom-used indexes should be removed.",
+    "required_facts": [
+      "Keeping indexes synchronized adds overhead to data modification.",
+      "Indexes can prevent heap-only tuples, so seldom-used indexes should be removed."
+    ],
+    "evidence_specs": [
+      {
+        "fact_index": 0,
+        "filename": "indexes-intro.html",
+        "quote": "After an index is created, the system has to keep it synchronized with the table. This adds overhead to data manipulation operations."
+      },
+      {
+        "fact_index": 1,
+        "filename": "indexes-intro.html",
+        "quote": "Indexes can also prevent the creation of heap-only tuples . Therefore indexes that are seldom or never used in queries should be removed."
+      }
+    ],
+    "author": "Codex; AI-authored and AI source-reviewed, not independent human validation",
+    "unanswerability_rationale": null,
+    "source_review_rationale": "Both maintenance burdens are sourced, avoiding a measured space or speed claim.",
+    "candidate_id": "pg18-b05-18"
+  },
+  {
+    "topic": "indexes",
+    "difficulty": "hard",
+    "text": "Why run ANALYZE before evaluating whether a workload uses indexes appropriately?",
+    "answerable": true,
+    "reference_answer": "ANALYZE collects value-distribution statistics needed for row-count estimates and realistic plan costs.",
+    "required_facts": [
+      "ANALYZE collects value-distribution statistics needed for row-count estimates and realistic plan costs."
+    ],
+    "evidence_specs": [
+      {
+        "fact_index": 0,
+        "filename": "indexes-examine.html",
+        "quote": "This command collects statistics about the distribution of the values in the table. This information is required to estimate the number of rows returned by a query, which is needed by the planner to assign realistic costs to each possible query plan."
+      }
+    ],
+    "author": "Codex; AI-authored and AI source-reviewed, not independent human validation",
+    "unanswerability_rationale": null,
+    "source_review_rationale": "Read the full paragraph tying stale or absent statistics to unreliable index-use experiments.",
+    "candidate_id": "pg18-b05-19"
+  },
+  {
+    "topic": "indexes",
+    "difficulty": "medium",
+    "text": "What is the exact byte size of an index I have not described, without schema, data or relation-size measurements?",
+    "answerable": false,
+    "reference_answer": "The provided corpus and question do not contain enough information to determine that.",
+    "required_facts": [],
+    "evidence_specs": [],
+    "author": "Codex; AI-authored and AI source-reviewed, not independent human validation",
+    "unanswerability_rationale": "Index-size semantics cannot determine bytes for an unknown object. No application index or physical-size observation is supplied.",
+    "source_review_rationale": "Index-size semantics cannot determine bytes for an unknown object. No application index or physical-size observation is supplied.",
+    "audit_context_sections": [
+      "6dbbe37b-8bd8-55b1-b7e2-1b7a4c3a433e"
+    ],
+    "candidate_id": "pg18-b05-20"
+  },
+  {
+    "topic": "indexes",
+    "difficulty": "medium",
+    "text": "Which existing index did my last query use when neither the query, its plan nor runtime observations are supplied?",
+    "answerable": false,
+    "reference_answer": "The provided corpus and question do not contain enough information to determine that.",
+    "required_facts": [],
+    "evidence_specs": [],
+    "author": "Codex; AI-authored and AI source-reviewed, not independent human validation",
+    "unanswerability_rationale": "The corpus describes EXPLAIN and usage statistics, not this application query history. An exact used-index name is unavailable.",
+    "source_review_rationale": "The corpus describes EXPLAIN and usage statistics, not this application query history. An exact used-index name is unavailable.",
+    "audit_context_sections": [
+      "37bf310e-cb0c-569b-a192-c2f33d157116"
+    ],
+    "candidate_id": "pg18-b05-21"
+  },
+  {
+    "topic": "indexes",
+    "difficulty": "medium",
+    "text": "How many distinct x values are currently in my private table for deciding whether a B-tree skip scan will be useful?",
+    "answerable": false,
+    "reference_answer": "The provided corpus and question do not contain enough information to determine that.",
+    "required_facts": [],
+    "evidence_specs": [],
+    "author": "Codex; AI-authored and AI source-reviewed, not independent human validation",
+    "unanswerability_rationale": "The skip-scan discussion explains why distinct values matter but contains no observations of this private table. Its distinct count is missing.",
+    "source_review_rationale": "The skip-scan discussion explains why distinct values matter but contains no observations of this private table. Its distinct count is missing.",
+    "audit_context_sections": [
+      "fd45b5f4-7727-5964-9a19-c36564c537f5"
+    ],
+    "candidate_id": "pg18-b05-22"
+  },
+  {
+    "topic": "indexes",
+    "difficulty": "medium",
+    "text": "What exact partial-index predicate is optimal for my application when its workload and data distribution are not supplied?",
+    "answerable": false,
+    "reference_answer": "The provided corpus and question do not contain enough information to determine that.",
+    "required_facts": [],
+    "evidence_specs": [],
+    "author": "Codex; AI-authored and AI source-reviewed, not independent human validation",
+    "unanswerability_rationale": "A partial predicate depends on workload and value distribution. The manual recommends care and experimentation rather than one uniquely optimal predicate for an unknown application.",
+    "source_review_rationale": "A partial predicate depends on workload and value distribution. The manual recommends care and experimentation rather than one uniquely optimal predicate for an unknown application.",
+    "audit_context_sections": [
+      "5b73f44b-0f99-554d-961f-7751ae48f713",
+      "73b031ec-544f-5348-b13a-3b951a5af4dc"
+    ],
+    "candidate_id": "pg18-b05-23"
+  },
+  {
+    "topic": "indexes",
+    "difficulty": "medium",
+    "text": "For a new unique index on my existing email column, which exact stored values would cause the build to fail when no email rows are supplied?",
+    "answerable": false,
+    "reference_answer": "The provided corpus and question do not contain enough information to determine that.",
+    "required_facts": [],
+    "evidence_specs": [],
+    "author": "Codex; AI-authored and AI source-reviewed, not independent human validation",
+    "unanswerability_rationale": "The uniqueness rule cannot identify unknown existing duplicate values. No email dataset is provided, and manual examples are not that application table.",
+    "source_review_rationale": "The uniqueness rule cannot identify unknown existing duplicate values. No email dataset is provided, and manual examples are not that application table.",
+    "audit_context_sections": [
+      "8ef80aba-e786-53fb-a392-288120453665"
+    ],
+    "candidate_id": "pg18-b05-24"
+  }
+]

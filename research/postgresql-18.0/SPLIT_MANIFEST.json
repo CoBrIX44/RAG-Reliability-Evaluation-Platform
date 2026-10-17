@@ -1,0 +1,765 @@
+{
+  "status": "frozen-before-experiments",
+  "dataset_id": "aee91608-6a2b-4f6f-afa4-dcf4c10d0021",
+  "draft_revision": 160,
+  "question_snapshot_sha256": "94a99838c29c6ab182ffc9e38eba9b1fb732c59225564d08581f02ee819664ee",
+  "algorithm": "sorted-component Bernoulli(0.3) search; Python Random(0); 20000 proposals; first lowest score retained",
+  "objective": "100*abs(test_n-45) + 5*sum(abs(topic_test_n-9)) + 3*abs(test_unanswerable_n-9)",
+  "objective_value": 36,
+  "reviewer": "Codex (AI grouping review)",
+  "scope": "All 150 question texts, facts, evidence and negative rationales inspected. Grouped source documents, selected cross-page concept families and negative context anchors. No run outputs inspected.",
+  "limitations": [
+    "Same-assistant curation/grouping; no independent semantic-deduplication validation.",
+    "Negative labels test missing instance data, not genuinely corpus-missing technical facts; shared abstention reference is formulaic.",
+    "All corpus documents stay retrievable in both splits; split holds out questions, not source access.",
+    "Gold evidence is known relevant, not exhaustive; shared background concepts may remain across families.",
+    "Difficulty is subjective and not an equal-count quota. Split balance is approximate because whole groups stay together."
+  ],
+  "source_families": [
+    {
+      "name": "sql-selection-order",
+      "files": [
+        "tutorial-select.html",
+        "queries-select-lists.html",
+        "queries-order.html",
+        "queries-limit.html"
+      ]
+    },
+    {
+      "name": "sql-joins-table-expression",
+      "files": [
+        "tutorial-join.html",
+        "queries-table-expressions.html"
+      ]
+    },
+    {
+      "name": "sql-aggregation",
+      "files": [
+        "tutorial-agg.html"
+      ]
+    },
+    {
+      "name": "sql-with",
+      "files": [
+        "queries-with.html"
+      ]
+    },
+    {
+      "name": "transaction-savepoints",
+      "files": [
+        "tutorial-transactions.html",
+        "sql-savepoint.html",
+        "sql-rollback-to.html"
+      ]
+    },
+    {
+      "name": "transaction-locks-mvcc",
+      "files": [
+        "explicit-locking.html",
+        "monitoring-locks.html",
+        "mvcc-intro.html"
+      ]
+    },
+    {
+      "name": "transaction-isolation",
+      "files": [
+        "transaction-iso.html",
+        "mvcc-serialization-failure-handling.html"
+      ]
+    },
+    {
+      "name": "transaction-caveats",
+      "files": [
+        "mvcc-caveats.html"
+      ]
+    },
+    {
+      "name": "index-uniqueness-payload-expression",
+      "files": [
+        "indexes-unique.html",
+        "indexes-index-only-scans.html",
+        "indexes-expressional.html"
+      ]
+    },
+    {
+      "name": "index-partial",
+      "files": [
+        "indexes-partial.html"
+      ]
+    },
+    {
+      "name": "index-methods-multicolumn",
+      "files": [
+        "indexes-types.html",
+        "indexes-multicolumn.html"
+      ]
+    },
+    {
+      "name": "index-maintenance",
+      "files": [
+        "indexes-intro.html"
+      ]
+    },
+    {
+      "name": "plan-index-diagnostics",
+      "files": [
+        "indexes-examine.html",
+        "using-explain.html",
+        "performance-tips.html"
+      ]
+    },
+    {
+      "name": "configuration-files",
+      "files": [
+        "config-setting.html",
+        "runtime-config-file-locations.html"
+      ]
+    },
+    {
+      "name": "configuration-client",
+      "files": [
+        "runtime-config-client.html"
+      ]
+    },
+    {
+      "name": "configuration-memory",
+      "files": [
+        "runtime-config-resource.html"
+      ]
+    },
+    {
+      "name": "configuration-wal",
+      "files": [
+        "runtime-config-wal.html"
+      ]
+    },
+    {
+      "name": "configuration-planner",
+      "files": [
+        "runtime-config-query.html"
+      ]
+    },
+    {
+      "name": "configuration-logging",
+      "files": [
+        "runtime-config-logging.html"
+      ]
+    },
+    {
+      "name": "configuration-connections",
+      "files": [
+        "runtime-config-connection.html"
+      ]
+    },
+    {
+      "name": "monitoring-statistics",
+      "files": [
+        "monitoring-stats.html"
+      ]
+    },
+    {
+      "name": "vacuum-maintenance",
+      "files": [
+        "routine-vacuuming.html"
+      ]
+    },
+    {
+      "name": "reindex-maintenance",
+      "files": [
+        "routine-reindex.html"
+      ]
+    },
+    {
+      "name": "error-codes",
+      "files": [
+        "errcodes-appendix.html"
+      ]
+    },
+    {
+      "name": "disk-space",
+      "files": [
+        "diskusage.html"
+      ]
+    }
+  ],
+  "stats": {
+    "development": {
+      "questions": 105,
+      "groups": 15,
+      "topics": {
+        "sql": 20,
+        "transactions": 23,
+        "troubleshooting": 19,
+        "indexes": 21,
+        "configuration": 22
+      },
+      "difficulties": {
+        "hard": 37,
+        "easy": 14,
+        "medium": 54
+      },
+      "unanswerable": 19,
+      "human_reviewed": 7
+    },
+    "test": {
+      "questions": 45,
+      "groups": 8,
+      "topics": {
+        "troubleshooting": 11,
+        "configuration": 8,
+        "sql": 10,
+        "transactions": 7,
+        "indexes": 9
+      },
+      "difficulties": {
+        "medium": 26,
+        "hard": 14,
+        "easy": 5
+      },
+      "unanswerable": 11,
+      "human_reviewed": 3
+    }
+  },
+  "groups": [
+    {
+      "group": "pg18-group-033524853c9a",
+      "question_ids": [
+        "124c39cb-fff1-46e2-8e70-c81f3535f48c",
+        "65c4422a-3f1f-4f45-aa8f-a6bfc24c5c5f",
+        "780c9f84-abac-4535-96a2-771d272a799b",
+        "b334b2f9-279b-4d2f-bff9-2e74bb20f906",
+        "e21a5b61-bbd5-4836-82a7-7f3f76212f63"
+      ],
+      "files": [
+        "queries-with.html"
+      ],
+      "families": [
+        "sql-with"
+      ],
+      "topics": {
+        "sql": 5
+      },
+      "unanswerable": 1,
+      "split": "development"
+    },
+    {
+      "group": "pg18-group-1e9e77df0389",
+      "question_ids": [
+        "32017f35-cad4-4c34-abcd-ebeb204b4fd5",
+        "39798a9f-f1f8-4d1b-a8f9-8a4fefd467ff",
+        "6977321a-7aa0-41f2-9c36-3dd121b14900"
+      ],
+      "files": [
+        "routine-reindex.html"
+      ],
+      "families": [
+        "reindex-maintenance"
+      ],
+      "topics": {
+        "troubleshooting": 3
+      },
+      "unanswerable": 0,
+      "split": "test"
+    },
+    {
+      "group": "pg18-group-20af67b7b003",
+      "question_ids": [
+        "01f60500-0be5-45c7-9245-0002a8ebffa4",
+        "07fb920c-99cc-403c-ad0f-4dc53eb39167",
+        "16858463-3118-44c4-b3e7-76fe0155b412",
+        "2ef92b07-bd71-4587-8748-3875906e2d65",
+        "349130c7-dd86-422f-a4ae-40bd2f5c62b1",
+        "896e3f56-d34d-49e9-9fe4-80eee73e0db1",
+        "b8027c1c-5f5a-4027-8530-da6c85bd0c4d",
+        "ba9bff5b-9733-4cd0-8453-2cd168da25d3",
+        "d7a5d41e-38c2-466b-a12f-ff0b52e38cbf",
+        "df18f725-c88f-48f2-ae08-60ee809c70b2",
+        "eb4096ec-1276-4574-85c7-7564f0393890",
+        "f9256346-dfd3-4cdf-ad77-27d28cb396c7"
+      ],
+      "files": [
+        "explicit-locking.html",
+        "monitoring-locks.html",
+        "mvcc-intro.html"
+      ],
+      "families": [
+        "transaction-locks-mvcc"
+      ],
+      "topics": {
+        "transactions": 11,
+        "troubleshooting": 1
+      },
+      "unanswerable": 3,
+      "split": "development"
+    },
+    {
+      "group": "pg18-group-38c0c0848064",
+      "question_ids": [
+        "19e637c5-c337-497f-bf8c-34fbbb25bacb",
+        "20de3220-ccfe-462b-9e0f-0d6779d666a4",
+        "38eab92e-5562-409f-b0cb-dac78ae5ab7c",
+        "59d29728-0c30-4496-9dfe-e5570ba606c6",
+        "64e4a57a-3b0e-410d-aaf7-91abdef07549",
+        "8a47003d-4ae7-4d09-9645-f01296fa27fe",
+        "8bfc34ff-f5eb-4b9e-a102-26a538909cc9",
+        "8e0696a3-ded1-44e1-8862-217d5d5d629a",
+        "b5d919fd-19d5-4bb5-b7fe-728275f35944",
+        "bfe58291-92e2-482b-9f85-c7986e4e5ad0",
+        "e94cc706-286d-47c3-a6f9-a4c708a869cb"
+      ],
+      "files": [
+        "transaction-iso.html"
+      ],
+      "families": [
+        "transaction-isolation"
+      ],
+      "topics": {
+        "transactions": 11
+      },
+      "unanswerable": 1,
+      "split": "development"
+    },
+    {
+      "group": "pg18-group-39b8183ceef9",
+      "question_ids": [
+        "19858b3b-cc44-450c-8ddc-566b6162d199",
+        "378f1abe-7dc6-4cf3-85dc-e6ba1b1c8370",
+        "4f147150-0117-48b2-8dd5-a0a42166313c",
+        "5b8aef20-151e-4a7f-aef7-38811bc9b8d4"
+      ],
+      "files": [
+        "indexes-partial.html"
+      ],
+      "families": [
+        "index-partial"
+      ],
+      "topics": {
+        "indexes": 4
+      },
+      "unanswerable": 1,
+      "split": "development"
+    },
+    {
+      "group": "pg18-group-4a6c78a36ed5",
+      "question_ids": [
+        "6e0292c4-83fa-4f0b-9097-cb830011c400",
+        "c37bc18b-c1f5-45e3-ad12-e6f6fdb1d000"
+      ],
+      "files": [
+        "errcodes-appendix.html"
+      ],
+      "families": [
+        "error-codes"
+      ],
+      "topics": {
+        "troubleshooting": 2
+      },
+      "unanswerable": 0,
+      "split": "development"
+    },
+    {
+      "group": "pg18-group-501067ff1ca1",
+      "question_ids": [
+        "22851de4-3f5d-48e8-a344-f78e0dc4c4ec",
+        "588536d3-473f-4179-8e0b-de113f229787",
+        "8b8ad70c-b811-46ae-b6e4-02dacda2547c",
+        "a656e265-0c4a-4ca0-bd47-7807c3dd36e2"
+      ],
+      "files": [
+        "tutorial-agg.html"
+      ],
+      "families": [
+        "sql-aggregation"
+      ],
+      "topics": {
+        "sql": 4
+      },
+      "unanswerable": 2,
+      "split": "development"
+    },
+    {
+      "group": "pg18-group-53e610aafa94",
+      "question_ids": [
+        "54fa20d4-2c26-4f0b-91c0-47077951ef1b",
+        "7e5375a9-eb09-4697-b1ff-91b60412d6b9",
+        "90570d4e-b19d-4076-bf81-c1213cdd90ff",
+        "e2dc1445-87f4-4d58-8cf6-135893bdf8f5"
+      ],
+      "files": [
+        "runtime-config-connection.html"
+      ],
+      "families": [
+        "configuration-connections"
+      ],
+      "topics": {
+        "configuration": 4
+      },
+      "unanswerable": 3,
+      "split": "test"
+    },
+    {
+      "group": "pg18-group-5889a6554167",
+      "question_ids": [
+        "ac9c4ca7-6e72-4976-9cea-cd39703735da"
+      ],
+      "files": [
+        "mvcc-caveats.html"
+      ],
+      "families": [
+        "transaction-caveats"
+      ],
+      "topics": {
+        "transactions": 1
+      },
+      "unanswerable": 0,
+      "split": "development"
+    },
+    {
+      "group": "pg18-group-5a57fc034ef0",
+      "question_ids": [
+        "11be7668-64aa-4449-8968-448c33a304f8",
+        "2f93f6ba-8f29-48f9-a94a-ee6c726d3541",
+        "3e98e9a1-832c-4ac5-9cc8-48c753cd8c67",
+        "40144b2e-a595-42b3-86fc-0149ee383637",
+        "50e0589b-1e30-4508-8922-49b370b702a2",
+        "5215f397-56ce-4fb6-960f-eb0ca5a04333",
+        "65fb1b0d-8458-4e9d-8ad8-a77342ed1dc9",
+        "68ff08f6-36c2-4b7b-9704-a2c688b11e4d",
+        "7193b40e-a546-471b-b3b8-c62e54f754f3",
+        "7365b9f1-b87a-4d14-944e-a082e66ef6cd",
+        "76a40be1-c5f1-44f8-a3cc-fb80a99f99e4",
+        "89730c57-3251-458f-8d6b-f694b5bad8e9",
+        "9d0d28ed-6a62-4af2-b82d-292749771952",
+        "c6a4b240-3f94-44bd-b12f-23e0fac44cc1",
+        "cbd2f90e-a151-499e-b6c9-a3e48eb7ba65",
+        "cf9f56e5-23d3-4930-b59a-6f8836d0e000",
+        "d0a4fc68-aa1f-43b7-86c9-21e446c96afb",
+        "d2f75b5d-a4da-424b-b432-c14673ac1f41",
+        "dd56e95b-29a9-4b4f-98f0-9e027c95cd12"
+      ],
+      "files": [
+        "config-setting.html",
+        "runtime-config-client.html",
+        "runtime-config-file-locations.html"
+      ],
+      "families": [
+        "configuration-client",
+        "configuration-files"
+      ],
+      "topics": {
+        "configuration": 19
+      },
+      "unanswerable": 2,
+      "split": "development"
+    },
+    {
+      "group": "pg18-group-61abc200ad79",
+      "question_ids": [
+        "2b6bfe1a-403e-44cc-8e2a-b6fee37abd6a",
+        "30bfdd54-e0b2-4212-92e6-db86974464e6",
+        "4f143f81-0e28-4238-93b2-a6c8876f6ce6"
+      ],
+      "files": [
+        "runtime-config-resource.html"
+      ],
+      "families": [
+        "configuration-memory"
+      ],
+      "topics": {
+        "configuration": 3
+      },
+      "unanswerable": 2,
+      "split": "test"
+    },
+    {
+      "group": "pg18-group-6dfc8b07ef46",
+      "question_ids": [
+        "1ecc11d0-a8b3-4a5c-8aba-d91acbfe0017",
+        "29e1aee6-46d6-4d03-8837-20dcf8daee15",
+        "626e50f0-e726-40cd-8287-c21cc5f52515",
+        "c34e7c0d-1db9-4446-bfcd-fd78efb5fa33"
+      ],
+      "files": [
+        "indexes-intro.html"
+      ],
+      "families": [
+        "index-maintenance"
+      ],
+      "topics": {
+        "indexes": 4
+      },
+      "unanswerable": 1,
+      "split": "development"
+    },
+    {
+      "group": "pg18-group-7c6bb9b171d2",
+      "question_ids": [
+        "4a7481c6-b088-431f-bc8c-d1e55cfbc5b7",
+        "60eab12b-9d7d-41e6-845d-1b3e8fd34870",
+        "6fa67cda-368e-4eee-86c4-b2148dc6e0a6",
+        "8cdaeb12-86ee-4211-8bc8-1a2d14f91bd9",
+        "909535c8-e579-4c0d-b058-b2de960728ba",
+        "a39f0ec3-d0dd-46e1-8d04-072b71b8f6ff",
+        "af419f8c-77aa-4af8-9cfa-d8db5e80b551",
+        "b016de7b-3eb0-4fc8-acbf-4d4eab143770",
+        "bd2c32c1-ee37-46cd-a6c0-2d702b711cfc",
+        "f298753d-343e-4a85-964e-93ff4bfa8a44"
+      ],
+      "files": [
+        "queries-table-expressions.html",
+        "tutorial-join.html"
+      ],
+      "families": [
+        "sql-joins-table-expression"
+      ],
+      "topics": {
+        "sql": 10
+      },
+      "unanswerable": 2,
+      "split": "test"
+    },
+    {
+      "group": "pg18-group-8031fd89c648",
+      "question_ids": [
+        "128356fa-3990-4f4e-ab63-12c4d6155234",
+        "1a11706b-c572-48ac-9f15-1219e5d1b74d",
+        "239a36e6-d99e-495c-8853-9e82417b8f99",
+        "4108b206-bd0d-43f1-bb49-1c49864b7ee0",
+        "6757014f-df19-4d0c-94d1-cc4476f0e273",
+        "bc4051c3-f8d9-4f6f-88ca-224dabec42ce",
+        "c22c46f6-2ccc-40e0-b70d-87dc4448235c"
+      ],
+      "files": [
+        "sql-rollback-to.html",
+        "sql-savepoint.html",
+        "tutorial-transactions.html"
+      ],
+      "families": [
+        "transaction-savepoints"
+      ],
+      "topics": {
+        "transactions": 7
+      },
+      "unanswerable": 1,
+      "split": "test"
+    },
+    {
+      "group": "pg18-group-8ceda77d9531",
+      "question_ids": [
+        "ea5a0cf1-793b-46ac-ada3-99eb3b62c78e"
+      ],
+      "files": [
+        "runtime-config-logging.html"
+      ],
+      "families": [
+        "configuration-logging"
+      ],
+      "topics": {
+        "configuration": 1
+      },
+      "unanswerable": 0,
+      "split": "development"
+    },
+    {
+      "group": "pg18-group-8d7f982b3e02",
+      "question_ids": [
+        "02231f87-bcc8-4b0e-9b14-4fd4fd9e41f8",
+        "19a44d30-0d38-42fc-b004-ec4757746124",
+        "2b9449ce-e131-43dd-8414-38b3f95f1616",
+        "2d61f95b-1e71-43d4-8a80-05508c25dd6a",
+        "33c7d368-b063-412a-b2b6-6cc44239bd07",
+        "8ffd8bcc-1384-483d-afe4-85f996cfa840",
+        "9394eb52-a122-48e5-a201-76ffdeaf048c"
+      ],
+      "files": [
+        "monitoring-stats.html"
+      ],
+      "families": [
+        "monitoring-statistics"
+      ],
+      "topics": {
+        "troubleshooting": 7
+      },
+      "unanswerable": 3,
+      "split": "development"
+    },
+    {
+      "group": "pg18-group-ab8c42e4d3ba",
+      "question_ids": [
+        "b7867e60-e4de-431c-b0de-df7106c90ff5",
+        "eff1dff2-880d-44b9-b3ad-ba75f9ca3018"
+      ],
+      "files": [
+        "runtime-config-wal.html"
+      ],
+      "families": [
+        "configuration-wal"
+      ],
+      "topics": {
+        "configuration": 2
+      },
+      "unanswerable": 0,
+      "split": "development"
+    },
+    {
+      "group": "pg18-group-b36761bc9a1f",
+      "question_ids": [
+        "060e41a2-8e98-4a7e-afa6-c774848fb96a",
+        "268dccef-382a-450d-ad2a-fccd1b8a5739",
+        "373dd2f9-1a54-43d7-9c62-b21cd6e446ad",
+        "385deb35-58d1-4547-a257-d251a5ad84af",
+        "8dbc7008-e7dd-4486-83e2-e2a0ec495ba1",
+        "a759ecab-ee97-46df-83d4-a79ff298082d",
+        "b6b4ba43-629f-4607-9110-a1d7c372ec9b",
+        "c37b239e-f54a-4ba4-b679-926bf199631e",
+        "cbd35242-f133-43c0-b4de-b16e37d1754e",
+        "cd91720d-0d34-4336-ab46-b67d76cc7ae8",
+        "fc6e6a3b-3594-4315-ae2b-224a8713a924"
+      ],
+      "files": [
+        "queries-limit.html",
+        "queries-order.html",
+        "queries-select-lists.html",
+        "tutorial-select.html"
+      ],
+      "families": [
+        "sql-selection-order"
+      ],
+      "topics": {
+        "sql": 11
+      },
+      "unanswerable": 1,
+      "split": "development"
+    },
+    {
+      "group": "pg18-group-bc19148c2eac",
+      "question_ids": [
+        "4da9b79b-d551-4440-a3a6-486799b22f5f",
+        "57eaa9c7-bfcd-43a8-8bed-0c2c8ea00199",
+        "5da051d3-0f59-4ed0-828b-74d18fd3aa5b",
+        "5f1efe2f-25d4-4588-b59c-b3dec5bccb63",
+        "64d78050-2f25-42ac-9241-f6fbedb92d03",
+        "6a10816f-e2df-4a6f-b258-c966c02254ef",
+        "bb15030c-64f6-4550-9e3f-f63fc42d29cd",
+        "cf7069dc-1021-4d22-bbb6-14fe3ec07cc7",
+        "e879a632-3ffe-4823-8848-6fa480d5cbfb"
+      ],
+      "files": [
+        "indexes-multicolumn.html",
+        "indexes-types.html"
+      ],
+      "families": [
+        "index-methods-multicolumn"
+      ],
+      "topics": {
+        "indexes": 9
+      },
+      "unanswerable": 1,
+      "split": "test"
+    },
+    {
+      "group": "pg18-group-c485ece6fed7",
+      "question_ids": [
+        "2793219d-804a-49cb-add6-f379aef37a2c",
+        "483efb90-d4a8-4750-ba20-99f6d3a8d03b",
+        "92555411-e5f1-47a2-ad0c-8291793efc7f",
+        "9fbe84c4-d116-4dd6-897b-22db5eb91356",
+        "a2d57310-0c60-46ef-8475-f2fd26b71234",
+        "dd02491e-eed1-4c20-b1df-adf1eda347c3",
+        "f5f4916a-0053-4e44-81dc-854cf36116b9",
+        "fbf26f10-8e73-46bb-96cb-840217f9f37f"
+      ],
+      "files": [
+        "diskusage.html",
+        "routine-vacuuming.html"
+      ],
+      "families": [
+        "disk-space",
+        "vacuum-maintenance"
+      ],
+      "topics": {
+        "troubleshooting": 8
+      },
+      "unanswerable": 2,
+      "split": "test"
+    },
+    {
+      "group": "pg18-group-d91ba3f14450",
+      "question_ids": [
+        "21462cc2-82bc-4ee0-9c63-b170925cc051",
+        "245fa9ae-48dd-4ece-b7d7-ae2fe9a0fbc1",
+        "31da067b-f76f-4b0a-9326-8fbec003934c",
+        "43f5e2fc-60c6-40e5-a6b9-968b325f9ddf",
+        "5bec6f22-3d31-4b17-a7b1-87d338e72f7b",
+        "61b37089-b619-4568-bdb7-59cef6367bec",
+        "6c101279-bc90-4bf7-be6b-eb8cc24b92ed",
+        "6ff340f9-a1d1-4e6c-b88e-d36f2466f4de",
+        "85ec2483-1327-4d81-be0b-325c55c47fb1",
+        "e91197e8-4a7e-4310-8268-80a48ea9f65a",
+        "f690af87-e056-4601-a3ef-c8315c8646fe",
+        "f7b71cc9-2e85-43b8-a9f7-09becfa44e99"
+      ],
+      "files": [
+        "indexes-examine.html",
+        "using-explain.html"
+      ],
+      "families": [
+        "plan-index-diagnostics"
+      ],
+      "topics": {
+        "troubleshooting": 9,
+        "indexes": 3
+      },
+      "unanswerable": 3,
+      "split": "development"
+    },
+    {
+      "group": "pg18-group-e6935ef415e0",
+      "question_ids": [
+        "21add569-e0a8-4c83-9f2b-f10607060061",
+        "375a0e40-c636-401d-bb76-c0be3b62a2ed",
+        "4440212f-a904-4a4d-88f1-05a22d642dac",
+        "759910aa-2034-4603-8014-173a0466ad60",
+        "7fc13003-b000-408a-979b-ac508453cfb7",
+        "aedbb6c3-0711-400e-9fc6-79a25a82366b",
+        "b06403c7-be21-4ddc-9c99-9cd0b8c2aff0",
+        "d81fe509-95a2-4a09-922d-99c21ddb82e6",
+        "f74a5001-b751-4004-a4a0-463d26fd94b7",
+        "fd5526fc-55f3-455f-8570-769367194af9"
+      ],
+      "files": [
+        "indexes-expressional.html",
+        "indexes-index-only-scans.html",
+        "indexes-unique.html"
+      ],
+      "families": [
+        "index-uniqueness-payload-expression"
+      ],
+      "topics": {
+        "indexes": 10
+      },
+      "unanswerable": 1,
+      "split": "development"
+    },
+    {
+      "group": "pg18-group-ebfec9497a33",
+      "question_ids": [
+        "3cde6527-857a-4338-b6b6-b4cdd5b11aeb"
+      ],
+      "files": [
+        "runtime-config-query.html"
+      ],
+      "families": [
+        "configuration-planner"
+      ],
+      "topics": {
+        "configuration": 1
+      },
+      "unanswerable": 0,
+      "split": "test"
+    }
+  ],
+  "dataset_version_id": "c68dbf7c-4f98-4431-b789-4d9fdd11a811",
+  "dataset_manifest_hash": "f857d3b849ee33858262614e9af5eaeedbb1e6057ea7ad483e98b996d8082ccf",
+  "review_receipts": "Private local data/research/postgresql-18.0/ai-source-review-03-07.json and split-freeze.json; original attestations retained separately"
+}

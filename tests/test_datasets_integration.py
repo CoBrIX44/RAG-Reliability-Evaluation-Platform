@@ -96,6 +96,78 @@ def create_dataset(client: TestClient, version_id: UUID) -> str:
     return str(response.json()["id"])
 
 
+@pytest.mark.parametrize("review_source", ["human", "ai"])
+def test_split_assignment_preserves_actual_source_review_time(
+    setup: tuple[Settings, UUID, UUID], review_source: str
+) -> None:
+    settings, corpus_id, section_id = setup
+    with TestClient(create_app(settings)) as client:
+        dataset_id = create_dataset(client, corpus_id)
+        path = f"/api/v1/datasets/{dataset_id}/questions"
+        saved = client.post(path, json=question(section_id) | {"review_source": review_source})
+        assert saved.status_code == 201, saved.text
+        original = saved.json()
+        url = path + "/" + original["id"]
+        content = original["content"] | {"split": "test", "split_group": "audited-group"}
+        updated = client.patch(
+            url, json={"expected_revision": original["revision"], "content": content}
+        )
+        assert updated.status_code == 200, updated.text
+        current = updated.json()
+        assert current["reviewed_at"] == original["reviewed_at"]
+        assert current["content"]["review_source"] == review_source
+        assert current["revision"] == original["revision"] + 1
+        # Saving new source-reviewed gold is a new attestation, unlike moving a split.
+        changed = client.patch(
+            url,
+            json={
+                "expected_revision": current["revision"],
+                "content": content | {"reference_answer": "The fixture describes a single unit."},
+            },
+        )
+        assert changed.status_code == 200, changed.text
+        assert changed.json()["reviewed_at"] > current["reviewed_at"]
+        cleared = client.patch(
+            url,
+            json={
+                "expected_revision": changed.json()["revision"],
+                "content": changed.json()["content"] | {"review_status": "candidate"},
+            },
+        )
+        assert cleared.status_code == 200, cleared.text
+        assert cleared.json()["reviewed_at"] is None
+
+
+def test_ai_gold_review_provenance_survives_publication_and_jsonl(
+    setup: tuple[Settings, UUID, UUID],
+) -> None:
+    settings, corpus_id, section_id = setup
+    with TestClient(create_app(settings)) as client:
+        dataset_id = create_dataset(client, corpus_id)
+        value = question(section_id) | {
+            "review_source": "ai",
+            "reviewer": "Synthetic AI reviewer",
+        }
+        saved = client.post(f"/api/v1/datasets/{dataset_id}/questions", json=value)
+        assert saved.status_code == 201
+        assert saved.json()["content"]["review_source"] == "ai"
+        published = client.post(f"/api/v1/datasets/{dataset_id}/versions")
+        assert published.status_code == 201, published.text
+        version_id = published.json()["id"]
+        raw = client.get(f"/api/v1/dataset-versions/{version_id}/export")
+        assert raw.status_code == 200
+        exported = json.loads(raw.text.strip())
+        assert exported["review_source"] == "ai"
+        other = create_dataset(client, corpus_id)
+        imported = client.post(
+            f"/api/v1/datasets/{other}/import",
+            files={"file": ("synthetic.jsonl", raw.content, "application/x-ndjson")},
+        )
+        assert imported.status_code == 200, imported.text
+        row = client.get(f"/api/v1/datasets/{other}/questions").json()["items"][0]
+        assert row["content"]["review_source"] == "ai"
+
+
 def test_dataset_publication_export_roundtrip_and_draft_isolation(
     setup: tuple[Settings, UUID, UUID],
 ) -> None:

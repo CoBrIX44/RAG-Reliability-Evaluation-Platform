@@ -1,0 +1,26 @@
+[
+  {
+    "file": "instrument-serif-latin.woff2",
+    "url": "https://fonts.gstatic.com/s/instrumentserif/v5/jizBRFtNs2ka5fXjeivQ4LroWlx-6zUTjg.woff2",
+    "sha256": "5eb09b5ac0e28b67c2f041c8ba6d244604ca0c0980d65912ab2d47fed84ddc31",
+    "bytes": 21032
+  },
+  {
+    "file": "ostrich-sans-bold.woff",
+    "url": "https://raw.githubusercontent.com/theleagueof/ostrich-sans/master/webfonts/ostrich-sans-bold.woff",
+    "sha256": "cf67177f7c2593f7693be23ff2917c26cfcb6aa30693981751ea1b0bd1b1b004",
+    "bytes": 14808
+  },
+  {
+    "file": "instrument-serif-OFL.txt",
+    "url": "https://raw.githubusercontent.com/Instrument/instrument-serif/main/OFL.txt",
+    "sha256": "129ed7618959716959f2941fdd5b49e0ad6e6c1d78726761786a00253d865521",
+    "bytes": 4405
+  },
+  {
+    "file": "ostrich-sans-OFL.txt",
+    "url": "https://raw.githubusercontent.com/theleagueof/ostrich-sans/master/Open%20Font%20License.markdown",
+    "sha256": "a30f4b287032b32a1034cc63ed3895f91ea5abdb371c2b12da2a744f6f15e3f4",
+    "bytes": 4425
+  }
+]

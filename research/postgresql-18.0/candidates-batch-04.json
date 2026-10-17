@@ -1,0 +1,501 @@
+[
+  {
+    "topic": "transactions",
+    "difficulty": "easy",
+    "text": "Which commands delimit a PostgreSQL transaction block?",
+    "answerable": true,
+    "reference_answer": "BEGIN and COMMIT surround the commands of a transaction block.",
+    "required_facts": [
+      "BEGIN and COMMIT surround the commands of a transaction block."
+    ],
+    "evidence_specs": [
+      {
+        "fact_index": 0,
+        "filename": "tutorial-transactions.html",
+        "quote": "In PostgreSQL , a transaction is set up by surrounding the SQL commands of the transaction with BEGIN and COMMIT commands. So our banking transaction would actually look like:"
+      }
+    ],
+    "author": "Codex; AI-authored and AI source-reviewed, not independent human validation",
+    "unanswerability_rationale": null,
+    "source_review_rationale": "Direct tutorial command names; not the already-reviewed atomic-failure behavior.",
+    "candidate_id": "pg18-b04-01"
+  },
+  {
+    "topic": "transactions",
+    "difficulty": "medium",
+    "text": "If no BEGIN is issued, is a standalone successful SQL statement executed outside a transaction?",
+    "answerable": true,
+    "reference_answer": "No. Each statement has an implicit BEGIN and, if successful, COMMIT around it.",
+    "required_facts": [
+      "No. Each statement has an implicit BEGIN and, if successful, COMMIT around it."
+    ],
+    "evidence_specs": [
+      {
+        "fact_index": 0,
+        "filename": "tutorial-transactions.html",
+        "quote": "PostgreSQL actually treats every SQL statement as being executed within a transaction. If you do not issue a BEGIN command, then each individual statement has an implicit BEGIN and (if successful) COMMIT wrapped around it. A group of statements surrounded by BEGIN and COMMIT is sometimes called a transaction block ."
+      }
+    ],
+    "author": "Codex; AI-authored and AI source-reviewed, not independent human validation",
+    "unanswerability_rationale": null,
+    "source_review_rationale": "The success qualification matters; failure is not described as committing.",
+    "candidate_id": "pg18-b04-02"
+  },
+  {
+    "topic": "transactions",
+    "difficulty": "medium",
+    "text": "Does ROLLBACK undo a sequence increment made by an aborted transaction?",
+    "answerable": true,
+    "reference_answer": "No. Sequence changes are immediately visible to other transactions and are not rolled back when the transaction aborts.",
+    "required_facts": [
+      "No. Sequence changes are immediately visible to other transactions and are not rolled back when the transaction aborts."
+    ],
+    "evidence_specs": [
+      {
+        "fact_index": 0,
+        "filename": "transaction-iso.html",
+        "quote": "Some PostgreSQL data types and functions have special rules regarding transactional behavior. In particular, changes made to a sequence (and therefore the counter of a column declared using serial ) are immediately visible to all other transactions and are not rolled back if the transaction that made the changes aborts. See Section 9.17 and Section 8.1.4 ."
+      }
+    ],
+    "author": "Codex; AI-authored and AI source-reviewed, not independent human validation",
+    "unanswerability_rationale": null,
+    "source_review_rationale": "A documented exception to ordinary transactional changes; both visibility and rollback properties are retained.",
+    "candidate_id": "pg18-b04-03"
+  },
+  {
+    "topic": "transactions",
+    "difficulty": "medium",
+    "text": "How does PostgreSQL implement a request for Read Uncommitted isolation?",
+    "answerable": true,
+    "reference_answer": "PostgreSQL Read Uncommitted behaves like Read Committed; only three distinct isolation levels are implemented.",
+    "required_facts": [
+      "PostgreSQL Read Uncommitted behaves like Read Committed; only three distinct isolation levels are implemented."
+    ],
+    "evidence_specs": [
+      {
+        "fact_index": 0,
+        "filename": "transaction-iso.html",
+        "quote": "In PostgreSQL , you can request any of the four standard transaction isolation levels, but internally only three distinct isolation levels are implemented, i.e., PostgreSQL's Read Uncommitted mode behaves like Read Committed. This is because it is the only sensible way to map the standard isolation levels to PostgreSQL's multiversion concurrency control architecture."
+      }
+    ],
+    "author": "Codex; AI-authored and AI source-reviewed, not independent human validation",
+    "unanswerability_rationale": null,
+    "source_review_rationale": "The source distinguishes four requestable names from three implemented behaviors.",
+    "candidate_id": "pg18-b04-04"
+  },
+  {
+    "topic": "transactions",
+    "difficulty": "medium",
+    "text": "Does PostgreSQL Repeatable Read permit phantom reads?",
+    "answerable": true,
+    "reference_answer": "No. PostgreSQL Repeatable Read prevents phantom reads, exceeding the minimum SQL-standard guarantee.",
+    "required_facts": [
+      "No. PostgreSQL Repeatable Read prevents phantom reads, exceeding the minimum SQL-standard guarantee."
+    ],
+    "evidence_specs": [
+      {
+        "fact_index": 0,
+        "filename": "transaction-iso.html",
+        "quote": "The table also shows that PostgreSQL's Repeatable Read implementation does not allow phantom reads. This is acceptable under the SQL standard because the standard specifies which anomalies must not occur at certain isolation levels; higher guarantees are acceptable. The behavior of the available isolation levels is detailed in the following subsections."
+      }
+    ],
+    "author": "Codex; AI-authored and AI source-reviewed, not independent human validation",
+    "unanswerability_rationale": null,
+    "source_review_rationale": "Version-specific PostgreSQL behavior is explicit and should not be replaced with the SQL-standard minimum.",
+    "candidate_id": "pg18-b04-05"
+  },
+  {
+    "topic": "transactions",
+    "difficulty": "hard",
+    "text": "At what point is the Repeatable Read snapshot established, rather than refreshed for every SELECT?",
+    "answerable": true,
+    "reference_answer": "It is the snapshot at the start of the transaction's first non-transaction-control statement.",
+    "required_facts": [
+      "It is the snapshot at the start of the transaction's first non-transaction-control statement."
+    ],
+    "evidence_specs": [
+      {
+        "fact_index": 0,
+        "filename": "transaction-iso.html",
+        "quote": "This level is different from Read Committed in that a query in a repeatable read transaction sees a snapshot as of the start of the first non-transaction-control statement in the transaction , not as of the start of the current statement within the transaction. Thus, successive SELECT commands within a single transaction see the same data, i.e., they do not see changes made by other transactions that committed after their own transaction started."
+      }
+    ],
+    "author": "Codex; AI-authored and AI source-reviewed, not independent human validation",
+    "unanswerability_rationale": null,
+    "source_review_rationale": "The exact first-statement boundary avoids the looser transaction-BEGIN shorthand.",
+    "candidate_id": "pg18-b04-06"
+  },
+  {
+    "topic": "transactions",
+    "difficulty": "hard",
+    "text": "If a concurrent updater commits an actual change to a target row found by a Repeatable Read updater, what happens to the latter transaction?",
+    "answerable": true,
+    "reference_answer": "The Repeatable Read transaction is rolled back when the first updater commits an actual update or deletion. The error is: could not serialize access due to concurrent update.",
+    "required_facts": [
+      "The Repeatable Read transaction is rolled back when the first updater commits an actual update or deletion.",
+      "The error is: could not serialize access due to concurrent update."
+    ],
+    "evidence_specs": [
+      {
+        "fact_index": 0,
+        "filename": "transaction-iso.html",
+        "quote": "But if the first updater commits (and actually updated or deleted the row, not just locked it) then the repeatable read transaction will be rolled back with the message"
+      },
+      {
+        "fact_index": 1,
+        "filename": "transaction-iso.html",
+        "quote": "ERROR: could not serialize access due to concurrent update"
+      }
+    ],
+    "author": "Codex; AI-authored and AI source-reviewed, not independent human validation",
+    "unanswerability_rationale": null,
+    "source_review_rationale": "Reviewed adjacent serialized-access error text; excludes a mere lock and excludes a first-updater rollback.",
+    "candidate_id": "pg18-b04-07"
+  },
+  {
+    "topic": "transactions",
+    "difficulty": "hard",
+    "text": "Does Serializable emulate serial execution only by preventing all concurrent transaction execution?",
+    "answerable": true,
+    "reference_answer": "Serializable guarantees an effect equivalent to serial execution for committed transactions. Applications must be prepared to retry transactions after serialization failures.",
+    "required_facts": [
+      "Serializable guarantees an effect equivalent to serial execution for committed transactions.",
+      "Applications must be prepared to retry transactions after serialization failures."
+    ],
+    "evidence_specs": [
+      {
+        "fact_index": 0,
+        "filename": "transaction-iso.html",
+        "quote": "This level emulates serial transaction execution for all committed transactions; as if transactions had been executed one after another, serially, rather than concurrently."
+      },
+      {
+        "fact_index": 1,
+        "filename": "transaction-iso.html",
+        "quote": "applications using this level must be prepared to retry transactions due to serialization failures."
+      }
+    ],
+    "author": "Codex; AI-authored and AI source-reviewed, not independent human validation",
+    "unanswerability_rationale": null,
+    "source_review_rationale": "The wording asks about the guarantee, not literal serialized scheduling; the monitored concurrent-execution context was inspected.",
+    "candidate_id": "pg18-b04-08"
+  },
+  {
+    "topic": "transactions",
+    "difficulty": "hard",
+    "text": "Do PostgreSQL predicate locks used for Serializable cause blocking or deadlocks?",
+    "answerable": true,
+    "reference_answer": "These predicate locks do not block and therefore cannot themselves cause a deadlock.",
+    "required_facts": [
+      "These predicate locks do not block and therefore cannot themselves cause a deadlock."
+    ],
+    "evidence_specs": [
+      {
+        "fact_index": 0,
+        "filename": "transaction-iso.html",
+        "quote": "In PostgreSQL these locks do not cause any blocking and therefore can not play any part in causing a deadlock."
+      }
+    ],
+    "author": "Codex; AI-authored and AI source-reviewed, not independent human validation",
+    "unanswerability_rationale": null,
+    "source_review_rationale": "Scope is Serializable predicate locks, not ordinary row/table locks.",
+    "candidate_id": "pg18-b04-09"
+  },
+  {
+    "topic": "transactions",
+    "difficulty": "hard",
+    "text": "When is read data safe to use for a SERIALIZABLE READ ONLY DEFERRABLE transaction?",
+    "answerable": true,
+    "reference_answer": "Its data is valid as soon as read because it waits for a safe snapshot before reading.",
+    "required_facts": [
+      "Its data is valid as soon as read because it waits for a safe snapshot before reading."
+    ],
+    "evidence_specs": [
+      {
+        "fact_index": 0,
+        "filename": "transaction-iso.html",
+        "quote": "data read within a deferrable read-only transaction is known to be valid as soon as it is read, because such a transaction waits until it can acquire a snapshot guaranteed to be free from such problems before starting to read any data."
+      }
+    ],
+    "author": "Codex; AI-authored and AI source-reviewed, not independent human validation",
+    "unanswerability_rationale": null,
+    "source_review_rationale": "The special deferrable read-only exception is preserved, not generalized to all Serializable transactions.",
+    "candidate_id": "pg18-b04-10"
+  },
+  {
+    "topic": "transactions",
+    "difficulty": "medium",
+    "text": "What SQLSTATE is associated with serialization failures in the Serializable implementation?",
+    "answerable": true,
+    "reference_answer": "Serialization failures return SQLSTATE 40001.",
+    "required_facts": [
+      "Serialization failures return SQLSTATE 40001."
+    ],
+    "evidence_specs": [
+      {
+        "fact_index": 0,
+        "filename": "transaction-iso.html",
+        "quote": "serialization failures (which always return with an SQLSTATE value of '40001')"
+      }
+    ],
+    "author": "Codex; AI-authored and AI source-reviewed, not independent human validation",
+    "unanswerability_rationale": null,
+    "source_review_rationale": "Exact code read from the canonical paragraph, independent of localized human-readable error wording.",
+    "candidate_id": "pg18-b04-11"
+  },
+  {
+    "topic": "transactions",
+    "difficulty": "medium",
+    "text": "When rolling back to a savepoint, what happens to locks acquired after that savepoint?",
+    "answerable": true,
+    "reference_answer": "Locks acquired after the savepoint are released immediately when rolling back to it.",
+    "required_facts": [
+      "Locks acquired after the savepoint are released immediately when rolling back to it."
+    ],
+    "evidence_specs": [
+      {
+        "fact_index": 0,
+        "filename": "explicit-locking.html",
+        "quote": "But if a lock is acquired after establishing a savepoint, the lock is released immediately if the savepoint is rolled back to."
+      }
+    ],
+    "author": "Codex; AI-authored and AI source-reviewed, not independent human validation",
+    "unanswerability_rationale": null,
+    "source_review_rationale": "This is the documented exception to holding locks until transaction end.",
+    "candidate_id": "pg18-b04-12"
+  },
+  {
+    "topic": "transactions",
+    "difficulty": "hard",
+    "text": "How does PostgreSQL resolve a detected deadlock, and can an application rely on which transaction is aborted?",
+    "answerable": true,
+    "reference_answer": "PostgreSQL aborts one of the involved transactions to resolve a detected deadlock. Applications must not rely on which transaction is chosen as the victim.",
+    "required_facts": [
+      "PostgreSQL aborts one of the involved transactions to resolve a detected deadlock.",
+      "Applications must not rely on which transaction is chosen as the victim."
+    ],
+    "evidence_specs": [
+      {
+        "fact_index": 0,
+        "filename": "explicit-locking.html",
+        "quote": "PostgreSQL automatically detects deadlock situations and resolves them by aborting one of the transactions involved, allowing the other(s) to complete."
+      },
+      {
+        "fact_index": 1,
+        "filename": "explicit-locking.html",
+        "quote": "Exactly which transaction will be aborted is difficult to predict and should not be relied upon."
+      }
+    ],
+    "author": "Codex; AI-authored and AI source-reviewed, not independent human validation",
+    "unanswerability_rationale": null,
+    "source_review_rationale": "The victim choice caveat is part of the gold, avoiding a deterministic scheduling promise.",
+    "candidate_id": "pg18-b04-13"
+  },
+  {
+    "topic": "transactions",
+    "difficulty": "medium",
+    "text": "What lock-acquisition practice is recommended to reduce deadlocks across multiple objects?",
+    "answerable": true,
+    "reference_answer": "Applications should acquire locks on multiple objects in a consistent order.",
+    "required_facts": [
+      "Applications should acquire locks on multiple objects in a consistent order."
+    ],
+    "evidence_specs": [
+      {
+        "fact_index": 0,
+        "filename": "explicit-locking.html",
+        "quote": "The best defense against deadlocks is generally to avoid them by being certain that all applications using a database acquire locks on multiple objects in a consistent order."
+      }
+    ],
+    "author": "Codex; AI-authored and AI source-reviewed, not independent human validation",
+    "unanswerability_rationale": null,
+    "source_review_rationale": "A recommendation to reduce deadlocks, not a guarantee that every possible deadlock is eliminated.",
+    "candidate_id": "pg18-b04-14"
+  },
+  {
+    "topic": "transactions",
+    "difficulty": "hard",
+    "text": "Does transaction rollback release a session-level advisory lock acquired during that transaction?",
+    "answerable": true,
+    "reference_answer": "No. A session-level advisory lock remains held after the transaction rolls back.",
+    "required_facts": [
+      "No. A session-level advisory lock remains held after the transaction rolls back."
+    ],
+    "evidence_specs": [
+      {
+        "fact_index": 0,
+        "filename": "explicit-locking.html",
+        "quote": "a lock acquired during a transaction that is later rolled back will still be held following the rollback"
+      }
+    ],
+    "author": "Codex; AI-authored and AI source-reviewed, not independent human validation",
+    "unanswerability_rationale": null,
+    "source_review_rationale": "Session-level semantics are explicitly different from transaction-level requests in the same source paragraph.",
+    "candidate_id": "pg18-b04-15"
+  },
+  {
+    "topic": "transactions",
+    "difficulty": "medium",
+    "text": "When are transaction-level advisory locks automatically released, and is there an explicit unlock operation?",
+    "answerable": true,
+    "reference_answer": "Transaction-level advisory locks are released at transaction end and have no explicit unlock operation.",
+    "required_facts": [
+      "Transaction-level advisory locks are released at transaction end and have no explicit unlock operation."
+    ],
+    "evidence_specs": [
+      {
+        "fact_index": 0,
+        "filename": "explicit-locking.html",
+        "quote": "Transaction-level lock requests, on the other hand, behave more like regular lock requests: they are automatically released at the end of the transaction, and there is no explicit unlock operation."
+      }
+    ],
+    "author": "Codex; AI-authored and AI source-reviewed, not independent human validation",
+    "unanswerability_rationale": null,
+    "source_review_rationale": "Contrasts a distinct lifetime and API contract with the session-level rollback item; will group both for splitting.",
+    "candidate_id": "pg18-b04-16"
+  },
+  {
+    "topic": "transactions",
+    "difficulty": "hard",
+    "text": "What becomes accessible after releasing a newer savepoint with the same name as an older one?",
+    "answerable": true,
+    "reference_answer": "The older identically named savepoint becomes accessible again.",
+    "required_facts": [
+      "The older identically named savepoint becomes accessible again."
+    ],
+    "evidence_specs": [
+      {
+        "fact_index": 0,
+        "filename": "sql-savepoint.html",
+        "quote": "Releasing the newer savepoint with RELEASE SAVEPOINT will cause the older one to again become accessible to ROLLBACK TO SAVEPOINT and RELEASE SAVEPOINT ."
+      }
+    ],
+    "author": "Codex; AI-authored and AI source-reviewed, not independent human validation",
+    "unanswerability_rationale": null,
+    "source_review_rationale": "PostgreSQL retains the older savepoint rather than automatically destroying it as the SQL standard specifies.",
+    "candidate_id": "pg18-b04-17"
+  },
+  {
+    "topic": "transactions",
+    "difficulty": "hard",
+    "text": "If an already-open cursor is moved by FETCH inside a savepoint, does rolling back the savepoint restore its old position?",
+    "answerable": true,
+    "reference_answer": "No. Cursor movement from FETCH or MOVE is not undone by savepoint rollback.",
+    "required_facts": [
+      "No. Cursor movement from FETCH or MOVE is not undone by savepoint rollback."
+    ],
+    "evidence_specs": [
+      {
+        "fact_index": 0,
+        "filename": "sql-rollback-to.html",
+        "quote": "If a previously opened cursor is affected by a FETCH or MOVE command inside a savepoint that is later rolled back, the cursor remains at the position that FETCH left it pointing to (that is, the cursor motion caused by FETCH is not rolled back)."
+      }
+    ],
+    "author": "Codex; AI-authored and AI source-reviewed, not independent human validation",
+    "unanswerability_rationale": null,
+    "source_review_rationale": "The question says already-open cursor; a cursor opened inside the savepoint would instead be closed.",
+    "candidate_id": "pg18-b04-18"
+  },
+  {
+    "topic": "transactions",
+    "difficulty": "hard",
+    "text": "What is the strictest isolation level supported on a PostgreSQL hot standby in this release?",
+    "answerable": true,
+    "reference_answer": "Repeatable Read is the strictest supported isolation level on a hot standby; Serializable is not supported there.",
+    "required_facts": [
+      "Repeatable Read is the strictest supported isolation level on a hot standby; Serializable is not supported there."
+    ],
+    "evidence_specs": [
+      {
+        "fact_index": 0,
+        "filename": "mvcc-caveats.html",
+        "quote": "Support for the Serializable transaction isolation level has not yet been added to hot standby replication targets (described in Section 26.4 ). The strictest isolation level currently supported in hot standby mode is Repeatable Read."
+      }
+    ],
+    "author": "Codex; AI-authored and AI source-reviewed, not independent human validation",
+    "unanswerability_rationale": null,
+    "source_review_rationale": "The adjacent first sentence explicitly states lack of Serializable standby support; evidence is supplemented below.",
+    "candidate_id": "pg18-b04-19"
+  },
+  {
+    "topic": "transactions",
+    "difficulty": "medium",
+    "text": "Which backend PID will PostgreSQL abort in a deadlock between my sessions when their PIDs and wait graph are not supplied?",
+    "answerable": false,
+    "reference_answer": "The provided corpus and question do not contain enough information to determine that.",
+    "required_facts": [],
+    "evidence_specs": [],
+    "author": "Codex; AI-authored and AI source-reviewed, not independent human validation",
+    "unanswerability_rationale": "The manual says victim choice should not be relied upon, and no concrete wait graph or process IDs are given. It cannot identify an exact victim PID.",
+    "source_review_rationale": "The manual says victim choice should not be relied upon, and no concrete wait graph or process IDs are given. It cannot identify an exact victim PID.",
+    "audit_context_sections": [
+      "4289377a-381f-5391-b73e-0d9e937de5d4"
+    ],
+    "candidate_id": "pg18-b04-20"
+  },
+  {
+    "topic": "transactions",
+    "difficulty": "medium",
+    "text": "What exact number of serialization retries will my next workload require when its transactions, data and schedule are unspecified?",
+    "answerable": false,
+    "reference_answer": "The provided corpus and question do not contain enough information to determine that.",
+    "required_facts": [],
+    "evidence_specs": [],
+    "author": "Codex; AI-authored and AI source-reviewed, not independent human validation",
+    "unanswerability_rationale": "Serializable may require retries but does not assign a fixed count. Unknown transaction interleavings and workload make the requested number undetermined.",
+    "source_review_rationale": "Serializable may require retries but does not assign a fixed count. Unknown transaction interleavings and workload make the requested number undetermined.",
+    "audit_context_sections": [
+      "5b48325b-87b9-5405-a59f-b0fc3cf85dd3",
+      "5196c73a-d56b-54d5-89bb-e501c451a61d"
+    ],
+    "candidate_id": "pg18-b04-21"
+  },
+  {
+    "topic": "transactions",
+    "difficulty": "medium",
+    "text": "Which row keys are currently locked by my application when no session or lock observations are provided?",
+    "answerable": false,
+    "reference_answer": "The provided corpus and question do not contain enough information to determine that.",
+    "required_facts": [],
+    "evidence_specs": [],
+    "author": "Codex; AI-authored and AI source-reviewed, not independent human validation",
+    "unanswerability_rationale": "Locking semantics describe behavior, not the live row keys held by an unknown application. Runtime lock observations are absent.",
+    "source_review_rationale": "Locking semantics describe behavior, not the live row keys held by an unknown application. Runtime lock observations are absent.",
+    "audit_context_sections": [
+      "797fef9c-28b4-5d54-9234-debbe7e5dd1a"
+    ],
+    "candidate_id": "pg18-b04-22"
+  },
+  {
+    "topic": "transactions",
+    "difficulty": "medium",
+    "text": "At what exact wall-clock time will my blocked transaction acquire its row lock when no holder state or timeout configuration is supplied?",
+    "answerable": false,
+    "reference_answer": "The provided corpus and question do not contain enough information to determine that.",
+    "required_facts": [],
+    "evidence_specs": [],
+    "author": "Codex; AI-authored and AI source-reviewed, not independent human validation",
+    "unanswerability_rationale": "The conflicting transaction release time and timeout settings are absent. The manual cannot supply this application-specific acquisition timestamp.",
+    "source_review_rationale": "The conflicting transaction release time and timeout settings are absent. The manual cannot supply this application-specific acquisition timestamp.",
+    "audit_context_sections": [
+      "56637864-583f-5854-baa2-e426a68c4215"
+    ],
+    "candidate_id": "pg18-b04-23"
+  },
+  {
+    "topic": "transactions",
+    "difficulty": "medium",
+    "text": "What account balance will remain after my transaction rolls back when neither its starting balance nor executed commands are provided?",
+    "answerable": false,
+    "reference_answer": "The provided corpus and question do not contain enough information to determine that.",
+    "required_facts": [],
+    "evidence_specs": [],
+    "author": "Codex; AI-authored and AI source-reviewed, not independent human validation",
+    "unanswerability_rationale": "Rollback semantics do not reveal an unknown starting balance or application history. The illustrative banking values are not facts about this user database.",
+    "source_review_rationale": "Rollback semantics do not reveal an unknown starting balance or application history. The illustrative banking values are not facts about this user database.",
+    "audit_context_sections": [
+      "26990bc8-2ed7-5e83-bba4-31b85b4bf955",
+      "2816c2e5-5d73-56e4-a0b5-e75bd6a94eee"
+    ],
+    "candidate_id": "pg18-b04-24"
+  }
+]

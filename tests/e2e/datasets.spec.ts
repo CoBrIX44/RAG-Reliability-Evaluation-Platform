@@ -79,3 +79,36 @@ test("curate canonical evidence, record review, publish and export", async ({ pa
   await page.getByRole("button", { name: "What does the test fixture say?" }).click();
   await expect(page.getByLabel("I have reviewed this question, answer, and evidence")).not.toBeChecked();
 });
+
+
+test("AI gold review remains AI until an explicit human review is saved", async ({ page }) => {
+  let content = { text: "Synthetic AI-reviewed question?", answerable: false, reference_answer: "Not enough evidence.", required_facts: [], evidence_groups: [], topic: "synthetic", difficulty: "easy", split: "unassigned", split_group: "synthetic", review_status: "reviewed", review_source: "ai", reviewer: "Synthetic AI reviewer" };
+  let revision = 1;
+  const submissions: Array<Record<string, unknown>> = [];
+  const dataset = { id: datasetId, name: "Synthetic provenance fixture", purpose: "research", corpus_version_id: versionId, draft_revision: 1 };
+  await page.route("**/api/workspace", route => route.fulfill({ json: { stage: "datasets", api: "ready", capabilities: ["dataset_curation"], database: { status: "ready", code: "ok", message: "Ready", worker_status: "ready" }, generation_configured: false, judge_configured: false } }));
+  await page.route("**/api/platform/**", async route => {
+    const request = route.request(), path = new URL(request.url()).pathname.replace("/api/platform/", "");
+    const row = () => ({ id: questionId, dataset_id: datasetId, revision, content, reviewed_at: "2026-10-16T00:00:00Z" });
+    if (path === "datasets") await route.fulfill({ json: { items: [dataset], next_cursor: null } });
+    else if (path === `datasets/${datasetId}/questions`) await route.fulfill({ json: { items: [row()], next_cursor: null } });
+    else if (path === `datasets/${datasetId}/questions/${questionId}`) {
+      const body = request.postDataJSON(); submissions.push(body.content); content = body.content; revision += 1;
+      await route.fulfill({ json: row() });
+    } else await route.fulfill({ json: { items: [], next_cursor: null } });
+  });
+  await page.goto("/datasets");
+  await expect(page.locator(".question-list")).toContainText("AI · Reviewed by Synthetic AI reviewer");
+  await page.getByRole("button", { name: content.text, exact: true }).click();
+  const review = page.getByLabel("I have reviewed this question, answer, and evidence", { exact: true });
+  await expect(review).not.toBeChecked();
+  await page.getByRole("button", { name: "Save question", exact: true }).click();
+  await expect.poll(() => submissions.length).toBe(1);
+  expect(submissions[0].review_source).toBe("ai");
+  await review.check();
+  await page.getByLabel("Reviewer name", { exact: true }).fill("Synthetic human reviewer");
+  await page.getByRole("button", { name: "Save question", exact: true }).click();
+  await expect.poll(() => submissions.length).toBe(2);
+  expect(submissions[1].review_source).toBe("human");
+  await expect(page.locator(".question-list")).toContainText("Human · Reviewed by Synthetic human reviewer");
+});

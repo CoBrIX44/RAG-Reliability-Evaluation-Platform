@@ -81,3 +81,9 @@ Rubric/model prompt revision and full policy are frozen inside every manifest ra
 An export references exactly one terminal run or comparison through nullable foreign keys, with unique request key, immutable frozen manifest/hash, state, attempts/max_attempts, lease token/expiry, output and timestamps. Database guards enforce source hash/terminal lineage, immutable input and terminal records, and live lease ownership on publication. Export completion writes a lease-specific artifact key, byte lengths, file count and SHA-256; it never rewrites run/result/assessment evidence.
 
 Frozen membership records run results/attempts, selected evaluation IDs/input hashes/states and code/lock availability expectations. Pending outputs cannot be backfilled. Comparison snapshots preserve topic/difficulty labels with selected questions; older unfiltered snapshots remain readable.
+
+## M7 gold review source
+QuestionInput JSON adds review_source=human|ai with human as the backward-compatible legacy default; no relational schema change or immutable-snapshot rewrite. New AI reviews explicitly store ai and a reviewer label, while actual original owner rows are untouched. Gold snapshot and JSONL round-trip preserve source. Audit/UI counts separate human and AI. This provenance is independent of answer_evaluations.source (human/model judgments of generated answers).
+
+## M7 frozen benchmark curation - 2026-10-16
+Draft split-only/split-group-only updates preserve the original reviewed_at when gold/provenance is unchanged. A substantive reviewed-content edit records a new attestation timestamp; returning to candidate clears it. This retains the actual human/AI review time during grouped split assignment. Frozen dataset manifests preserve their original content/times; no SQL migration or published record update is performed.

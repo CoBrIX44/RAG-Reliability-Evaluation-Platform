@@ -1,0 +1,412 @@
+[
+  {
+    "candidate_id": "pg18-b02-01",
+    "topic": "sql",
+    "difficulty": "medium",
+    "text": "Without an explicit NULLS FIRST or NULLS LAST clause, where do null values appear for ascending and descending sorts?",
+    "answerable": true,
+    "reference_answer": "Null values appear last for ascending order and first for descending order.",
+    "required_facts": [
+      "Ascending sorts default to NULLS LAST; descending sorts default to NULLS FIRST."
+    ],
+    "evidence_specs": [
+      {
+        "fact_index": 0,
+        "filename": "queries-order.html",
+        "quote": "The NULLS FIRST and NULLS LAST options can be used to determine whether nulls appear before or after non-null values in the sort ordering. By default, null values sort as if larger than any non-null value; that is, NULLS FIRST is the default for DESC order, and NULLS LAST otherwise."
+      }
+    ],
+    "author": "Codex-authored candidate; not human-reviewed",
+    "unanswerability_rationale": null
+  },
+  {
+    "candidate_id": "pg18-b02-02",
+    "topic": "sql",
+    "difficulty": "easy",
+    "text": "What is the lifetime of the temporary-table-like definitions supplied by WITH?",
+    "answerable": true,
+    "reference_answer": "The common table expressions exist just for the one query.",
+    "required_facts": [
+      "WITH can define common table expressions that exist for one query."
+    ],
+    "evidence_specs": [
+      {
+        "fact_index": 0,
+        "filename": "queries-with.html",
+        "quote": "WITH provides a way to write auxiliary statements for use in a larger query. These statements, which are often referred to as Common Table Expressions or CTE s, can be thought of as defining temporary tables that exist just for one query. Each auxiliary statement in a WITH clause can be a SELECT , INSERT , UPDATE , DELETE , or MERGE ; and the WITH clause itself is attached to a primary statement that can also be a SELECT , INSERT , UPDATE , DELETE , or MERGE ."
+      }
+    ],
+    "author": "Codex-authored candidate; not human-reviewed",
+    "unanswerability_rationale": null
+  },
+  {
+    "candidate_id": "pg18-b02-03",
+    "topic": "sql",
+    "difficulty": "medium",
+    "text": "At what stages do WHERE and HAVING filter rows relative to grouping and aggregation?",
+    "answerable": true,
+    "reference_answer": "WHERE filters input rows before grouping and aggregation; HAVING filters group rows afterward.",
+    "required_facts": [
+      "WHERE selects input rows before groups and aggregates are computed.",
+      "HAVING selects group rows after groups and aggregates are computed."
+    ],
+    "evidence_specs": [
+      {
+        "fact_index": 0,
+        "filename": "tutorial-agg.html",
+        "quote": "WHERE selects input rows before groups and aggregates are computed"
+      },
+      {
+        "fact_index": 1,
+        "filename": "tutorial-agg.html",
+        "quote": "HAVING selects group rows after groups and aggregates are computed."
+      }
+    ],
+    "author": "Codex-authored candidate; not human-reviewed",
+    "unanswerability_rationale": null
+  },
+  {
+    "candidate_id": "pg18-b02-04",
+    "topic": "sql",
+    "difficulty": "hard",
+    "text": "What numeric result will SELECT count(*) FROM orders return on my database when no contents of orders are supplied?",
+    "answerable": false,
+    "reference_answer": "The provided corpus and question do not contain enough information to determine that.",
+    "required_facts": [],
+    "evidence_specs": [],
+    "author": "Codex-authored candidate; not human-reviewed",
+    "unanswerability_rationale": "The requested instance-specific facts are absent from the question and require deployment data. Reviewer must confirm against the entire frozen corpus."
+  },
+  {
+    "candidate_id": "pg18-b02-05",
+    "topic": "transactions",
+    "difficulty": "medium",
+    "text": "Under Read Committed, can two successive ordinary SELECT commands in one transaction see different committed data?",
+    "answerable": true,
+    "reference_answer": "Yes. Each command takes a statement-start snapshot, so commits between the starts of the two commands can change what the second sees.",
+    "required_facts": [
+      "Two successive SELECT commands can see different data under Read Committed if another transaction commits between their starts."
+    ],
+    "evidence_specs": [
+      {
+        "fact_index": 0,
+        "filename": "transaction-iso.html",
+        "quote": "Read Committed is the default isolation level in PostgreSQL . When a transaction uses this isolation level, a SELECT query (without a FOR UPDATE/SHARE clause) sees only data committed before the query began; it never sees either uncommitted data or changes committed by concurrent transactions during the query's execution. In effect, a SELECT query sees a snapshot of the database as of the instant the query begins to run. However, SELECT does see the effects of previous updates executed within its own transaction, even though they are not yet committed. Also note that two successive SELECT commands can see different data, even though they are within a single transaction, if other transactions commit changes after the first SELECT starts and before the second SELECT starts."
+      }
+    ],
+    "author": "Codex-authored candidate; not human-reviewed",
+    "unanswerability_rationale": null
+  },
+  {
+    "candidate_id": "pg18-b02-06",
+    "topic": "transactions",
+    "difficulty": "medium",
+    "text": "Do row-level locks block ordinary data querying, and what operations do they block on the same row?",
+    "answerable": true,
+    "reference_answer": "They do not block data querying; they block writers and lockers of the same row.",
+    "required_facts": [
+      "Row-level locks do not affect data querying and block only writers and lockers of the same row."
+    ],
+    "evidence_specs": [
+      {
+        "fact_index": 0,
+        "filename": "explicit-locking.html",
+        "quote": "Row-level locks do not affect data querying; they block only writers and lockers to the same row."
+      }
+    ],
+    "author": "Codex-authored candidate; not human-reviewed",
+    "unanswerability_rationale": null
+  },
+  {
+    "candidate_id": "pg18-b02-07",
+    "topic": "transactions",
+    "difficulty": "hard",
+    "text": "After creating savepoints A and then B, what does ROLLBACK TO A undo, and which savepoints remain usable?",
+    "answerable": true,
+    "reference_answer": "It undoes commands after A; A remains valid and can be reused, while B is destroyed.",
+    "required_facts": [
+      "A savepoint marks a transaction state to which later commands can be rolled back.",
+      "ROLLBACK TO leaves its named savepoint valid for a later rollback.",
+      "ROLLBACK TO destroys savepoints established after its named target."
+    ],
+    "evidence_specs": [
+      {
+        "fact_index": 0,
+        "filename": "sql-savepoint.html",
+        "quote": "A savepoint is a special mark inside a transaction that allows all commands that are executed after it was established to be rolled back, restoring the transaction state to what it was at the time of the savepoint."
+      },
+      {
+        "fact_index": 1,
+        "filename": "sql-rollback-to.html",
+        "quote": "Roll back all commands that were executed after the savepoint was established and then start a new subtransaction at the same transaction level. The savepoint remains valid and can be rolled back to again later, if needed."
+      },
+      {
+        "fact_index": 2,
+        "filename": "sql-rollback-to.html",
+        "quote": "ROLLBACK TO SAVEPOINT implicitly destroys all savepoints that were established after the named savepoint."
+      }
+    ],
+    "author": "Codex-authored candidate; not human-reviewed",
+    "unanswerability_rationale": null
+  },
+  {
+    "candidate_id": "pg18-b02-08",
+    "topic": "transactions",
+    "difficulty": "hard",
+    "text": "What data view does MVCC give a SQL statement, and do row-level locks themselves prevent ordinary querying of rows?",
+    "answerable": true,
+    "reference_answer": "MVCC gives the statement a snapshot of data. Row-level locks do not affect data querying; they block writers and lockers of the same row.",
+    "required_facts": [
+      "Each SQL statement sees a snapshot of data under MVCC.",
+      "Row-level locks do not affect data querying."
+    ],
+    "evidence_specs": [
+      {
+        "fact_index": 0,
+        "filename": "mvcc-intro.html",
+        "quote": "PostgreSQL provides a rich set of tools for developers to manage concurrent access to data. Internally, data consistency is maintained by using a multiversion model (Multiversion Concurrency Control, MVCC ). This means that each SQL statement sees a snapshot of data (a database version ) as it was some time ago, regardless of the current state of the underlying data. This prevents statements from viewing inconsistent data produced by concurrent transactions performing updates on the same data rows, providing transaction isolation for each database session. MVCC , by eschewing the locking methodologies of traditional database systems, minimizes lock contention in order to allow for reasonable performance in multiuser environments."
+      },
+      {
+        "fact_index": 1,
+        "filename": "explicit-locking.html",
+        "quote": "Row-level locks do not affect data querying; they block only writers and lockers to the same row."
+      }
+    ],
+    "author": "Codex-authored candidate; not human-reviewed",
+    "unanswerability_rationale": null
+  },
+  {
+    "candidate_id": "pg18-b02-09",
+    "topic": "indexes",
+    "difficulty": "easy",
+    "text": "Which rows have entries in a partial index?",
+    "answerable": true,
+    "reference_answer": "Only rows satisfying the conditional expression that defines the partial-index predicate.",
+    "required_facts": [
+      "A partial index contains entries only for table rows that satisfy its predicate."
+    ],
+    "evidence_specs": [
+      {
+        "fact_index": 0,
+        "filename": "indexes-partial.html",
+        "quote": "A partial index is an index built over a subset of a table; the subset is defined by a conditional expression (called the predicate of the partial index). The index contains entries only for those table rows that satisfy the predicate. Partial indexes are a specialized feature, but there are several situations in which they are useful."
+      }
+    ],
+    "author": "Codex-authored candidate; not human-reviewed",
+    "unanswerability_rationale": null
+  },
+  {
+    "candidate_id": "pg18-b02-10",
+    "topic": "indexes",
+    "difficulty": "medium",
+    "text": "What additional case-related constraint can a unique index on lower(col1) enforce?",
+    "answerable": true,
+    "reference_answer": "It prevents rows whose col1 values differ only in case, as well as rows with identical values.",
+    "required_facts": [
+      "A unique expression index on lower(col1) prevents values that differ only in case."
+    ],
+    "evidence_specs": [
+      {
+        "fact_index": 0,
+        "filename": "indexes-expressional.html",
+        "quote": "If we were to declare this index UNIQUE , it would prevent creation of rows whose col1 values differ only in case, as well as rows whose col1 values are actually identical. Thus, indexes on expressions can be used to enforce constraints that are not definable as simple unique constraints."
+      }
+    ],
+    "author": "Codex-authored candidate; not human-reviewed",
+    "unanswerability_rationale": null
+  },
+  {
+    "candidate_id": "pg18-b02-11",
+    "topic": "indexes",
+    "difficulty": "hard",
+    "text": "Why must an index-only scan consider MVCC visibility, and when can the visibility map avoid a heap visit?",
+    "answerable": true,
+    "reference_answer": "Rows must be visible to the query snapshot. If the candidate row's heap page has its all-visible bit set, the index-only scan can return it without a heap visit.",
+    "required_facts": [
+      "Queries see a snapshot under MVCC.",
+      "An index-only scan can avoid a heap visibility visit when the heap page's visibility-map bit is set."
+    ],
+    "evidence_specs": [
+      {
+        "fact_index": 0,
+        "filename": "mvcc-intro.html",
+        "quote": "PostgreSQL provides a rich set of tools for developers to manage concurrent access to data. Internally, data consistency is maintained by using a multiversion model (Multiversion Concurrency Control, MVCC ). This means that each SQL statement sees a snapshot of data (a database version ) as it was some time ago, regardless of the current state of the underlying data. This prevents statements from viewing inconsistent data produced by concurrent transactions performing updates on the same data rows, providing transaction isolation for each database session. MVCC , by eschewing the locking methodologies of traditional database systems, minimizes lock contention in order to allow for reasonable performance in multiuser environments."
+      },
+      {
+        "fact_index": 1,
+        "filename": "indexes-index-only-scans.html",
+        "quote": "An index-only scan, after finding a candidate index entry, checks the visibility map bit for the corresponding heap page. If it's set, the row is known visible and so the data can be returned with no further work. If it's not set, the heap entry must be visited to find out whether it's visible, so no performance advantage is gained over a standard index scan."
+      }
+    ],
+    "author": "Codex-authored candidate; not human-reviewed",
+    "unanswerability_rationale": null
+  },
+  {
+    "candidate_id": "pg18-b02-12",
+    "topic": "indexes",
+    "difficulty": "hard",
+    "text": "Exactly how many milliseconds will adding a B-tree index save for my application, without a query, data distribution or measured plan?",
+    "answerable": false,
+    "reference_answer": "The provided corpus and question do not contain enough information to determine that.",
+    "required_facts": [],
+    "evidence_specs": [],
+    "author": "Codex-authored candidate; not human-reviewed",
+    "unanswerability_rationale": "The requested instance-specific facts are absent from the question and require deployment data. Reviewer must confirm against the entire frozen corpus."
+  },
+  {
+    "candidate_id": "pg18-b02-13",
+    "topic": "configuration",
+    "difficulty": "medium",
+    "text": "Does setting enable_seqscan to off entirely prevent sequential scans?",
+    "answerable": true,
+    "reference_answer": "No. It discourages sequential scans when other methods are available but cannot suppress them entirely.",
+    "required_facts": [
+      "Disabling enable_seqscan cannot suppress sequential scans entirely."
+    ],
+    "evidence_specs": [
+      {
+        "fact_index": 0,
+        "filename": "runtime-config-query.html",
+        "quote": "Enables or disables the query planner's use of sequential scan plan types. It is impossible to suppress sequential scans entirely, but turning this variable off discourages the planner from using one if there are other methods available. The default is on ."
+      }
+    ],
+    "author": "Codex-authored candidate; not human-reviewed",
+    "unanswerability_rationale": null
+  },
+  {
+    "candidate_id": "pg18-b02-14",
+    "topic": "configuration",
+    "difficulty": "medium",
+    "text": "How can increasing max_connections affect server resource allocation?",
+    "answerable": true,
+    "reference_answer": "PostgreSQL sizes some resources from max_connections, so raising it increases those allocations, including shared memory.",
+    "required_facts": [
+      "Increasing max_connections increases directly related resource allocations, including shared memory."
+    ],
+    "evidence_specs": [
+      {
+        "fact_index": 0,
+        "filename": "runtime-config-connection.html",
+        "quote": "PostgreSQL sizes certain resources based directly on the value of max_connections . Increasing its value leads to higher allocation of those resources, including shared memory."
+      }
+    ],
+    "author": "Codex-authored candidate; not human-reviewed",
+    "unanswerability_rationale": null
+  },
+  {
+    "candidate_id": "pg18-b02-15",
+    "topic": "configuration",
+    "difficulty": "easy",
+    "text": "What does setting log_min_duration_statement to zero do?",
+    "answerable": true,
+    "reference_answer": "It logs the duration of all completed statements.",
+    "required_facts": [
+      "A zero log_min_duration_statement logs all statement durations."
+    ],
+    "evidence_specs": [
+      {
+        "fact_index": 0,
+        "filename": "runtime-config-logging.html",
+        "quote": "Causes the duration of each completed statement to be logged if the statement ran for at least the specified amount of time. For example, if you set it to 250ms then all SQL statements that run 250ms or longer will be logged. Enabling this parameter can be helpful in tracking down unoptimized queries in your applications. If this value is specified without units, it is taken as milliseconds. Setting this to zero prints all statement durations. -1 (the default) disables logging statement durations. Only superusers and users with the appropriate SET privilege can change this setting."
+      }
+    ],
+    "author": "Codex-authored candidate; not human-reviewed",
+    "unanswerability_rationale": null
+  },
+  {
+    "candidate_id": "pg18-b02-16",
+    "topic": "configuration",
+    "difficulty": "hard",
+    "text": "What exact max_connections value should my production server use when its memory, workload and connection-management requirements are unspecified?",
+    "answerable": false,
+    "reference_answer": "The provided corpus and question do not contain enough information to determine that.",
+    "required_facts": [],
+    "evidence_specs": [],
+    "author": "Codex-authored candidate; not human-reviewed",
+    "unanswerability_rationale": "The requested instance-specific facts are absent from the question and require deployment data. Reviewer must confirm against the entire frozen corpus."
+  },
+  {
+    "candidate_id": "pg18-b02-17",
+    "topic": "troubleshooting",
+    "difficulty": "hard",
+    "text": "How do standard VACUUM and VACUUM FULL differ in space handling and concurrent table use?",
+    "answerable": true,
+    "reference_answer": "Standard VACUUM normally makes dead-row space reusable without returning it to the OS and can coexist with normal operations. VACUUM FULL compacts a replacement table file and requires an ACCESS EXCLUSIVE lock.",
+    "required_facts": [
+      "Standard VACUUM marks dead-row space for reuse, with only limited circumstances returning space to the OS.",
+      "VACUUM FULL requires an ACCESS EXCLUSIVE table lock, unlike ordinary VACUUM's ability to run alongside production operations."
+    ],
+    "evidence_specs": [
+      {
+        "fact_index": 0,
+        "filename": "routine-vacuuming.html",
+        "quote": "The standard form of VACUUM removes dead row versions in tables and indexes and marks the space available for future reuse. However, it will not return the space to the operating system, except in the special case where one or more pages at the end of a table become entirely free and an exclusive table lock can be easily obtained. In contrast, VACUUM FULL actively compacts tables by writing a complete new version of the table file with no dead space. This minimizes the size of the table, but can take a long time. It also requires extra disk space for the new copy of the table, until the operation completes."
+      },
+      {
+        "fact_index": 1,
+        "filename": "routine-vacuuming.html",
+        "quote": "There are two variants of VACUUM : standard VACUUM and VACUUM FULL . VACUUM FULL can reclaim more disk space but runs much more slowly. Also, the standard form of VACUUM can run in parallel with production database operations. (Commands such as SELECT , INSERT , UPDATE , and DELETE will continue to function normally, though you will not be able to modify the definition of a table with commands such as ALTER TABLE while it is being vacuumed.) VACUUM FULL requires an ACCESS EXCLUSIVE lock on the table it is working on, and therefore cannot be done in parallel with other use of the table. Generally, therefore, administrators should strive to use standard VACUUM and avoid VACUUM FULL ."
+      }
+    ],
+    "author": "Codex-authored candidate; not human-reviewed",
+    "unanswerability_rationale": null
+  },
+  {
+    "candidate_id": "pg18-b02-18",
+    "topic": "troubleshooting",
+    "difficulty": "medium",
+    "text": "How does EXPLAIN ANALYZE differ from plain EXPLAIN with respect to execution and reported plan-node measurements?",
+    "answerable": true,
+    "reference_answer": "Its ANALYZE option actually executes the query and shows actual row counts and runtime for plan nodes alongside planner estimates.",
+    "required_facts": [
+      "EXPLAIN with ANALYZE executes the query and reports actual row counts and runtime alongside estimates."
+    ],
+    "evidence_specs": [
+      {
+        "fact_index": 0,
+        "filename": "using-explain.html",
+        "quote": "It is possible to check the accuracy of the planner's estimates by using EXPLAIN 's ANALYZE option. With this option, EXPLAIN actually executes the query, and then displays the true row counts and true run time accumulated within each plan node, along with the same estimates that a plain EXPLAIN shows. For example, we might get a result like this:"
+      }
+    ],
+    "author": "Codex-authored candidate; not human-reviewed",
+    "unanswerability_rationale": null
+  },
+  {
+    "candidate_id": "pg18-b02-19",
+    "topic": "troubleshooting",
+    "difficulty": "medium",
+    "text": "Which system view helps inspect outstanding locks, and do row-level locks themselves block ordinary data querying?",
+    "answerable": true,
+    "reference_answer": "Use pg_locks for outstanding lock information. Row-level locks do not affect data querying, but block writers and lockers on the same row.",
+    "required_facts": [
+      "pg_locks exposes outstanding locks in the lock manager.",
+      "Row-level locks do not affect data querying."
+    ],
+    "evidence_specs": [
+      {
+        "fact_index": 0,
+        "filename": "monitoring-locks.html",
+        "quote": "Another useful tool for monitoring database activity is the pg_locks system table. It allows the database administrator to view information about the outstanding locks in the lock manager. For example, this capability can be used to:"
+      },
+      {
+        "fact_index": 1,
+        "filename": "explicit-locking.html",
+        "quote": "Row-level locks do not affect data querying; they block only writers and lockers to the same row."
+      }
+    ],
+    "author": "Codex-authored candidate; not human-reviewed",
+    "unanswerability_rationale": null
+  },
+  {
+    "candidate_id": "pg18-b02-20",
+    "topic": "troubleshooting",
+    "difficulty": "hard",
+    "text": "Which exact file or process exhausted disk space on my server when no disk-usage measurements or logs are provided?",
+    "answerable": false,
+    "reference_answer": "The provided corpus and question do not contain enough information to determine that.",
+    "required_facts": [],
+    "evidence_specs": [],
+    "author": "Codex-authored candidate; not human-reviewed",
+    "unanswerability_rationale": "The requested instance-specific facts are absent from the question and require deployment data. Reviewer must confirm against the entire frozen corpus."
+  }
+]

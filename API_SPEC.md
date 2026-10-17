@@ -133,3 +133,9 @@ All paths below use /api/v1. Existing same-origin mutation and Idempotency-Key r
 - GET /exports/latest?source_kind=run|comparison&source_id=UUID returns the newest job or null. GET /exports/{id} exposes state/output/hash; GET /exports/{id}/download serves completed application/zip with attachment filename and nosniff. The download survives page reload and service restart.
 
 Pending/running assessments are frozen as metadata without later output backfill. Comparison exports retain selected evaluations and already-terminal attempts at the comparison cutoff; their accounting remains the original frozen report. Archives have per-file checksums and an overall SHA-256. The Next.js /api/platform proxy supports these routes, including streamed ZIP downloads.
+
+## Explicit gold review provenance
+QuestionInput accepts review_source: human|ai, default human for existing legacy rows. It is stored with draft question content and retained in published gold snapshots/JSONL. This labels gold curation, not model-answer evaluations. Reviewer identity/time remain required for reviewed records. The owner authorized AI curation; reports/UI must distinguish AI reviews from actual human reviews. Editing an AI-reviewed question does not silently promote it to human review.
+
+## M7 frozen benchmark curation - 2026-10-16
+PATCH /datasets/{dataset_id}/questions/{question_id} still requires expected_revision and full content. Changing only split/split_group, or saving identical reviewed content, retains reviewed_at; changing reviewed gold/provenance refreshes it, and candidate status clears it. Publication remains immutable/idempotent for a draft revision. Current PostgreSQL research version has150 questions with explicit10 human/140 AI review provenance, not150 human reviews.

@@ -1,0 +1,169 @@
+{
+  "schema": "postgresql-corpus-selection-v1",
+  "release": "18.0",
+  "archive_url": "https://ftp.postgresql.org/pub/source/v18.0/postgresql-18.0-docs.tar.gz",
+  "archive_sha256": "f0dfc5b0882aa68ca471e9930a0dcfe4644a10a9b9613c60d6d14bfc9c224d44",
+  "selection_rationale": "Purposeful 40-page subset covering five planned benchmark topics, eight pages each. Not an exhaustive manual or probability sample. Selected before answer runs. No moving major-version documentation is an acquisition input.",
+  "pages": [
+    {
+      "filename": "tutorial-select.html",
+      "topic": "sql"
+    },
+    {
+      "filename": "tutorial-join.html",
+      "topic": "sql"
+    },
+    {
+      "filename": "tutorial-agg.html",
+      "topic": "sql"
+    },
+    {
+      "filename": "queries-table-expressions.html",
+      "topic": "sql"
+    },
+    {
+      "filename": "queries-select-lists.html",
+      "topic": "sql"
+    },
+    {
+      "filename": "queries-order.html",
+      "topic": "sql"
+    },
+    {
+      "filename": "queries-limit.html",
+      "topic": "sql"
+    },
+    {
+      "filename": "queries-with.html",
+      "topic": "sql"
+    },
+    {
+      "filename": "tutorial-transactions.html",
+      "topic": "transactions"
+    },
+    {
+      "filename": "mvcc-intro.html",
+      "topic": "transactions"
+    },
+    {
+      "filename": "transaction-iso.html",
+      "topic": "transactions"
+    },
+    {
+      "filename": "explicit-locking.html",
+      "topic": "transactions"
+    },
+    {
+      "filename": "mvcc-caveats.html",
+      "topic": "transactions"
+    },
+    {
+      "filename": "mvcc-serialization-failure-handling.html",
+      "topic": "transactions"
+    },
+    {
+      "filename": "sql-savepoint.html",
+      "topic": "transactions"
+    },
+    {
+      "filename": "sql-rollback-to.html",
+      "topic": "transactions"
+    },
+    {
+      "filename": "indexes-intro.html",
+      "topic": "indexes"
+    },
+    {
+      "filename": "indexes-types.html",
+      "topic": "indexes"
+    },
+    {
+      "filename": "indexes-multicolumn.html",
+      "topic": "indexes"
+    },
+    {
+      "filename": "indexes-unique.html",
+      "topic": "indexes"
+    },
+    {
+      "filename": "indexes-expressional.html",
+      "topic": "indexes"
+    },
+    {
+      "filename": "indexes-partial.html",
+      "topic": "indexes"
+    },
+    {
+      "filename": "indexes-index-only-scans.html",
+      "topic": "indexes"
+    },
+    {
+      "filename": "indexes-examine.html",
+      "topic": "indexes"
+    },
+    {
+      "filename": "config-setting.html",
+      "topic": "configuration"
+    },
+    {
+      "filename": "runtime-config-file-locations.html",
+      "topic": "configuration"
+    },
+    {
+      "filename": "runtime-config-connection.html",
+      "topic": "configuration"
+    },
+    {
+      "filename": "runtime-config-resource.html",
+      "topic": "configuration"
+    },
+    {
+      "filename": "runtime-config-wal.html",
+      "topic": "configuration"
+    },
+    {
+      "filename": "runtime-config-query.html",
+      "topic": "configuration"
+    },
+    {
+      "filename": "runtime-config-client.html",
+      "topic": "configuration"
+    },
+    {
+      "filename": "runtime-config-logging.html",
+      "topic": "configuration"
+    },
+    {
+      "filename": "using-explain.html",
+      "topic": "troubleshooting"
+    },
+    {
+      "filename": "performance-tips.html",
+      "topic": "troubleshooting"
+    },
+    {
+      "filename": "monitoring-stats.html",
+      "topic": "troubleshooting"
+    },
+    {
+      "filename": "monitoring-locks.html",
+      "topic": "troubleshooting"
+    },
+    {
+      "filename": "routine-vacuuming.html",
+      "topic": "troubleshooting"
+    },
+    {
+      "filename": "routine-reindex.html",
+      "topic": "troubleshooting"
+    },
+    {
+      "filename": "diskusage.html",
+      "topic": "troubleshooting"
+    },
+    {
+      "filename": "errcodes-appendix.html",
+      "topic": "troubleshooting"
+    }
+  ]
+}

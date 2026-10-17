@@ -39,6 +39,30 @@ async function fixtures(page: Page, state = run.state) {
   });
 }
 
+test("saved-run filtering and experiment shortcut preserve the visible workflow", async ({ page }) => {
+  await fixtures(page);
+  await page.emulateMedia({ colorScheme: "dark" });
+  await page.route("**/api/platform/runs?*", route => route.fulfill({ json: { items: [
+    { ...run, state: "running", failed_count: 0, finished_at: null },
+    { ...run, id: "55555555-5555-4555-8555-555555555556", state: "completed", completed_count: 2, failed_count: 0 },
+    { ...run, id: "55555555-5555-4555-8555-555555555557" },
+  ], next_cursor: null } }));
+  await page.goto("/experiments");
+  const saved = page.getByRole("region", { name: "Saved experiment runs" });
+  await expect(saved.getByRole("link", { name: "Synthetic experiment", exact: true })).toHaveCount(3);
+  await page.getByLabel("Filter saved runs on this page").selectOption("active");
+  await expect(saved.getByRole("link", { name: "Synthetic experiment", exact: true })).toHaveCount(1);
+  await expect(saved.locator(".run-state")).toHaveText(/running/i);
+  await page.getByLabel("Filter saved runs on this page").selectOption("completed");
+  await expect(saved.locator(".run-state")).toHaveText(/^completed$/i);
+  await page.getByLabel("Filter saved runs on this page").selectOption("attention");
+  await expect(saved.locator(".run-state")).toHaveText(/^completed with errors$/i);
+  await page.getByRole("link", { name: "New experiment", exact: true }).click();
+  await expect(page.getByLabel("Experiment name", { exact: true })).toBeFocused();
+  const result = await new AxeBuilder({ page }).withTags(["wcag2a", "wcag2aa", "wcag21aa"]).analyze();
+  expect(result.violations).toEqual([]);
+});
+
 test("saved partial run exposes unavailable metrics, context loss, safe source, and usable mobile traces", async ({ page }) => {
   await fixtures(page);
   await page.goto(`/runs/${runId}`);

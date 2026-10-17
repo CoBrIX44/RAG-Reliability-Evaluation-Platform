@@ -1,0 +1,148 @@
+[
+  {
+    "candidate_id": "pg18-b01-01",
+    "topic": "sql",
+    "difficulty": "easy",
+    "filename": "tutorial-select.html",
+    "match_normalized_text": "optional qualification",
+    "text": "Which three parts of a SELECT statement are described in the tutorial, and which one is optional?",
+    "answerable": true,
+    "reference_answer": "The statement has a select list, a table list, and an optional qualification that restricts the selected rows.",
+    "required_facts": [
+      "A SELECT statement has a select list and a table list; the qualification is optional."
+    ],
+    "author": "Codex-authored candidate; not human-reviewed",
+    "unanswerability_rationale": null
+  },
+  {
+    "candidate_id": "pg18-b01-02",
+    "topic": "sql",
+    "difficulty": "easy",
+    "filename": "tutorial-join.html",
+    "match_normalized_text": "are called join queries",
+    "text": "What makes a query a join query in the tutorial?",
+    "answerable": true,
+    "reference_answer": "A join query accesses multiple tables or multiple instances of one table and combines rows according to a pairing expression.",
+    "required_facts": [
+      "A join query combines rows from multiple tables or multiple instances of the same table."
+    ],
+    "author": "Codex-authored candidate; not human-reviewed",
+    "unanswerability_rationale": null
+  },
+  {
+    "candidate_id": "pg18-b01-03",
+    "topic": "transactions",
+    "difficulty": "easy",
+    "filename": "tutorial-transactions.html",
+    "match_normalized_text": "all-or-nothing operation",
+    "text": "What happens to the steps of a transaction if a failure prevents it from completing?",
+    "answerable": true,
+    "reference_answer": "None of its steps affect the database; the steps form a single all-or-nothing operation.",
+    "required_facts": [
+      "If a failure prevents a transaction from completing, none of its steps affect the database."
+    ],
+    "author": "Codex-authored candidate; not human-reviewed",
+    "unanswerability_rationale": null
+  },
+  {
+    "candidate_id": "pg18-b01-04",
+    "topic": "transactions",
+    "difficulty": "medium",
+    "filename": "mvcc-intro.html",
+    "match_normalized_text": "a snapshot of data",
+    "text": "How does the introductory MVCC description explain the data visible to each SQL statement?",
+    "answerable": true,
+    "reference_answer": "Each statement sees a snapshot of data from some point in time, so it does not see inconsistent intermediate updates from concurrent transactions.",
+    "required_facts": [
+      "Each SQL statement sees a snapshot of data rather than inconsistent updates from concurrent transactions."
+    ],
+    "author": "Codex-authored candidate; not human-reviewed",
+    "unanswerability_rationale": null
+  },
+  {
+    "candidate_id": "pg18-b01-05",
+    "topic": "indexes",
+    "difficulty": "easy",
+    "filename": "indexes-intro.html",
+    "match_normalized_text": "With no advance preparation",
+    "text": "Why can an index help a query that matches only a few rows in a large table?",
+    "answerable": true,
+    "reference_answer": "It can locate matching rows more efficiently than scanning the entire table row by row, for example by traversing a search tree.",
+    "required_facts": [
+      "An index can find matching rows without scanning every row of the table."
+    ],
+    "author": "Codex-authored candidate; not human-reviewed",
+    "unanswerability_rationale": null
+  },
+  {
+    "candidate_id": "pg18-b01-06",
+    "topic": "indexes",
+    "difficulty": "easy",
+    "filename": "indexes-unique.html",
+    "match_normalized_text": "only B-tree indexes",
+    "text": "Which index type can be declared unique according to this release?",
+    "answerable": true,
+    "reference_answer": "Only B-tree indexes can be declared unique.",
+    "required_facts": [
+      "Only B-tree indexes can be declared unique."
+    ],
+    "author": "Codex-authored candidate; not human-reviewed",
+    "unanswerability_rationale": null
+  },
+  {
+    "candidate_id": "pg18-b01-07",
+    "topic": "configuration",
+    "difficulty": "easy",
+    "filename": "config-setting.html",
+    "match_normalized_text": "case-insensitive. Every",
+    "text": "Are PostgreSQL configuration parameter names case-sensitive?",
+    "answerable": true,
+    "reference_answer": "No. Configuration parameter names are case-insensitive.",
+    "required_facts": [
+      "Configuration parameter names are case-insensitive."
+    ],
+    "author": "Codex-authored candidate; not human-reviewed",
+    "unanswerability_rationale": null
+  },
+  {
+    "candidate_id": "pg18-b01-08",
+    "topic": "troubleshooting",
+    "difficulty": "easy",
+    "filename": "using-explain.html",
+    "match_normalized_text": "EXPLAIN command to see",
+    "text": "Which command shows the query plan selected by the PostgreSQL planner?",
+    "answerable": true,
+    "reference_answer": "Use EXPLAIN to see the planner's query plan.",
+    "required_facts": [
+      "EXPLAIN shows the query plan the planner creates."
+    ],
+    "author": "Codex-authored candidate; not human-reviewed",
+    "unanswerability_rationale": null
+  },
+  {
+    "candidate_id": "pg18-b01-09",
+    "topic": "configuration",
+    "difficulty": "hard",
+    "filename": "runtime-config-resource.html",
+    "match_normalized_text": "",
+    "text": "For a server with unspecified RAM, workload and concurrent connections, which single shared_buffers value is guaranteed to prevent all out-of-memory errors?",
+    "answerable": false,
+    "reference_answer": "",
+    "required_facts": [],
+    "author": "Codex-authored candidate; not human-reviewed",
+    "unanswerability_rationale": "Requires unspecified deployment/workload evidence or an unsupported universal guarantee. Reviewer must check the entire frozen corpus; absence is not proven by this candidate."
+  },
+  {
+    "candidate_id": "pg18-b01-10",
+    "topic": "troubleshooting",
+    "difficulty": "hard",
+    "filename": "monitoring-stats.html",
+    "match_normalized_text": "",
+    "text": "An application reports a query slowdown but supplies no query, plan, configuration, workload or monitoring data. Which exact database parameter caused the regression?",
+    "answerable": false,
+    "reference_answer": "",
+    "required_facts": [],
+    "author": "Codex-authored candidate; not human-reviewed",
+    "unanswerability_rationale": "Requires unspecified deployment/workload evidence or an unsupported universal guarantee. Reviewer must check the entire frozen corpus; absence is not proven by this candidate."
+  }
+]

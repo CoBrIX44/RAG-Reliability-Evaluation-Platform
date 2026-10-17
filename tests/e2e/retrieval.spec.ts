@@ -26,7 +26,8 @@ test("build and inspect lexical retrieval with context truncation and source lin
     if (path.endsWith(`/sections/${sectionId}`)) return route.fulfill({ json: { id: sectionId, document_name: "Software fixture manual.md", heading_path: ["Transactions"], text: chunk.text, start_offset: 0, end_offset: 44, source: { format: "markdown" } } });
     return route.fulfill({ status: 404, json: { message: "Unknown software fixture route" } });
   });
-  await page.goto("/");
+  await page.goto("/experiments");
+  await page.getByText("Retrieval preview", { exact: true }).click();
   await expect(page.getByLabel("Published corpus")).toHaveValue(versionId);
   await page.getByRole("button", { name: "Build lexical index" }).click();
   await expect(page.getByText("1 chunks ready", { exact: true })).toBeVisible();
@@ -58,7 +59,8 @@ test("failed index build can be retried without losing the search query", async 
     if (path.endsWith("/indexes")) return route.fulfill({ json: { items: [{ id: indexId, corpus_version_id: versionId, fingerprint: "a".repeat(64), config: {}, state: retried ? "pending" : "failed", chunk_count: 0, manifest: null, attempts: 1, error_code: "tokenizer_unavailable", error_message: retried ? null : "The pinned tokenizer is unavailable.", created_at: createdAt }], next_cursor: null } });
     return route.fulfill({ json: { items: [], next_cursor: null } });
   });
-  await page.goto("/");
+  await page.goto("/experiments");
+  await page.getByText("Retrieval preview", { exact: true }).click();
   await expect(page.getByText("The pinned tokenizer is unavailable.")).toBeVisible();
   await page.getByLabel("Search the technical documents").fill("transactions");
   await expect(page.getByRole("button", { name: "Inspect retrieval", exact: true })).toBeDisabled();
@@ -93,7 +95,8 @@ test("dense index uses bounded chunks and queued previews recover after a failed
     if (path === `dense-searches/${searchId}`) return route.fulfill({ json: job() });
     return route.fulfill({ status: 404, json: { message: "Unknown software fixture route" } });
   });
-  await page.goto("/");
+  await page.goto("/experiments");
+  await page.getByText("Retrieval preview", { exact: true }).click();
   await page.getByLabel("Retrieval method").selectOption("dense");
   await expect(page.getByLabel("Chunk token limit")).toHaveValue("254");
   await page.getByRole("button", { name: "Build dense index" }).click();

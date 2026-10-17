@@ -1,0 +1,23 @@
+{
+  "schema": "m7-delivery-scope-v1",
+  "mode": "exploratory_retrieval",
+  "authorized_on": "2026-10-17",
+  "authorization": "Deliver an exploratory report with answer quality unvalidated",
+  "answer_quality": "unvalidated",
+  "human_calibration": "not_performed",
+  "primary_factual_accuracy_hypothesis": "not_established",
+  "requires": [
+    "all eight development runs qualified before controls freeze",
+    "all eight held-out runs complete with 135 successful observations each",
+    "all eight exploratory comparison reports complete",
+    "all requested evidence exports pass outer and member checksums",
+    "actual exploratory report written with unavailable answer-quality metrics",
+    "post-experiment backup passes manifest-bound isolated restore"
+  ],
+  "limitations": [
+    "No validated correctness, faithfulness, citation support or abstention-quality findings",
+    "No claim that retrieval improvements establish factual-accuracy improvements",
+    "Same-assistant gold curation and incomplete relevance annotations remain disclosed",
+    "Shared-host timing and cache are uncontrolled; financial and energy costs unavailable"
+  ]
+}

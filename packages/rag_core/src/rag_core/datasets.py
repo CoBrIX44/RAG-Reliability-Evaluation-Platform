@@ -245,13 +245,23 @@ class DatasetStore:
                 raise PlatformError(
                     "duplicate_question", "This question already exists in the dataset.", 409
                 )
-            question.content = value.content.model_dump(mode="json")
-            question.revision += 1
-            question.reviewed_at = (
-                session.execute(select(func.clock_timestamp())).scalar_one()
-                if value.content.review_status == "reviewed"
-                else None
+            previous_content = QuestionInput.model_validate(question.content).model_dump(
+                mode="json"
             )
+            next_content = value.content.model_dump(mode="json")
+            # Assigning a split is curation metadata, not a new human/AI source review.
+            # Retain the actual attestation time when only split metadata changes.
+            source_review_unchanged = all(
+                previous_content[key] == item
+                for key, item in next_content.items()
+                if key not in {"split", "split_group"}
+            )
+            question.content = next_content
+            question.revision += 1
+            if value.content.review_status != "reviewed":
+                question.reviewed_at = None
+            elif not source_review_unchanged or question.reviewed_at is None:
+                question.reviewed_at = session.execute(select(func.clock_timestamp())).scalar_one()
             dataset.draft_revision += 1
             session.flush()
             return QuestionView.model_validate(question)
@@ -352,7 +362,7 @@ class DatasetStore:
                 ):
                     raise PlatformError(
                         "dataset_not_ready",
-                        "Every question needs a human review, topic, split, and split group.",
+                        "Every question needs a recorded review, topic, split, and split group.",
                         409,
                     )
                 if not content.reference_answer:

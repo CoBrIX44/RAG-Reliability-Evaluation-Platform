@@ -31,6 +31,7 @@ export function ExperimentWorkspace({ available, configured, workerReady, initia
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState("");
   const [offset, setOffset] = useState(0);
+  const [runFilter, setRunFilter] = useState("all");
   const submission = useRef<{ fingerprint: string; key: string } | null>(null);
   const versions = useSWR(available ? "experiment-datasets" : null, async () => {
     const datasets = await allPages("datasets", datasetSchema);
@@ -43,10 +44,26 @@ export function ExperimentWorkspace({ available, configured, workerReady, initia
   const readyIndexes = indexes.data?.filter(item => item.state === "ready" && item.corpus_version_id === selectedDataset?.corpus && (retrievalStrategy === "index" || item.config.retrieval === "pgvector-exact-cosine-v1")) ?? [];
   const selectedIndex = readyIndexes.find(item => item.id === indexId) ?? readyIndexes[0];
   const loadError = versions.error || indexes.error || runs.error || experiments.error;
+  const visibleRuns = runs.data?.items.filter(run => runFilter === "all" || (runFilter === "active" ? !terminal(run.state) : runFilter === "completed" ? run.state === "completed" : run.failed_count > 0 || run.state === "failed" || run.state === "completed_with_errors")) ?? [];
 
   if (failureRunId) return <FailureExplorer runId={failureRunId} available={available} />;
   return <section className="experiment-workspace" aria-labelledby="experiment-title">
     {initialRunId ? <><Link className="text-link" href="/experiments">← All experiments</Link><RunDetail key={initialRunId} id={initialRunId} available={available} initialResultId={initialResultId} /></> : <>
+      <section className="saved-runs" aria-label="Saved experiment runs">
+      <div className="section-topline run-list-toolbar"><div><h2>Recent experiment runs</h2><p className="muted-text">Saved results on page {Math.floor(offset / 20) + 1}</p></div>
+        <label className="run-filter">Show<select aria-label="Filter saved runs on this page" value={runFilter} onChange={event => setRunFilter(event.target.value)}><option value="all">All runs</option><option value="active">Active</option><option value="completed">Completed</option><option value="attention">Needs attention</option></select></label>
+      </div>
+      {runs.isLoading && <p role="status">Loading saved runs…</p>}
+      {runs.data && !runs.data.items.length && <div className="table-frame empty-state"><h3>No saved runs yet.</h3><p>Start a run from a published dataset. Results and evidence will appear here as each question completes.</p></div>}
+      {!!runs.data?.items.length && !visibleRuns.length && <p className="connection-message" role="status">No runs match this filter on the current page. Choose All runs or another page.</p>}
+      {!!visibleRuns.length && <div className="run-list">{visibleRuns.map(run => <div className="run-list-row" data-state={run.state} key={run.id}>
+        <div><Link className="text-link" href={`/runs/${run.id}`}>{experiments.data?.find(item => item.id === run.experiment_id)?.name ?? `Run ${run.id.slice(0, 8)}`}</Link><p className="muted-text">{strategyLabel(run.manifest_summary.config.retrieval_strategy)} · {run.manifest_summary.purpose === "development_fixture" ? "Development fixture" : "Research dataset"} · {new Date(run.created_at).toLocaleString()}</p></div>
+        <div><span className={`run-state ${run.state.includes("errors") || run.state === "failed" ? "has-errors" : ""}`}>{displayState(run.state)}</span><p className="muted-text">{run.completed_count + run.failed_count}/{run.total_count} observations · {run.failed_count} failed</p></div>
+      </div>)}</div>}
+      {(offset > 0 || runs.data?.next_cursor) && <div className="inline-actions source-pagination"><button className="button subtle" disabled={offset === 0 || runs.isLoading} onClick={() => setOffset(Math.max(0, offset - 20))}>Newer runs</button><button className="button subtle" disabled={!runs.data?.next_cursor || runs.isLoading} onClick={() => setOffset(Number(runs.data?.next_cursor))}>Older runs</button></div>}
+      </section>
+      <details id="experiment-configuration" className="tool-disclosure experiment-composer" open>
+        <summary><span>New experiment</span><span className="muted-text">Configure a controlled comparison</span></summary><div className="disclosure-body">
       <div className="section-topline"><h2 id="experiment-title">Run an experiment</h2><span className="outline-tag">Local CPU baseline</span></div>
       <p className="retrieval-intro">Freeze a reviewed dataset and a ready index. Compare an index baseline with hybrid rank fusion or cross-encoder reranking while keeping the local answer model and evidence budget fixed.</p>
       {!available && <p className="connection-message warning" role="status">Runs need PostgreSQL and the current API. <Link href="/settings">Check workspace setup.</Link></p>}
@@ -90,14 +107,7 @@ export function ExperimentWorkspace({ available, configured, workerReady, initia
         </div><p className="muted-text">Cache preparation is your declaration and is not automatically verified. Answer models load in fresh CPU processes per call. Do not label cache conditions as controlled without preparing and documenting them.</p><p className="muted-text">Greedy CPU generation. Repeats are fresh executions with seed + repeat; they do not create new independent questions. Evidence uses the answer tokenizer; the full prompt is checked against a 2,048-token limit.</p></details>
         <button className="button primary" disabled={busy || !available || !configured || !selectedDataset || !selectedIndex}>{busy ? "Submitting…" : "Start run"}</button>
       </form>
-      <div className="section-topline"><h2>Recent experiment runs</h2><span className="muted-text">Persisted results · page {Math.floor(offset / 20) + 1}</span></div>
-      {runs.isLoading && <p role="status">Loading saved runs…</p>}
-      {runs.data && !runs.data.items.length && <div className="table-frame empty-state"><h3>No saved runs yet.</h3><p>Start a run from a published dataset. Results and evidence will appear here as each question completes.</p></div>}
-      {!!runs.data?.items.length && <div className="run-list">{runs.data.items.map(run => <div className="run-list-row" key={run.id}>
-        <div><Link className="text-link" href={`/runs/${run.id}`}>{experiments.data?.find(item => item.id === run.experiment_id)?.name ?? `Run ${run.id.slice(0, 8)}`}</Link><p className="muted-text">{strategyLabel(run.manifest_summary.config.retrieval_strategy)} · {run.manifest_summary.purpose === "development_fixture" ? "Development fixture" : "Research dataset"} · {new Date(run.created_at).toLocaleString()}</p></div>
-        <div><span className={`run-state ${run.state.includes("errors") || run.state === "failed" ? "has-errors" : ""}`}>{displayState(run.state)}</span><p className="muted-text">{run.completed_count + run.failed_count}/{run.total_count} observations · {run.failed_count} failed</p></div>
-      </div>)}</div>}
-      {(offset > 0 || runs.data?.next_cursor) && <div className="inline-actions source-pagination"><button className="button subtle" disabled={offset === 0 || runs.isLoading} onClick={() => setOffset(Math.max(0, offset - 20))}>Newer runs</button><button className="button subtle" disabled={!runs.data?.next_cursor || runs.isLoading} onClick={() => setOffset(Number(runs.data?.next_cursor))}>Older runs</button></div>}
+      </div></details>
     </>}
   </section>;
 }

@@ -1,0 +1,26 @@
+[
+  {
+    "file": "ibm-plex-mono-400.woff2",
+    "family": "IBM Plex Mono",
+    "weight": "400",
+    "url": "https://fonts.gstatic.com/s/ibmplexmono/v20/-F63fjptAgt5VM-kVkqdyU8n1i8q1w.woff2",
+    "sha256": "08949f728dc52d528e69b1667d15c89a5686a4ee9a296ff90983985f99c380f7",
+    "bytes": 14708
+  },
+  {
+    "file": "ibm-plex-mono-500.woff2",
+    "family": "IBM Plex Mono",
+    "weight": "500",
+    "url": "https://fonts.gstatic.com/s/ibmplexmono/v20/-F6qfjptAgt5VM-kVkqdyU8n3twJwlBFgg.woff2",
+    "sha256": "01d285447409c8a588692162439a038b8cbd7871309ee20267b0d2d91c6e8e22",
+    "bytes": 14888
+  },
+  {
+    "file": "outfit-latin.woff2",
+    "family": "Outfit",
+    "weight": "400 700",
+    "url": "https://fonts.gstatic.com/s/outfit/v15/QGYvz_MVcBeNP4NJtEtq.woff2",
+    "sha256": "6c18d579fd87c3776be068b762cbc83fde3acb543d49eabd3ade842eb987e887",
+    "bytes": 32292
+  }
+]

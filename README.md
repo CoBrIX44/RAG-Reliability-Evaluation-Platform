@@ -127,3 +127,19 @@ Timing tables show observed p50/p95, sample/missing counts, run windows, attempt
 Open [comparisons](http://localhost:3000/comparisons) to create immutable paired reports filtered by topic/difficulty, inspect coverage and latency charts, and download an evidence ZIP. Saved runs link to a failure explorer and exact answer/source traces. [Read-only demo](http://localhost:3000/demo) works without the API and uses explicit synthetic software fixtures, without inference or submission actions.
 
 Exports include frozen manifests/results/assessments, canonical corpus text, index chunks/vectors, and checksums. They exclude original upload binaries and model weights. Historical code bytes are included only when their hashes match; provenance/availability.json explicitly lists unavailable files. These artifacts support evidence inspection and do not guarantee a complete historical runtime. Live data remains one reviewed development question; benchmark acquisition, annotation and actual research experiments are M7.
+
+## M7 execution in progress - 2026-10-16
+
+The official PostgreSQL18.0 subset contains40 documents and2,013 canonical sections. The locally published150-question benchmark has a frozen105/45 grouped split and10 human/140 AI gold source reviews. Same-assistant curation is not independent human validation. See research/postgresql-18.0/CURATION_REVIEW.md and DATASET_CARD.md for provenance and limitations.
+
+Eight development runs are submitted (840 planned observations). A native completion controller is running and will require full development qualification before freezing unchanged controls and submitting the held-out three-repeat matrix (1,080 planned observations). Reports, evidence ZIPs and a post-experiment recovery rehearsal follow execution; these stages are not yet complete. Generated-answer quality remains unassessed. M7 is still in progress.
+
+Keep Docker Desktop and the machine running. Inspect the [live Runs screen](http://localhost:3000/runs) or private `data/research/postgresql-18.0/completion/state.json`. See research/postgresql-18.0/DEVELOPMENT_PLAN.md for controller resume/recovery commands. Preserve matching API/worker code and configuration while jobs are unfinished.
+
+BACKUP_RESTORE.md documents private point-in-time snapshots. Checkpoint02 isolated restoration verified23 database tables,83 artifact files and86 model files; it predates current experiment runs. This proves same-machine restoration, not offsite recovery or inference replay. Current M7 changes remain uncommitted; pushed checkpoint863b267 has a successful three-job GitHub workflow.
+
+## Refreshed frontend preview
+
+The2026-10-17 interface refresh adds locally bundled Outfit/IBM Plex Mono, light/dark/system appearance, saved-run filters and clearer configuration/evidence hierarchy. The verified native production preview is http://127.0.0.1:3001; Docker port3000 keeps its currently running image. All28 Chromium checks and build/lint/type checks pass. Preserve frozen experiment API/worker identities while M7 runs; frontend source changes need a native build/restart to update the preview. See DESIGN_SYSTEM.md for tokens and interaction rules.
+
+The frontend opens with a product landing page at `/`; use `/experiments` for the research workspace or `/demo` for a read-only synthetic walkthrough. The landing bundles Instrument Serif/Ostrich Sans locally and uses Lenis/GSAP with reduced-motion support. Frontend-only dependency updates do not change already-running frozen benchmark images.

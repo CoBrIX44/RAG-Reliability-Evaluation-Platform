@@ -7,9 +7,9 @@ const jobId = "33333333-3333-4333-8333-333333333333";
 const revisionId = "44444444-4444-4444-8444-444444444444";
 const status = { stage: "documents", api: "ready", capabilities: ["document_ingestion", "corpus_versions"], database: { status: "ready", code: "ok", message: "Ready", worker_status: "ready" }, generation_configured: false, judge_configured: false };
 
-test("proxy accepts its browser origin and blocks conflicting origins", async ({ request }) => {
+test("proxy accepts its browser origin and blocks conflicting origins", async ({ request, baseURL }) => {
   const local = await request.post("/api/platform/corpora", {
-    headers: { Origin: "http://127.0.0.1:3000" }, data: { name: " " },
+    headers: { Origin: new URL(baseURL!).origin }, data: { name: " " },
   });
   expect([422, 503]).toContain(local.status());
   const foreign = await request.post("/api/platform/corpora", {

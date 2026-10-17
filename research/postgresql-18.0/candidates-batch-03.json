@@ -1,0 +1,488 @@
+[
+  {
+    "topic": "sql",
+    "difficulty": "easy",
+    "text": "What does WHERE do with rows whose search condition evaluates to false or null?",
+    "answerable": true,
+    "reference_answer": "WHERE discards a row when its condition is false or null; only true retains it.",
+    "required_facts": [
+      "WHERE discards a row when its condition is false or null; only true retains it."
+    ],
+    "evidence_specs": [
+      {
+        "fact_index": 0,
+        "filename": "queries-table-expressions.html",
+        "quote": "After the processing of the FROM clause is done, each row of the derived virtual table is checked against the search condition. If the result of the condition is true, the row is kept in the output table, otherwise (i.e., if the result is false or null) it is discarded. The search condition typically references at least one column of the table generated in the FROM clause; this is not required, but otherwise the WHERE clause will be fairly useless."
+      }
+    ],
+    "author": "Codex; AI-authored and AI source-reviewed, not independent human validation",
+    "unanswerability_rationale": null,
+    "source_review_rationale": "The paragraph explicitly treats false and null together; no unsupported Boolean equivalence is assumed.",
+    "candidate_id": "pg18-b03-01"
+  },
+  {
+    "topic": "sql",
+    "difficulty": "easy",
+    "text": "What does SELECT * emit from a table expression?",
+    "answerable": true,
+    "reference_answer": "SELECT * emits all columns produced by the table expression.",
+    "required_facts": [
+      "SELECT * emits all columns produced by the table expression."
+    ],
+    "evidence_specs": [
+      {
+        "fact_index": 0,
+        "filename": "queries-select-lists.html",
+        "quote": "The simplest kind of select list is * which emits all columns that the table expression produces. Otherwise, a select list is a comma-separated list of value expressions (as defined in Section 4.2 ). For instance, it could be a list of column names:"
+      }
+    ],
+    "author": "Codex; AI-authored and AI source-reviewed, not independent human validation",
+    "unanswerability_rationale": null,
+    "source_review_rationale": "Scope is the table expression, rather than all columns in unrelated tables.",
+    "candidate_id": "pg18-b03-02"
+  },
+  {
+    "topic": "sql",
+    "difficulty": "medium",
+    "text": "Why can SELECT * make production query results change after a table is extended?",
+    "answerable": true,
+    "reference_answer": "Adding a column to the table changes the results of SELECT *.",
+    "required_facts": [
+      "Adding a column to the table changes the results of SELECT *."
+    ],
+    "evidence_specs": [
+      {
+        "fact_index": 0,
+        "filename": "tutorial-select.html",
+        "quote": "[2] While SELECT * is useful for off-the-cuff queries, it is widely considered bad style in production code, since adding a column to the table would change the results."
+      }
+    ],
+    "author": "Codex; AI-authored and AI source-reviewed, not independent human validation",
+    "unanswerability_rationale": null,
+    "source_review_rationale": "The tutorial footnote directly identifies schema evolution as the concern.",
+    "candidate_id": "pg18-b03-03"
+  },
+  {
+    "topic": "sql",
+    "difficulty": "medium",
+    "text": "Does DISTINCT alone guarantee sorted query output in current PostgreSQL?",
+    "answerable": true,
+    "reference_answer": "PostgreSQL does not guarantee that DISTINCT causes rows to be ordered.",
+    "required_facts": [
+      "PostgreSQL does not guarantee that DISTINCT causes rows to be ordered."
+    ],
+    "evidence_specs": [
+      {
+        "fact_index": 0,
+        "filename": "tutorial-select.html",
+        "quote": "[3] In some database systems, including older versions of PostgreSQL , the implementation of DISTINCT automatically orders the rows and so ORDER BY is unnecessary. But this is not required by the SQL standard, and current PostgreSQL does not guarantee that DISTINCT causes the rows to be ordered."
+      }
+    ],
+    "author": "Codex; AI-authored and AI source-reviewed, not independent human validation",
+    "unanswerability_rationale": null,
+    "source_review_rationale": "Distinguishes current guarantee from the historical implementation mentioned in the same footnote.",
+    "candidate_id": "pg18-b03-04"
+  },
+  {
+    "topic": "sql",
+    "difficulty": "easy",
+    "text": "For ORDER BY x, y DESC, which direction applies to x?",
+    "answerable": true,
+    "reference_answer": "x is sorted ascending; DESC applies independently to y.",
+    "required_facts": [
+      "x is sorted ascending; DESC applies independently to y."
+    ],
+    "evidence_specs": [
+      {
+        "fact_index": 0,
+        "filename": "queries-order.html",
+        "quote": "Note that the ordering options are considered independently for each sort column. For example ORDER BY x, y DESC means ORDER BY x ASC, y DESC , which is not the same as ORDER BY x DESC, y DESC ."
+      }
+    ],
+    "author": "Codex; AI-authored and AI source-reviewed, not independent human validation",
+    "unanswerability_rationale": null,
+    "source_review_rationale": "The documented expansion is exactly x ASC, y DESC, without reusing the existing null-order question.",
+    "candidate_id": "pg18-b03-05"
+  },
+  {
+    "topic": "sql",
+    "difficulty": "medium",
+    "text": "When several sort expressions are supplied, what do later expressions do?",
+    "answerable": true,
+    "reference_answer": "Later sort expressions break ties in the earlier expressions.",
+    "required_facts": [
+      "Later sort expressions break ties in the earlier expressions."
+    ],
+    "evidence_specs": [
+      {
+        "fact_index": 0,
+        "filename": "queries-order.html",
+        "quote": "When more than one expression is specified, the later values are used to sort rows that are equal according to the earlier values."
+      }
+    ],
+    "author": "Codex; AI-authored and AI source-reviewed, not independent human validation",
+    "unanswerability_rationale": null,
+    "source_review_rationale": "Only tie-breaking behavior is requested; direction and null policies are separate questions.",
+    "candidate_id": "pg18-b03-06"
+  },
+  {
+    "topic": "sql",
+    "difficulty": "hard",
+    "text": "Why must LIMIT pagination specify an ORDER BY that uniquely orders rows?",
+    "answerable": true,
+    "reference_answer": "Without a unique ORDER BY, LIMIT can return an unpredictable subset of rows.",
+    "required_facts": [
+      "Without a unique ORDER BY, LIMIT can return an unpredictable subset of rows."
+    ],
+    "evidence_specs": [
+      {
+        "fact_index": 0,
+        "filename": "queries-limit.html",
+        "quote": "When using LIMIT , it is important to use an ORDER BY clause that constrains the result rows into a unique order. Otherwise you will get an unpredictable subset of the query's rows. You might be asking for the tenth through twentieth rows, but tenth through twentieth in what ordering? The ordering is unknown, unless you specified ORDER BY ."
+      }
+    ],
+    "author": "Codex; AI-authored and AI source-reviewed, not independent human validation",
+    "unanswerability_rationale": null,
+    "source_review_rationale": "The source says unique order, so sorting on a non-unique key alone is not accepted as sufficient.",
+    "candidate_id": "pg18-b03-07"
+  },
+  {
+    "topic": "sql",
+    "difficulty": "easy",
+    "text": "Do LIMIT ALL and LIMIT NULL impose a row-count limit?",
+    "answerable": true,
+    "reference_answer": "LIMIT ALL and LIMIT NULL are equivalent to omitting LIMIT.",
+    "required_facts": [
+      "LIMIT ALL and LIMIT NULL are equivalent to omitting LIMIT."
+    ],
+    "evidence_specs": [
+      {
+        "fact_index": 0,
+        "filename": "queries-limit.html",
+        "quote": "If a limit count is given, no more than that many rows will be returned (but possibly fewer, if the query itself yields fewer rows). LIMIT ALL is the same as omitting the LIMIT clause, as is LIMIT with a NULL argument."
+      }
+    ],
+    "author": "Codex; AI-authored and AI source-reviewed, not independent human validation",
+    "unanswerability_rationale": null,
+    "source_review_rationale": "The paragraph explicitly covers both forms and the possibility of fewer returned rows.",
+    "candidate_id": "pg18-b03-08"
+  },
+  {
+    "topic": "sql",
+    "difficulty": "medium",
+    "text": "What happens to unmatched right-hand columns when a left outer join preserves a left-hand row?",
+    "answerable": true,
+    "reference_answer": "For a left-hand row with no right-hand match, the right-hand columns are filled with nulls.",
+    "required_facts": [
+      "For a left-hand row with no right-hand match, the right-hand columns are filled with nulls."
+    ],
+    "evidence_specs": [
+      {
+        "fact_index": 0,
+        "filename": "tutorial-join.html",
+        "quote": "This query is called a left outer join because the table mentioned on the left of the join operator will have each of its rows in the output at least once, whereas the table on the right will only have those rows output that match some row of the left table. When outputting a left-table row for which there is no right-table match, empty (null) values are substituted for the right-table columns."
+      }
+    ],
+    "author": "Codex; AI-authored and AI source-reviewed, not independent human validation",
+    "unanswerability_rationale": null,
+    "source_review_rationale": "The tutorial states null substitution; the question avoids the broader existing join-definition item.",
+    "candidate_id": "pg18-b03-09"
+  },
+  {
+    "topic": "sql",
+    "difficulty": "medium",
+    "text": "How does JOIN USING change output columns compared with JOIN ON?",
+    "answerable": true,
+    "reference_answer": "JOIN USING outputs one column per listed matching pair, then remaining left columns, then remaining right columns.",
+    "required_facts": [
+      "JOIN USING outputs one column per listed matching pair, then remaining left columns, then remaining right columns."
+    ],
+    "evidence_specs": [
+      {
+        "fact_index": 0,
+        "filename": "queries-table-expressions.html",
+        "quote": "Furthermore, the output of JOIN USING suppresses redundant columns: there is no need to print both of the matched columns, since they must have equal values. While JOIN ON produces all columns from T1 followed by all columns from T2 , JOIN USING produces one output column for each of the listed column pairs (in the listed order), followed by any remaining columns from T1 , followed by any remaining columns from T2 ."
+      }
+    ],
+    "author": "Codex; AI-authored and AI source-reviewed, not independent human validation",
+    "unanswerability_rationale": null,
+    "source_review_rationale": "The evidence specifies suppression and output order, including the listed USING order.",
+    "candidate_id": "pg18-b03-10"
+  },
+  {
+    "topic": "sql",
+    "difficulty": "hard",
+    "text": "Why is NATURAL JOIN more vulnerable to schema changes than a join with an explicit USING list?",
+    "answerable": true,
+    "reference_answer": "A new shared column name changes NATURAL JOIN matching, while USING combines only its explicitly listed columns.",
+    "required_facts": [
+      "A new shared column name changes NATURAL JOIN matching, while USING combines only its explicitly listed columns."
+    ],
+    "evidence_specs": [
+      {
+        "fact_index": 0,
+        "filename": "queries-table-expressions.html",
+        "quote": "USING is reasonably safe from column changes in the joined relations since only the listed columns are combined. NATURAL is considerably more risky since any schema changes to either relation that cause a new matching column name to be present will cause the join to combine that new column as well."
+      }
+    ],
+    "author": "Codex; AI-authored and AI source-reviewed, not independent human validation",
+    "unanswerability_rationale": null,
+    "source_review_rationale": "The conditional schema change is preserved; not every added column changes NATURAL JOIN.",
+    "candidate_id": "pg18-b03-11"
+  },
+  {
+    "topic": "sql",
+    "difficulty": "hard",
+    "text": "For an outer join, are filters in ON interchangeable with filters in WHERE?",
+    "answerable": true,
+    "reference_answer": "No. ON restrictions are processed before the join; WHERE restrictions are processed after it, which matters for outer joins.",
+    "required_facts": [
+      "No. ON restrictions are processed before the join; WHERE restrictions are processed after it, which matters for outer joins."
+    ],
+    "evidence_specs": [
+      {
+        "fact_index": 0,
+        "filename": "queries-table-expressions.html",
+        "quote": "This is because a restriction placed in the ON clause is processed before the join, while a restriction placed in the WHERE clause is processed after the join. That does not matter with inner joins, but it matters a lot with outer joins."
+      }
+    ],
+    "author": "Codex; AI-authored and AI source-reviewed, not independent human validation",
+    "unanswerability_rationale": null,
+    "source_review_rationale": "Read the adjacent left-join examples; the statement is scoped to outer joins and not all joins.",
+    "candidate_id": "pg18-b03-12"
+  },
+  {
+    "topic": "sql",
+    "difficulty": "medium",
+    "text": "What cross-reference does LATERAL enable for a subquery in FROM?",
+    "answerable": true,
+    "reference_answer": "LATERAL allows the subquery to reference columns from preceding FROM items.",
+    "required_facts": [
+      "LATERAL allows the subquery to reference columns from preceding FROM items."
+    ],
+    "evidence_specs": [
+      {
+        "fact_index": 0,
+        "filename": "queries-table-expressions.html",
+        "quote": "Subqueries appearing in FROM can be preceded by the key word LATERAL . This allows them to reference columns provided by preceding FROM items. (Without LATERAL , each subquery is evaluated independently and so cannot cross-reference any other FROM item.)"
+      }
+    ],
+    "author": "Codex; AI-authored and AI source-reviewed, not independent human validation",
+    "unanswerability_rationale": null,
+    "source_review_rationale": "This question concerns subqueries, avoiding the distinct optional-keyword rule for table functions.",
+    "candidate_id": "pg18-b03-13"
+  },
+  {
+    "topic": "sql",
+    "difficulty": "medium",
+    "text": "How are unequal-length function results combined by ROWS FROM?",
+    "answerable": true,
+    "reference_answer": "ROWS FROM returns as many rows as the largest function result and pads smaller results with nulls.",
+    "required_facts": [
+      "ROWS FROM returns as many rows as the largest function result and pads smaller results with nulls."
+    ],
+    "evidence_specs": [
+      {
+        "fact_index": 0,
+        "filename": "queries-table-expressions.html",
+        "quote": "Table functions may also be combined using the ROWS FROM syntax, with the results returned in parallel columns; the number of result rows in this case is that of the largest function result, with smaller results padded with null values to match."
+      }
+    ],
+    "author": "Codex; AI-authored and AI source-reviewed, not independent human validation",
+    "unanswerability_rationale": null,
+    "source_review_rationale": "Both cardinality and padding are explicit in one canonical paragraph.",
+    "candidate_id": "pg18-b03-14"
+  },
+  {
+    "topic": "sql",
+    "difficulty": "medium",
+    "text": "What does an aggregate FILTER clause remove, compared with filtering all query input?",
+    "answerable": true,
+    "reference_answer": "FILTER removes input rows only for the aggregate to which it is attached.",
+    "required_facts": [
+      "FILTER removes input rows only for the aggregate to which it is attached."
+    ],
+    "evidence_specs": [
+      {
+        "fact_index": 0,
+        "filename": "tutorial-agg.html",
+        "quote": "FILTER is much like WHERE , except that it removes rows only from the input of the particular aggregate function that it is attached to."
+      }
+    ],
+    "author": "Codex; AI-authored and AI source-reviewed, not independent human validation",
+    "unanswerability_rationale": null,
+    "source_review_rationale": "This is not another WHERE-versus-HAVING paraphrase; the per-aggregate scope is the required fact.",
+    "candidate_id": "pg18-b03-15"
+  },
+  {
+    "topic": "sql",
+    "difficulty": "hard",
+    "text": "For DISTINCT ON, is the retained first row predictable without sufficient ordering?",
+    "answerable": true,
+    "reference_answer": "No. The first row is unpredictable unless the query is sorted on enough columns to guarantee a unique ordering.",
+    "required_facts": [
+      "No. The first row is unpredictable unless the query is sorted on enough columns to guarantee a unique ordering."
+    ],
+    "evidence_specs": [
+      {
+        "fact_index": 0,
+        "filename": "queries-select-lists.html",
+        "quote": "Here expression is an arbitrary value expression that is evaluated for all rows. A set of rows for which all the expressions are equal are considered duplicates, and only the first row of the set is kept in the output. Note that the \u201c first row \u201d of a set is unpredictable unless the query is sorted on enough columns to guarantee a unique ordering of the rows arriving at the DISTINCT filter. ( DISTINCT ON processing occurs after ORDER BY sorting.)"
+      }
+    ],
+    "author": "Codex; AI-authored and AI source-reviewed, not independent human validation",
+    "unanswerability_rationale": null,
+    "source_review_rationale": "Reviewed DISTINCT ON context and processing after ORDER BY; the fact avoids claiming DISTINCT is a sort.",
+    "candidate_id": "pg18-b03-16"
+  },
+  {
+    "topic": "sql",
+    "difficulty": "hard",
+    "text": "How do MATERIALIZED and NOT MATERIALIZED affect folding a non-recursive, side-effect-free WITH query?",
+    "answerable": true,
+    "reference_answer": "MATERIALIZED forces separate calculation; NOT MATERIALIZED forces merging into the parent query.",
+    "required_facts": [
+      "MATERIALIZED forces separate calculation; NOT MATERIALIZED forces merging into the parent query."
+    ],
+    "evidence_specs": [
+      {
+        "fact_index": 0,
+        "filename": "queries-with.html",
+        "quote": "You can override that decision by specifying MATERIALIZED to force separate calculation of the WITH query, or by specifying NOT MATERIALIZED to force it to be merged into the parent query."
+      }
+    ],
+    "author": "Codex; AI-authored and AI source-reviewed, not independent human validation",
+    "unanswerability_rationale": null,
+    "source_review_rationale": "The question includes non-recursive, side-effect-free preconditions so the modifiers are not overgeneralized.",
+    "candidate_id": "pg18-b03-17"
+  },
+  {
+    "topic": "sql",
+    "difficulty": "hard",
+    "text": "Does a data-modifying WITH statement stop when its output is not read, as a SELECT WITH query can?",
+    "answerable": true,
+    "reference_answer": "Data-modifying WITH statements execute exactly once to completion regardless of output consumption; a SELECT WITH query runs only as far as its parent demands.",
+    "required_facts": [
+      "Data-modifying WITH statements execute exactly once to completion regardless of output consumption; a SELECT WITH query runs only as far as its parent demands."
+    ],
+    "evidence_specs": [
+      {
+        "fact_index": 0,
+        "filename": "queries-with.html",
+        "quote": "Data-modifying statements in WITH are executed exactly once, and always to completion, independently of whether the primary query reads all (or indeed any) of their output. Notice that this is different from the rule for SELECT in WITH : as stated in the previous section, execution of a SELECT is carried only as far as the primary query demands its output."
+      }
+    ],
+    "author": "Codex; AI-authored and AI source-reviewed, not independent human validation",
+    "unanswerability_rationale": null,
+    "source_review_rationale": "Both contrasted execution rules occur together in the source; output consumption is not execution order.",
+    "candidate_id": "pg18-b03-18"
+  },
+  {
+    "topic": "sql",
+    "difficulty": "hard",
+    "text": "How do data-modifying WITH sub-statements communicate changes when they share a snapshot?",
+    "answerable": true,
+    "reference_answer": "The sub-statements share a snapshot and cannot see one another's target-table effects. RETURNING data communicates changes between the sub-statements and main query.",
+    "required_facts": [
+      "The sub-statements share a snapshot and cannot see one another's target-table effects.",
+      "RETURNING data communicates changes between the sub-statements and main query."
+    ],
+    "evidence_specs": [
+      {
+        "fact_index": 0,
+        "filename": "queries-with.html",
+        "quote": "All the statements are executed with the same snapshot (see Chapter 13 ), so they cannot \u201c see \u201d one another's effects on the target tables."
+      },
+      {
+        "fact_index": 1,
+        "filename": "queries-with.html",
+        "quote": "RETURNING data is the only way to communicate changes between different WITH sub-statements and the main query."
+      }
+    ],
+    "author": "Codex; AI-authored and AI source-reviewed, not independent human validation",
+    "unanswerability_rationale": null,
+    "source_review_rationale": "The first quote is supplemented below before export to cover the full cannot-see clause; RETURNING is independently sourced.",
+    "candidate_id": "pg18-b03-19"
+  },
+  {
+    "topic": "sql",
+    "difficulty": "medium",
+    "text": "Which customer IDs are returned by SELECT customer_id FROM customers WHERE active when no customer rows are supplied?",
+    "answerable": false,
+    "reference_answer": "The provided corpus and question do not contain enough information to determine that.",
+    "required_facts": [],
+    "evidence_specs": [],
+    "author": "Codex; AI-authored and AI source-reviewed, not independent human validation",
+    "unanswerability_rationale": "The SQL predicate determines which rows qualify, but the corpus is a manual and supplies no contents for this application customers table. No exact IDs follow from the question.",
+    "source_review_rationale": "The SQL predicate determines which rows qualify, but the corpus is a manual and supplies no contents for this application customers table. No exact IDs follow from the question.",
+    "audit_context_sections": [
+      "3b30c7e3-7105-5683-a169-b3c70a288110"
+    ],
+    "candidate_id": "pg18-b03-20"
+  },
+  {
+    "topic": "sql",
+    "difficulty": "medium",
+    "text": "For my unspecified products table, what exact numeric value does SELECT sum(price) FROM products return?",
+    "answerable": false,
+    "reference_answer": "The provided corpus and question do not contain enough information to determine that.",
+    "required_facts": [],
+    "evidence_specs": [],
+    "author": "Codex; AI-authored and AI source-reviewed, not independent human validation",
+    "unanswerability_rationale": "No application price values or even row count are supplied. Aggregate semantics do not determine an instance-specific sum.",
+    "source_review_rationale": "No application price values or even row count are supplied. Aggregate semantics do not determine an instance-specific sum.",
+    "audit_context_sections": [
+      "2a22ccbd-3ebe-5ad9-8d3e-bc80b28f6a02"
+    ],
+    "candidate_id": "pg18-b03-21"
+  },
+  {
+    "topic": "sql",
+    "difficulty": "medium",
+    "text": "What exact number of rows will my recursive employee-hierarchy query produce when neither the hierarchy data nor the query is given?",
+    "answerable": false,
+    "reference_answer": "The provided corpus and question do not contain enough information to determine that.",
+    "required_facts": [],
+    "evidence_specs": [],
+    "author": "Codex; AI-authored and AI source-reviewed, not independent human validation",
+    "unanswerability_rationale": "The manual describes recursion, but this application graph and query are absent; neither its reachability nor row count is determined.",
+    "source_review_rationale": "The manual describes recursion, but this application graph and query are absent; neither its reachability nor row count is determined.",
+    "audit_context_sections": [
+      "547e1a26-c73c-591a-b520-0341c6535f8d",
+      "99dd2eed-6dc6-5ec5-bd8e-b11b7cc2e54f"
+    ],
+    "candidate_id": "pg18-b03-22"
+  },
+  {
+    "topic": "sql",
+    "difficulty": "medium",
+    "text": "Which stored email address will my DISTINCT ON (account_id) query retain when no account rows or ORDER BY are provided?",
+    "answerable": false,
+    "reference_answer": "The provided corpus and question do not contain enough information to determine that.",
+    "required_facts": [],
+    "evidence_specs": [],
+    "author": "Codex; AI-authored and AI source-reviewed, not independent human validation",
+    "unanswerability_rationale": "The source warns that the first row is unpredictable without sufficient ordering; no application email data is supplied either. An exact retained address cannot be inferred.",
+    "source_review_rationale": "The source warns that the first row is unpredictable without sufficient ordering; no application email data is supplied either. An exact retained address cannot be inferred.",
+    "audit_context_sections": [
+      "37caceec-f002-55cb-8a7d-3a65327420d0"
+    ],
+    "candidate_id": "pg18-b03-23"
+  },
+  {
+    "topic": "sql",
+    "difficulty": "medium",
+    "text": "How many result rows does my LEFT JOIN of invoices and payments produce if neither table contents nor the join condition are provided?",
+    "answerable": false,
+    "reference_answer": "The provided corpus and question do not contain enough information to determine that.",
+    "required_facts": [],
+    "evidence_specs": [],
+    "author": "Codex; AI-authored and AI source-reviewed, not independent human validation",
+    "unanswerability_rationale": "Outer-join rules do not supply match multiplicities for unknown tables and an unspecified condition. The requested cardinality is undetermined.",
+    "source_review_rationale": "Outer-join rules do not supply match multiplicities for unknown tables and an unspecified condition. The requested cardinality is undetermined.",
+    "audit_context_sections": [
+      "c2e1feaf-b1d1-5dc0-9239-80344329302a"
+    ],
+    "candidate_id": "pg18-b03-24"
+  }
+]

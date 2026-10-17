@@ -9,6 +9,8 @@ import { DatasetWorkspace } from "@/components/datasets";
 import { ComparisonWorkspace } from "@/components/comparisons";
 import { ExperimentWorkspace } from "@/components/experiments";
 import { RetrievalWorkspace } from "@/components/retrieval";
+import { ThemeControl } from "@/components/theme-control";
+import { WorkspaceMotion } from "@/components/workspace-motion";
 import { sections, workspaceSchema, type Section, type WorkspaceStatus } from "@/lib/workspace";
 
 const copy: Record<Section, { title: string; description: string }> = {
@@ -32,55 +34,62 @@ export function Workspace({ section, initialRunId, initialComparisonId, initialR
   const current = failureRunId ? { title: "Run diagnostics", description: "Inspect frozen answers, retrieval coverage, and evaluation signals." } : copy[section];
 
   return <div className="app-shell">
+    <WorkspaceMotion />
     <a className="skip-link" href="#main">Skip to main content</a>
     <aside className="sidebar">
       <Link className="brand" href="/" aria-label="RAG Observatory home">
         <span className="brand-symbol"><Icon name="book" /></span>
-        <span>RAG Observatory<small>RELIABILITY WORKSPACE</small></span>
+        <span>RAG Observatory<small>Reliability workspace</small></span>
       </Link>
       <button className="mobile-menu button subtle" onClick={() => setMenuOpen(!menuOpen)}
         aria-expanded={menuOpen} aria-controls="workspace-navigation"><Icon name="menu" />Navigation</button>
       <nav id="workspace-navigation" className={menuOpen ? "navigation open" : "navigation"} aria-label="Workspace">
-        <p className="nav-label">WORKSPACE</p>
+        <p className="nav-label">Workspace</p>
         {sections.filter((item) => item.id !== "settings").map((item) =>
           <Link className={`nav-link ${item.id === section ? "active" : ""}`} href={item.href}
             aria-current={item.id === section ? "page" : undefined} key={item.id}>
             <Icon name={item.id} />{item.label}<span className="active-marker" /></Link>)}
-        <p className="nav-label system-label">ENVIRONMENT</p>
+        <p className="nav-label system-label">Environment</p>
         <Link className={`nav-link ${section === "settings" ? "active" : ""}`} href="/settings"
           aria-current={section === "settings" ? "page" : undefined}><Icon name="settings" />Settings<span className="active-marker" /></Link>
       </nav>
-      <div className="sidebar-note"><span className="eyebrow">FIRST RESEARCH DOMAIN</span>
+      <div className="sidebar-note"><span className="eyebrow">Research domain</span>
         <strong>PostgreSQL documentation</strong><p>Versioned sources.<br />Evidence-grounded answers.</p>
         <span className="outline-tag">Local workspace</span>
       </div>
-      <div className="sidebar-footer"><span className="tiny-mark">RO</span><span>Local workspace<small>v0.1.0</small></span></div>
+      <div className="sidebar-footer"><Link href="/demo" className="sidebar-demo">Read-only demo<Icon name="arrow" /></Link><span className="muted-text">Explore with synthetic data</span></div>
     </aside>
 
     <div className="main-shell">
       <header className="topbar"><div className="breadcrumb">Workspace<span>/</span><strong>{section === "settings" ? "Settings" : current.title}</strong></div>
-        <span className={`connection-pill ${apiAvailable ? "connected" : ""}`}><span className="status-dot" />
-          {busy && !workspace ? "Checking API" : apiAvailable ? "API connected" : "API unavailable"}</span>
+        <div className="topbar-tools"><ThemeControl /><span className={`connection-pill ${apiAvailable ? "connected" : ""}`}><span className="status-dot" />
+          {busy && !workspace ? "Checking API" : apiAvailable ? "API connected" : "API unavailable"}</span></div>
       </header>
       <main id="main" className="main-content" tabIndex={-1}>
-        <div className="page-heading"><div><p className="eyebrow">RETRIEVAL · EVIDENCE · EVALUATION</p>
+        <div className="page-heading"><div>
           <h1>{current.title}</h1><p className="page-description">{current.description}</p></div>
-          {section !== "settings" && <Link className={`button ${(section === "documents" || section === "datasets" || section === "experiments") ? "subtle" : "primary"}`} href="/settings">View setup<Icon name="arrow" /></Link>}
+          {section !== "settings" && <div className="page-actions">
+            {section === "experiments" && !initialRunId && !failureRunId && <a className="button primary" href="#experiment-configuration" onClick={event => {
+              event.preventDefault();
+              const panel = document.getElementById("experiment-configuration");
+              if (panel instanceof HTMLDetailsElement) panel.open = true;
+              panel?.scrollIntoView({ block: "start" });
+              document.getElementById("experiment-name")?.focus({ preventScroll: true });
+            }}>New experiment<Icon name="arrow" /></a>}
+            <Link className="button subtle" href="/settings">View setup<Icon name="arrow" /></Link>
+          </div>}
         </div>
-
-        {!initialRunId && !initialComparisonId && !failureRunId && <div className="foundation-notice"><span className="notice-label">LOCAL RELEASE</span>
-          <p><Link className="text-link" href="/demo">Explore the read-only demo</Link>. Upload documents, curate reviewed datasets, and run lexical, dense, or hybrid retrieval with local CPU answers. Inspect saved retrieval metrics and question evidence.</p></div>}
 
         {section === "experiments" && <>
           <ExperimentWorkspace available={dbReady && !!workspace?.capabilities.includes("experiment_runs")} configured={!!workspace?.generation_configured} workerReady={workspace?.database.worker_status === "ready"} initialRunId={initialRunId} initialResultId={initialResultId} failureRunId={failureRunId} />
-          {!initialRunId && !failureRunId && <RetrievalWorkspace available={dbReady && !!workspace?.capabilities.includes("lexical_indexing")} workerReady={workspace?.database.worker_status === "ready"} />}
-          {!initialRunId && !failureRunId && <section className="workflow" aria-labelledby="workflow-title"><div className="section-topline"><h2 id="workflow-title">From source to finding</h2><span className="muted-text">The research workflow</span></div>
+          {!initialRunId && !failureRunId && <details className="tool-disclosure retrieval-disclosure"><summary><span>Retrieval preview</span><span className="muted-text">Inspect an index without starting an experiment</span></summary><div className="disclosure-body"><RetrievalWorkspace available={dbReady && !!workspace?.capabilities.includes("lexical_indexing")} workerReady={workspace?.database.worker_status === "ready"} /></div></details>}
+          {!initialRunId && !failureRunId && <details className="workflow tool-disclosure"><summary>Research workflow</summary><div className="disclosure-body">
             <div className="workflow-steps">
               <WorkflowStep number="01" title="Prepare the evidence" text="Freeze a document corpus and annotate the passages that support each question." href="/documents" icon="documents" />
               <WorkflowStep number="02" title="Run controlled experiments" text="Keep the questions and answer model fixed. Change the retrieval strategy." href="/datasets" icon="experiments" />
               <WorkflowStep number="03" title="Understand the differences" text="Compare accuracy and latency, then inspect where an answer lost its grounding." href="/comparisons" icon="comparisons" />
             </div>
-          </section>}
+          </div></details>}
           <div className="research-footnote"><Icon name="book" /><p><strong>A reproducible comparison, by design.</strong> Corpus versions, dataset versions, model settings, and scoring rules travel with every run.</p></div>
         </>}
 

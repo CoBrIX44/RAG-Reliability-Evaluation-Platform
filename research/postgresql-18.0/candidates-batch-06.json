@@ -1,0 +1,503 @@
+[
+  {
+    "topic": "configuration",
+    "difficulty": "easy",
+    "text": "How can a single quote be embedded in a quoted configuration string?",
+    "answerable": true,
+    "reference_answer": "Double the single quote inside the single-quoted configuration string.",
+    "required_facts": [
+      "Double the single quote inside the single-quoted configuration string."
+    ],
+    "evidence_specs": [
+      {
+        "fact_index": 0,
+        "filename": "config-setting.html",
+        "quote": "String: In general, enclose the value in single quotes, doubling any single quotes within the value. Quotes can usually be omitted if the value is a simple number or identifier, however. (Values that match an SQL keyword require quoting in some contexts.)"
+      }
+    ],
+    "author": "Codex; AI-authored and AI source-reviewed, not independent human validation",
+    "unanswerability_rationale": null,
+    "source_review_rationale": "The general string-setting paragraph states this escape explicitly.",
+    "candidate_id": "pg18-b06-01"
+  },
+  {
+    "topic": "configuration",
+    "difficulty": "medium",
+    "text": "Are explicit memory/time unit names case-sensitive, and is the memory multiplier 1000 or 1024?",
+    "answerable": true,
+    "reference_answer": "Unit names are case-sensitive. Memory units use a multiplier of 1024.",
+    "required_facts": [
+      "Unit names are case-sensitive.",
+      "Memory units use a multiplier of 1024."
+    ],
+    "evidence_specs": [
+      {
+        "fact_index": 0,
+        "filename": "config-setting.html",
+        "quote": "The unit name is case-sensitive"
+      },
+      {
+        "fact_index": 1,
+        "filename": "config-setting.html",
+        "quote": "The multiplier for memory units is 1024, not 1000."
+      }
+    ],
+    "author": "Codex; AI-authored and AI source-reviewed, not independent human validation",
+    "unanswerability_rationale": null,
+    "source_review_rationale": "Distinct from the already-reviewed case-insensitive parameter-name rule; both unit facts are sourced.",
+    "candidate_id": "pg18-b06-02"
+  },
+  {
+    "topic": "configuration",
+    "difficulty": "medium",
+    "text": "If postgresql.conf repeats a parameter, which occurrence is used?",
+    "answerable": true,
+    "reference_answer": "The last occurrence is used; earlier entries are ignored.",
+    "required_facts": [
+      "The last occurrence is used; earlier entries are ignored."
+    ],
+    "evidence_specs": [
+      {
+        "fact_index": 0,
+        "filename": "config-setting.html",
+        "quote": "If the file contains multiple entries for the same parameter, all but the last one are ignored."
+      }
+    ],
+    "author": "Codex; AI-authored and AI source-reviewed, not independent human validation",
+    "unanswerability_rationale": null,
+    "source_review_rationale": "A configuration-file precedence rule, not a claim about higher-precedence command-line/session settings.",
+    "candidate_id": "pg18-b06-03"
+  },
+  {
+    "topic": "configuration",
+    "difficulty": "medium",
+    "text": "Where does ALTER SYSTEM store settings, and which file wins over postgresql.conf?",
+    "answerable": true,
+    "reference_answer": "ALTER SYSTEM stores its settings in postgresql.auto.conf. postgresql.auto.conf overrides postgresql.conf.",
+    "required_facts": [
+      "ALTER SYSTEM stores its settings in postgresql.auto.conf.",
+      "postgresql.auto.conf overrides postgresql.conf."
+    ],
+    "evidence_specs": [
+      {
+        "fact_index": 0,
+        "filename": "config-setting.html",
+        "quote": "In addition to postgresql.conf , a PostgreSQL data directory contains a file postgresql.auto.conf , which has the same format as postgresql.conf but is intended to be edited automatically, not manually. This file holds settings provided through the ALTER SYSTEM command."
+      },
+      {
+        "fact_index": 1,
+        "filename": "config-setting.html",
+        "quote": "Settings in postgresql.auto.conf override those in postgresql.conf ."
+      }
+    ],
+    "author": "Codex; AI-authored and AI source-reviewed, not independent human validation",
+    "unanswerability_rationale": null,
+    "source_review_rationale": "First evidence quote is supplemented with the named-file sentence below to resolve its pronoun.",
+    "candidate_id": "pg18-b06-04"
+  },
+  {
+    "topic": "configuration",
+    "difficulty": "hard",
+    "text": "Will reloading configuration apply changes to parameters that can only be set at server start?",
+    "answerable": true,
+    "reference_answer": "No. Start-only parameter changes require a server restart.",
+    "required_facts": [
+      "No. Start-only parameter changes require a server restart."
+    ],
+    "evidence_specs": [
+      {
+        "fact_index": 0,
+        "filename": "config-setting.html",
+        "quote": "Some parameters can only be set at server start; any changes to their entries in the configuration file will be ignored until the server is restarted."
+      }
+    ],
+    "author": "Codex; AI-authored and AI source-reviewed, not independent human validation",
+    "unanswerability_rationale": null,
+    "source_review_rationale": "The question avoids implying every setting requires restart; only start-only parameters are covered.",
+    "candidate_id": "pg18-b06-05"
+  },
+  {
+    "topic": "configuration",
+    "difficulty": "medium",
+    "text": "Which command-line utility action or SQL function requests a configuration reload?",
+    "answerable": true,
+    "reference_answer": "Use pg_ctl reload or pg_reload_conf().",
+    "required_facts": [
+      "Use pg_ctl reload or pg_reload_conf()."
+    ],
+    "evidence_specs": [
+      {
+        "fact_index": 0,
+        "filename": "config-setting.html",
+        "quote": "this signal is most easily sent by running pg_ctl reload from the command line or by calling the SQL function pg_reload_conf() ."
+      }
+    ],
+    "author": "Codex; AI-authored and AI source-reviewed, not independent human validation",
+    "unanswerability_rationale": null,
+    "source_review_rationale": "These request a reload; this does not promise that all parameters can be applied without restart.",
+    "candidate_id": "pg18-b06-06"
+  },
+  {
+    "topic": "configuration",
+    "difficulty": "medium",
+    "text": "Do ALTER DATABASE and ALTER ROLE defaults retroactively change existing sessions?",
+    "answerable": true,
+    "reference_answer": "No. Those defaults are applied when a fresh database session starts.",
+    "required_facts": [
+      "No. Those defaults are applied when a fresh database session starts."
+    ],
+    "evidence_specs": [
+      {
+        "fact_index": 0,
+        "filename": "config-setting.html",
+        "quote": "Values set with ALTER DATABASE and ALTER ROLE are applied only when starting a fresh database session."
+      }
+    ],
+    "author": "Codex; AI-authored and AI source-reviewed, not independent human validation",
+    "unanswerability_rationale": null,
+    "source_review_rationale": "Fresh-session timing is explicit and independent of session-local SET behavior.",
+    "candidate_id": "pg18-b06-07"
+  },
+  {
+    "topic": "configuration",
+    "difficulty": "easy",
+    "text": "What SQL command and function inspect the current value of a configuration parameter?",
+    "answerable": true,
+    "reference_answer": "Use SHOW or current_setting(setting_name).",
+    "required_facts": [
+      "Use SHOW or current_setting(setting_name)."
+    ],
+    "evidence_specs": [
+      {
+        "fact_index": 0,
+        "filename": "config-setting.html",
+        "quote": "The SHOW command allows inspection of the current value of any parameter. The corresponding SQL function is current_setting(setting_name text) (see Section 9.28.1 )."
+      }
+    ],
+    "author": "Codex; AI-authored and AI source-reviewed, not independent human validation",
+    "unanswerability_rationale": null,
+    "source_review_rationale": "The API function name and command are present in canonical text, not recovered from definition labels.",
+    "candidate_id": "pg18-b06-08"
+  },
+  {
+    "topic": "configuration",
+    "difficulty": "medium",
+    "text": "Does a session-local SET alter configuration in other sessions?",
+    "answerable": true,
+    "reference_answer": "No. Session-local SET has no effect on other sessions.",
+    "required_facts": [
+      "No. Session-local SET has no effect on other sessions."
+    ],
+    "evidence_specs": [
+      {
+        "fact_index": 0,
+        "filename": "config-setting.html",
+        "quote": "The SET command allows modification of the current value of those parameters that can be set locally to a session; it has no effect on other sessions."
+      }
+    ],
+    "author": "Codex; AI-authored and AI source-reviewed, not independent human validation",
+    "unanswerability_rationale": null,
+    "source_review_rationale": "The can-be-set-locally scope avoids including parameters restricted to server startup.",
+    "candidate_id": "pg18-b06-09"
+  },
+  {
+    "topic": "configuration",
+    "difficulty": "medium",
+    "text": "Relative to what directory is a non-absolute configuration include path resolved?",
+    "answerable": true,
+    "reference_answer": "It is resolved relative to the directory containing the referencing configuration file.",
+    "required_facts": [
+      "It is resolved relative to the directory containing the referencing configuration file."
+    ],
+    "evidence_specs": [
+      {
+        "fact_index": 0,
+        "filename": "config-setting.html",
+        "quote": "If the file name is not an absolute path, it is taken as relative to the directory containing the referencing configuration file. Inclusions can be nested."
+      }
+    ],
+    "author": "Codex; AI-authored and AI source-reviewed, not independent human validation",
+    "unanswerability_rationale": null,
+    "source_review_rationale": "This include-path rule differs from server-start file-location parameter paths; they are not conflated.",
+    "candidate_id": "pg18-b06-10"
+  },
+  {
+    "topic": "configuration",
+    "difficulty": "hard",
+    "text": "How does include_if_exists handle a missing or unreadable included configuration file?",
+    "answerable": true,
+    "reference_answer": "It logs a message and continues, whereas a regular include treats the missing or unreadable file as an error.",
+    "required_facts": [
+      "It logs a message and continues, whereas a regular include treats the missing or unreadable file as an error."
+    ],
+    "evidence_specs": [
+      {
+        "fact_index": 0,
+        "filename": "config-setting.html",
+        "quote": "There is also an include_if_exists directive, which acts the same as the include directive, except when the referenced file does not exist or cannot be read. A regular include will consider this an error condition, but include_if_exists merely logs a message and continues processing the referencing configuration file."
+      }
+    ],
+    "author": "Codex; AI-authored and AI source-reviewed, not independent human validation",
+    "unanswerability_rationale": null,
+    "source_review_rationale": "Both missing and unreadable cases occur in the documented distinction.",
+    "candidate_id": "pg18-b06-11"
+  },
+  {
+    "topic": "configuration",
+    "difficulty": "hard",
+    "text": "Which files does include_dir read, and in what order?",
+    "answerable": true,
+    "reference_answer": "It reads non-directory files ending in .conf, skips dot-prefixed names, and processes filenames in C-locale order.",
+    "required_facts": [
+      "It reads non-directory files ending in .conf, skips dot-prefixed names, and processes filenames in C-locale order."
+    ],
+    "evidence_specs": [
+      {
+        "fact_index": 0,
+        "filename": "config-setting.html",
+        "quote": "Non-absolute directory names are taken as relative to the directory containing the referencing configuration file. Within the specified directory, only non-directory files whose names end with the suffix .conf will be included. File names that start with the . character are also ignored, to prevent mistakes since such files are hidden on some platforms. Multiple files within an include directory are processed in file name order (according to C locale rules, i.e., numbers before letters, and uppercase letters before lowercase ones)."
+      }
+    ],
+    "author": "Codex; AI-authored and AI source-reviewed, not independent human validation",
+    "unanswerability_rationale": null,
+    "source_review_rationale": "Retains suffix, hidden-name exclusion, and deterministic order rather than assuming filesystem enumeration order.",
+    "candidate_id": "pg18-b06-12"
+  },
+  {
+    "topic": "configuration",
+    "difficulty": "hard",
+    "text": "Does data_directory override -D or PGDATA for locating configuration files as well as data?",
+    "answerable": true,
+    "reference_answer": "It overrides the data location, not the location of configuration files.",
+    "required_facts": [
+      "It overrides the data location, not the location of configuration files."
+    ],
+    "evidence_specs": [
+      {
+        "fact_index": 0,
+        "filename": "runtime-config-file-locations.html",
+        "quote": "Notice that data_directory overrides -D and PGDATA for the location of the data directory, but not for the location of the configuration files."
+      }
+    ],
+    "author": "Codex; AI-authored and AI source-reviewed, not independent human validation",
+    "unanswerability_rationale": null,
+    "source_review_rationale": "The question tests the documented split of data and configuration paths, not the default layout.",
+    "candidate_id": "pg18-b06-13"
+  },
+  {
+    "topic": "configuration",
+    "difficulty": "hard",
+    "text": "If a schema in search_path does not exist or lacks USAGE permission, what happens?",
+    "answerable": true,
+    "reference_answer": "That schema name is silently ignored.",
+    "required_facts": [
+      "That schema name is silently ignored."
+    ],
+    "evidence_specs": [
+      {
+        "fact_index": 0,
+        "filename": "runtime-config-client.html",
+        "quote": "The value for search_path must be a comma-separated list of schema names. Any name that is not an existing schema, or is a schema for which the user does not have USAGE permission, is silently ignored."
+      }
+    ],
+    "author": "Codex; AI-authored and AI source-reviewed, not independent human validation",
+    "unanswerability_rationale": null,
+    "source_review_rationale": "Explicit retained search_path name anchors this fact despite neighboring dropped definition-term labels.",
+    "candidate_id": "pg18-b06-14"
+  },
+  {
+    "topic": "configuration",
+    "difficulty": "hard",
+    "text": "If pg_catalog is omitted from search_path, when is it searched?",
+    "answerable": true,
+    "reference_answer": "pg_catalog is still searched, before the listed path items.",
+    "required_facts": [
+      "pg_catalog is still searched, before the listed path items."
+    ],
+    "evidence_specs": [
+      {
+        "fact_index": 0,
+        "filename": "runtime-config-client.html",
+        "quote": "The system catalog schema, pg_catalog , is always searched, whether it is mentioned in the path or not. If it is mentioned in the path then it will be searched in the specified order. If pg_catalog is not in the path then it will be searched before searching any of the path items."
+      }
+    ],
+    "author": "Codex; AI-authored and AI source-reviewed, not independent human validation",
+    "unanswerability_rationale": null,
+    "source_review_rationale": "The omitted condition matters; explicitly listing it allows a different position.",
+    "candidate_id": "pg18-b06-15"
+  },
+  {
+    "topic": "configuration",
+    "difficulty": "medium",
+    "text": "What does current_schemas show that inspecting search_path alone does not?",
+    "answerable": true,
+    "reference_answer": "current_schemas shows the resolved effective schema search path.",
+    "required_facts": [
+      "current_schemas shows the resolved effective schema search path."
+    ],
+    "evidence_specs": [
+      {
+        "fact_index": 0,
+        "filename": "runtime-config-client.html",
+        "quote": "The current effective value of the search path can be examined via the SQL function current_schemas (see Section 9.27 ). This is not quite the same as examining the value of search_path , since current_schemas shows how the items appearing in search_path were resolved."
+      }
+    ],
+    "author": "Codex; AI-authored and AI source-reviewed, not independent human validation",
+    "unanswerability_rationale": null,
+    "source_review_rationale": "The source explicitly distinguishes configured list from resolved path.",
+    "candidate_id": "pg18-b06-16"
+  },
+  {
+    "topic": "configuration",
+    "difficulty": "hard",
+    "text": "Why can total query memory usage be many times work_mem?",
+    "answerable": true,
+    "reference_answer": "Multiple sort/hash operations and concurrent sessions can each consume their own work_mem-based allocations.",
+    "required_facts": [
+      "Multiple sort/hash operations and concurrent sessions can each consume their own work_mem-based allocations."
+    ],
+    "evidence_specs": [
+      {
+        "fact_index": 0,
+        "filename": "runtime-config-resource.html",
+        "quote": "Note that a complex query might perform several sort and hash operations at the same time, with each operation generally being allowed to use as much memory as this value specifies before it starts to write data into temporary files. Also, several running sessions could be doing such operations concurrently. Therefore, the total memory used could be many times the value of work_mem ; it is necessary to keep this fact in mind when choosing the value."
+      }
+    ],
+    "author": "Codex; AI-authored and AI source-reviewed, not independent human validation",
+    "unanswerability_rationale": null,
+    "source_review_rationale": "Read the full paragraph including explicit work_mem name and hash multiplier in the following paragraph; evidence naming supplemented below.",
+    "candidate_id": "pg18-b06-17"
+  },
+  {
+    "topic": "configuration",
+    "difficulty": "hard",
+    "text": "Is minimal WAL sufficient for point-in-time recovery and streaming binary replication?",
+    "answerable": true,
+    "reference_answer": "No. replica or higher is required; minimal lacks sufficient information for point-in-time recovery.",
+    "required_facts": [
+      "No. replica or higher is required; minimal lacks sufficient information for point-in-time recovery."
+    ],
+    "evidence_specs": [
+      {
+        "fact_index": 0,
+        "filename": "runtime-config-wal.html",
+        "quote": "However, minimal WAL does not contain sufficient information for point-in-time recovery, so replica or higher must be used to enable continuous archiving ( archive_mode ) and streaming binary replication."
+      }
+    ],
+    "author": "Codex; AI-authored and AI source-reviewed, not independent human validation",
+    "unanswerability_rationale": null,
+    "source_review_rationale": "The release explicitly states this WAL-level requirement; not a measured recovery rehearsal claim.",
+    "candidate_id": "pg18-b06-18"
+  },
+  {
+    "topic": "configuration",
+    "difficulty": "hard",
+    "text": "How do crash risks differ between disabling fsync and disabling synchronous_commit?",
+    "answerable": true,
+    "reference_answer": "Disabling fsync risks unrecoverable corruption after a crash. Disabling synchronous_commit can lose recent acknowledged transactions while retaining database consistency.",
+    "required_facts": [
+      "Disabling fsync risks unrecoverable corruption after a crash.",
+      "Disabling synchronous_commit can lose recent acknowledged transactions while retaining database consistency."
+    ],
+    "evidence_specs": [
+      {
+        "fact_index": 0,
+        "filename": "runtime-config-wal.html",
+        "quote": "While turning off fsync is often a performance benefit, this can result in unrecoverable data corruption in the event of a power failure or system crash."
+      },
+      {
+        "fact_index": 1,
+        "filename": "runtime-config-wal.html",
+        "quote": "Unlike fsync , setting this parameter to off does not create any risk of database inconsistency: an operating system or database crash might result in some recent allegedly-committed transactions being lost, but the database state will be just the same as if those transactions had been aborted cleanly. So, turning synchronous_commit off can be a useful alternative when performance is more important than exact certainty about the durability of a transaction."
+      }
+    ],
+    "author": "Codex; AI-authored and AI source-reviewed, not independent human validation",
+    "unanswerability_rationale": null,
+    "source_review_rationale": "The second paragraph is explicitly scoped by synchronous_commit context; add its named setting line as joint context below.",
+    "candidate_id": "pg18-b06-19"
+  },
+  {
+    "topic": "configuration",
+    "difficulty": "medium",
+    "text": "What exact search_path is active in my application session when no session settings or query output are provided?",
+    "answerable": false,
+    "reference_answer": "The provided corpus and question do not contain enough information to determine that.",
+    "required_facts": [],
+    "evidence_specs": [],
+    "author": "Codex; AI-authored and AI source-reviewed, not independent human validation",
+    "unanswerability_rationale": "The documented default is not proof of the active value because sessions may override it. No SHOW or current_schemas result is supplied.",
+    "source_review_rationale": "The documented default is not proof of the active value because sessions may override it. No SHOW or current_schemas result is supplied.",
+    "audit_context_sections": [
+      "81523ae9-acb1-5812-957d-19775f0cffda",
+      "ad3d3aff-a2d8-54b1-9da7-8ba05026c937",
+      "1c4a35e9-0ae5-51ad-bdd9-f8624e97648a"
+    ],
+    "candidate_id": "pg18-b06-20"
+  },
+  {
+    "topic": "configuration",
+    "difficulty": "medium",
+    "text": "Which exact config file path is my running server using when no startup command, PGDATA or settings are supplied?",
+    "answerable": false,
+    "reference_answer": "The provided corpus and question do not contain enough information to determine that.",
+    "required_facts": [],
+    "evidence_specs": [],
+    "author": "Codex; AI-authored and AI source-reviewed, not independent human validation",
+    "unanswerability_rationale": "The manual permits relocating configuration files. Without runtime settings or startup information, the actual path cannot be inferred from customary names.",
+    "source_review_rationale": "The manual permits relocating configuration files. Without runtime settings or startup information, the actual path cannot be inferred from customary names.",
+    "audit_context_sections": [
+      "dcdbba08-537d-5caa-b92b-e52fe26b9bc5",
+      "77958a2f-4b55-53e9-bf8d-964bba1e33ff"
+    ],
+    "candidate_id": "pg18-b06-21"
+  },
+  {
+    "topic": "configuration",
+    "difficulty": "medium",
+    "text": "Is TLS actually enabled on my server when no effective configuration or connection observations are supplied?",
+    "answerable": false,
+    "reference_answer": "The provided corpus and question do not contain enough information to determine that.",
+    "required_facts": [],
+    "evidence_specs": [],
+    "author": "Codex; AI-authored and AI source-reviewed, not independent human validation",
+    "unanswerability_rationale": "A documented default does not establish this instance configuration, which can be overridden. The question provides no effective ssl setting or observed connection state.",
+    "source_review_rationale": "A documented default does not establish this instance configuration, which can be overridden. The question provides no effective ssl setting or observed connection state.",
+    "audit_context_sections": [
+      "98747ea0-32a2-5690-86aa-a00240189877"
+    ],
+    "candidate_id": "pg18-b06-22"
+  },
+  {
+    "topic": "configuration",
+    "difficulty": "medium",
+    "text": "What exact work_mem value maximizes my workload throughput when hardware, concurrency, queries and measurements are unspecified?",
+    "answerable": false,
+    "reference_answer": "The provided corpus and question do not contain enough information to determine that.",
+    "required_facts": [],
+    "evidence_specs": [],
+    "author": "Codex; AI-authored and AI source-reviewed, not independent human validation",
+    "unanswerability_rationale": "Per-operation and concurrent allocations depend on workload and memory. The source supplies no universally maximizing value for an unknown workload.",
+    "source_review_rationale": "Per-operation and concurrent allocations depend on workload and memory. The source supplies no universally maximizing value for an unknown workload.",
+    "audit_context_sections": [
+      "f48eeb77-4dc1-5e35-be67-8ce953181966"
+    ],
+    "candidate_id": "pg18-b06-23"
+  },
+  {
+    "topic": "configuration",
+    "difficulty": "medium",
+    "text": "Which PostgreSQL OAuth validator library has my organization installed when its deployment configuration and installed modules are not supplied?",
+    "answerable": false,
+    "reference_answer": "The provided corpus and question do not contain enough information to determine that.",
+    "required_facts": [],
+    "evidence_specs": [],
+    "author": "Codex; AI-authored and AI source-reviewed, not independent human validation",
+    "unanswerability_rationale": "PostgreSQL ships no default validator implementation; deployment-specific installed modules cannot be discovered from the manual.",
+    "source_review_rationale": "PostgreSQL ships no default validator implementation; deployment-specific installed modules cannot be discovered from the manual.",
+    "audit_context_sections": [
+      "a12cb41a-b629-5cb0-b166-1195621997c3",
+      "f5c33b50-ea67-563f-8a55-e5072f165c39"
+    ],
+    "candidate_id": "pg18-b06-24"
+  }
+]

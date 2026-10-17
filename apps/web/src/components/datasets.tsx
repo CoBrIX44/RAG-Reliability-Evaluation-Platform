@@ -139,7 +139,7 @@ export function DatasetWorkspace({ available }: { available: boolean }) {
 
       {!datasets.data?.length && <option value="">{datasets.isLoading ? "Loading datasets…" : "Create your first dataset"}</option>}{datasets.data?.map(item => <option key={item.id} value={item.id}>{item.name}</option>)}</select>
 
-      {dataset && <span className="muted-text">{dataset.purpose === "development_fixture" ? "Development fixture · not a research benchmark" : "Research dataset · owner-reviewed labels"}</span>}</div>
+      {dataset && <span className="muted-text">{dataset.purpose === "development_fixture" ? "Development fixture · not a research benchmark" : "Research dataset · publication requires reviewed labels"}</span>}</div>
 
       <form className="dataset-create-form" onSubmit={event => { event.preventDefault(); void act(async () => {
 
@@ -173,7 +173,7 @@ export function DatasetWorkspace({ available }: { available: boolean }) {
 
       <button className="button subtle" disabled={!available || !datasetId || busy} onClick={() => importPicker.current?.click()}>Import JSONL</button><button className="button subtle" disabled={!datasetId || busy} onClick={() => edit(null)}>New question</button></div></div>
 
-    {!questions.data?.length ? <p className="version-empty">No questions yet. Add a question and annotate its source evidence below.</p> : <ul className="question-list">{questions.data.map(question => <li key={question.id}><button onClick={() => edit(question)} disabled={busy}>{question.content.text}</button><span>{question.content.answerable ? "Answerable" : "Unanswerable"} · {question.content.review_status === "reviewed" ? `Reviewed by ${question.content.reviewer}` : "Candidate"} · {question.content.split}</span></li>)}</ul>}
+    {!questions.data?.length ? <p className="version-empty">No questions yet. Add a question and annotate its source evidence below.</p> : <ul className="question-list">{questions.data.map(question => <li key={question.id}><button onClick={() => edit(question)} disabled={busy}>{question.content.text}</button><span>{question.content.answerable ? "Answerable" : "Unanswerable"} · {question.content.review_status === "reviewed" ? `${question.content.review_source === "ai" ? "AI" : "Human"} · Reviewed by ${question.content.reviewer}` : "Candidate"} · {question.content.split}</span></li>)}</ul>}
 
     <div className="dataset-editor-grid"><form className="question-editor" onSubmit={event => { event.preventDefault(); void act(async () => {
 
@@ -197,9 +197,9 @@ export function DatasetWorkspace({ available }: { available: boolean }) {
 
       <p className="muted-text">Keep related questions in one split group. Development and test cannot share gold source sections.</p>
 
-      <label className="checkbox-label"><input type="checkbox" checked={form.review_status === "reviewed"} onChange={event => setForm({ ...form, review_status: event.target.checked ? "reviewed" : "candidate" })} />I have reviewed this question, answer, and evidence</label>
+      <p className="muted-text">Review source: {form.review_source === "ai" ? "AI · not human validation" : "Human"}. Check the box and save to record your own human review.</p><label className="checkbox-label"><input type="checkbox" checked={form.review_status === "reviewed" && form.review_source === "human"} onChange={event => setForm({ ...form, review_status: event.target.checked ? "reviewed" : "candidate", review_source: "human", reviewer: "" })} />I have reviewed this question, answer, and evidence</label>
 
-      {form.review_status === "reviewed" && <div className="field"><label htmlFor="reviewer">Reviewer name</label><input id="reviewer" value={form.reviewer} maxLength={160} required onChange={event => setForm({ ...form, reviewer: event.target.value })} /></div>}
+      {form.review_status === "reviewed" && form.review_source === "human" && <div className="field"><label htmlFor="reviewer">Reviewer name</label><input id="reviewer" value={form.reviewer} maxLength={160} required onChange={event => setForm({ ...form, reviewer: event.target.value })} /></div>}
 
       <button className="button primary" type="submit" disabled={!form.text.trim() || (form.review_status === "reviewed" && !form.reviewer.trim())}>Save question</button>
 
