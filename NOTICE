@@ -1,0 +1,8 @@
+RAG Observatory — RAG Reliability & Evaluation Platform
+Copyright 2026 RAG Observatory contributors
+
+Original project code is licensed under the Apache License, Version 2.0.
+Third-party libraries, fonts, model assets, and PostgreSQL documentation retain
+their own licenses and notices. See THIRD_PARTY_NOTICES.md and included font and
+PostgreSQL license files. This project is not affiliated with PostgreSQL,
+Webflow/GSAP, Hugging Face, or the model authors.

@@ -24,10 +24,13 @@ This diagram describes the implemented workflow. Completed exploratory delivery 
 7. DEPLOYMENT.md, DECISIONS.md, .env.example — operations and rationale.
 
 ## Run locally
+
+Start with the [quickstart](docs/QUICKSTART.md): a frontend-only synthetic demo needs Node/npm, while a new full workspace adds Docker and pinned local model downloads. It includes a small [development fixture](examples/transactions.md) and a guided one-question experiment. A clone does not include the private M7 database or model cache.
+
 Prerequisites: Node 24, npm, and uv. Python 3.12 is selected in .python-version; uv can provision it. Docker with Compose is required for the full database-backed environment. Windows: use npm.cmd if PowerShell blocks npm.ps1.
 
 ```powershell
-Copy-Item .env.example .env
+if (-not (Test-Path .env)) { Copy-Item .env.example .env }
 uv sync --frozen
 npm.cmd ci
 ```
@@ -147,3 +150,7 @@ The final private backup passed a manifest-bound isolated restore:23 tables,100 
 ## Frontend
 
 Open [the local landing page](http://localhost:3000/), [the research workspace](http://localhost:3000/experiments), or the clearly synthetic [read-only demo](http://localhost:3000/demo). Instrument Serif/Ostrich Sans are bundled locally; technical evidence uses monospace. Light/dark/system themes, finite GSAP transitions and Lenis scrolling support reduced motion. Earlier native preview ports3001/3002 are historical builds. See [design system](DESIGN_SYSTEM.md).
+
+## License and release status
+
+Original code uses [Apache-2.0](LICENSE); see [NOTICE](NOTICE) and [third-party notices](THIRD_PARTY_NOTICES.md) for dependencies, fonts, models and source-document exceptions. GSAP has its own non-OSI standard license; do not describe the entire dependency stack as Apache/MIT-only. Models are downloaded separately, not bundled. The [release checklist](docs/RELEASE_CHECKLIST.md) records what has been verified and what remains before a public release.

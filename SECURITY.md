@@ -1,6 +1,10 @@
 # Security model
 
-Initial deployment is a single trusted local workspace bound to loopback. It is not a public multi-user security boundary. A configurable external provider can receive selected document context/questions; show that disclosure in experiment configuration.
+## Reporting a vulnerability
+
+Support targets the current default branch. If the repository's Security tab offers private vulnerability reporting, use that channel. Otherwise open a minimal public issue requesting a private reporting contact **without secrets, exploit payloads or private documents**; agree on a private channel before sharing details. No response-time SLA or dedicated security email is currently established. Ordinary non-sensitive bugs can use public issues with redacted reproductions.
+
+Initial deployment is a single trusted local workspace bound to loopback. It is not a public multi-user security boundary. Current model adapters run locally; external provider placeholders do not implement a remote adapter. Any future external provider must disclose when selected document context/questions leave the workspace. Default development database credentials are public examples, not production secrets.
 
 ## Document boundary
 Validate extension and content type, bound bytes and extraction resources, generate storage paths, and reject traversal. Sanitize HTML/Markdown in the browser and disable executable content. Preserve source text safely. Document instructions are data, never authority to run commands or access tools. PDFs that require OCR are unsupported initially.
