@@ -2,6 +2,23 @@
 
 Status: M1-M4 Docker builds/migration/service health, real ingestion/dataset/retrieval/local generation and saved-run restart persistence are verified locally. CI has not remotely executed; benchmark, public hosting and backup/restore remain unverified.
 
+## Vercel frontend demo
+
+Import only `apps/web` with the Next.js preset and Node 24. The committed
+`apps/web/vercel.json` installs locked dependencies from the monorepo root,
+including build-time devDependencies, then runs the web workspace build. Leave
+the output directory at its framework default. Enable inclusion of source files
+outside the Root Directory if that setting is shown. No private `.env` or backend
+credentials are needed for the landing page and synthetic `/demo`.
+
+The root prepare script skips Husky setup before loading its optional development
+dependency on Vercel, CI, production-only installs, or when `HUSKY=0`. Normal local
+development installs still configure the pre-commit hook.
+
+This deploys the frontend only. Real uploads, saved experiments and workspace data
+require a separately deployed protected API, durable worker and persistent storage.
+Do not expose the trusted local backend to anonymous public traffic.
+
 ## Run the local workspace
 Prerequisites: Node 24, npm, uv, Python 3.12 (provisioned by uv), and Docker with Compose for the full environment. Copy .env.example to .env only if .env does not exist; preserve existing settings. Run `uv sync --frozen` and `npm ci` (npm.cmd on Windows if required).
 

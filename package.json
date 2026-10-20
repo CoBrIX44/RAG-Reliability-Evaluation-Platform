@@ -16,7 +16,7 @@
     "typecheck": "npm run typecheck --workspace @rag/web && node node_modules/typescript/bin/tsc --noEmit -p tsconfig.tools.json",
     "test:e2e": "node node_modules/@playwright/test/cli.js test",
     "check": "npm run lint && npm run typecheck",
-    "prepare": "node node_modules/husky/bin.js"
+    "prepare": "node .husky/install.mjs"
   },
   "devDependencies": {
     "@axe-core/playwright": "4.13.0",

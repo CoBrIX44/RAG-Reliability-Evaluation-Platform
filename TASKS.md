@@ -366,3 +366,8 @@ Separate local clone603c98f, no .env/database/model cache: npm ci (zero npm vuln
 
 ## README native video player correction — 2026-10-20
 - [x] Synced owner web commit40b7aec; removed duplicate thumbnail and isolated the actual GitHub attachment URL as its own paragraph. GitHub's GFM render API now emits a native video element; original remote markup emitted only a link. Local README fix awaits owner commit/push.
+
+## Vercel frontend install fix — 2026-10-20
+- [x] Replaced unconditional root Husky binary execution with a guarded installer that skips Vercel/CI/production/HUSKY=0 before importing Husky; local hooks still install.
+- [x] Added apps/web/vercel.json to run locked root npm ci --include=dev and web build, preserving root module paths. Documented frontend-only deployment settings.
+- [x] Four skip branches verified without node_modules; isolated VERCEL=1 npm ci passed (180 packages, zero reported vulnerabilities), root Next.js/TypeScript paths verified, local prepare/check/production build and diff whitespace passed. Locks/backend unchanged. Owner push and successful hosted rebuild remain pending.
