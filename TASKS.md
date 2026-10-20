@@ -363,3 +363,6 @@ Separate local clone603c98f, no .env/database/model cache: npm ci (zero npm vuln
 
 ## README video integration — 2026-10-20
 - [x] Added the owner-approved walkthrough immediately after the workflow explanation, before Reading order. Clickable poster and explicit MP4 link use repository-relative docs/assets paths; final video/poster and media credits copied into publishable assets. Verified identical SHA256 against approved outputs, local README links, Git ignore inclusion and whitespace. No commit/push.
+
+## README native video player correction — 2026-10-20
+- [x] Synced owner web commit40b7aec; removed duplicate thumbnail and isolated the actual GitHub attachment URL as its own paragraph. GitHub's GFM render API now emits a native video element; original remote markup emitted only a link. Local README fix awaits owner commit/push.
