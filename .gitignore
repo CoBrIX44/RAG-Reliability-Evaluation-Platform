@@ -19,3 +19,6 @@ data/
 .DS_Store
 Thumbs.db
 artifacts/
+
+# Local launch-video compositions, audio and renders
+/brag-output*/

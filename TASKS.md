@@ -351,3 +351,15 @@ Owner selected Apache-2.0 for original code via explicit answer. Added official 
 Heuristic audit:252 tracked files and409 historical text blobs across nine local commits/refs; no forbidden private paths or credential-pattern/exact private credential matches. History blobs capped at2MiB; not a guarantee or scan of inaccessible remotes. Final current tree258 publishable files had no credential-pattern matches; new-doc relative links and Git ignore exclusions pass. Sensitive matches/values were never printed; private reports in ignored artifacts/release-audit-20261020.json and release-final-scan-20261020.json.
 
 Separate local clone603c98f, no .env/database/model cache: npm ci (zero npm vulnerabilities reported), npm check, production build and four selected landing/demo Chromium checks pass (4.1s) on temporary3003 production server. Temporary audit server stopped afterward; original Docker services unchanged. Not a full fresh backend/model experiment test: that remains an explicit release-checklist item. Final release changes still need owner-reviewed commit/push, newest remote CI and publication approval; no commit/tag/push/deploy performed. M7 remains completed_exploratory with unvalidated answer quality; morning controller terminal may be closed.
+
+## Launch-video preview — 2026-10-20
+- [x] Owner-invoked brag composition: 22s landscape with local project fonts, actual synthetic read-only demo captures, qualified public report excerpt, original instrumental bed and CC0 accents. Isolated ignored brag-output/; app dependencies/runtime unchanged.
+- [x] Hyperframes0.8.181 browser check: zero runtime/layout/contrast errors,40/40 contrast samples passed; five non-blocking composition-organization warnings remain. Source-reveal keyframes and rendered snapshots inspected; preview HTTP200 on3004.
+- [x] Owner approved with “render it”; local final MP4 render, poster-frame bake and decoded media verification completed. See launch-video delivery below.
+
+## Launch-video delivery — 2026-10-20
+- [x] Owner explicitly approved export with “render it.” Local Hyperframes0.8.181 delivery render completed:22s1920x1080 at30fps/660 frames, H.264/AAC stereo.
+- [x] Settled source-inspection poster extracted at6.5s and baked as frame0; final duration/frame count/audio unchanged. Compressed audio MD5 matches original; measured peak -13.6dB. Decoded frame0/report/closing and poster visually inspected. Final brag-output/brag.mp4, brag.jpg, share-copy.txt and delivery-verification.json retained locally. No publication or push.
+
+## README video integration — 2026-10-20
+- [x] Added the owner-approved walkthrough immediately after the workflow explanation, before Reading order. Clickable poster and explicit MP4 link use repository-relative docs/assets paths; final video/poster and media credits copied into publishable assets. Verified identical SHA256 against approved outputs, local README links, Git ignore inclusion and whitespace. No commit/push.

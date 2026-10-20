@@ -1,0 +1,4 @@
+Music: original deterministic oscillator/percussion score generated locally for this composition; see composition/make-music.py. No third-party music recording or voice.
+SFX: click_003.ogg and impactSoft_medium_001.ogg from the supplied brag skill Kenney sound assets (CC0), https://kenney.nl/.
+Fonts: Instrument Serif, Ostrich Sans and IBM Plex Mono; OFL notices included in composition/assets/fonts/.
+GSAP: locally copied3.15.0 runtime with original copyright/license header retained; separate standard license applies.

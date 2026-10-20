@@ -14,6 +14,12 @@ Index preparation and dataset curation independently use the published corpus, t
 
 This diagram describes the implemented workflow. Completed exploratory delivery does not establish validated answer quality. [Open the editable vector diagram](docs/assets/project-workflow.svg) · [Read the architecture](ARCHITECTURE.md).
 
+## Product walkthrough
+
+[![Watch the 22-second RAG Observatory walkthrough: inspect original sources and compare exploratory retrieval results.](docs/assets/rag-observatory-demo.jpg)](docs/assets/rag-observatory-demo.mp4)
+
+[Watch the video](docs/assets/rag-observatory-demo.mp4) · 22 seconds · 1080p with audio. The walkthrough shows the synthetic read-only demo and an excerpt from the PostgreSQL study. Retrieval findings are exploratory; answer quality remains unvalidated. [Media credits](docs/assets/rag-observatory-demo-credits.txt).
+
 ## Reading order
 1. PRD.md, USER_FLOWS.md, REQUIREMENTS.md — product and scope.
 2. DESIGN_SYSTEM.md, ARCHITECTURE.md, API_SPEC.md, DATA_MODEL.md — design contracts.
