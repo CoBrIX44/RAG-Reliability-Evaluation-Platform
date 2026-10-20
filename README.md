@@ -1,3 +1,6 @@
+
+
+
 # RAG Reliability & Evaluation Platform
 
 A research-oriented full-stack platform for uploading technical documents, building evidence-annotated datasets, running controlled RAG experiments, and investigating failures.
@@ -17,7 +20,7 @@ This diagram describes the implemented workflow. Completed exploratory delivery 
 ## Product walkthrough
 
 [![Watch the 22-second RAG Observatory walkthrough: inspect original sources and compare exploratory retrieval results.](docs/assets/rag-observatory-demo.jpg)](docs/assets/rag-observatory-demo.mp4)
-
+https://github.com/user-attachments/assets/24d3be15-beaf-4ed3-9fa4-dfcec85602c2
 [Watch the video](docs/assets/rag-observatory-demo.mp4) · 22 seconds · 1080p with audio. The walkthrough shows the synthetic read-only demo and an excerpt from the PostgreSQL study. Retrieval findings are exploratory; answer quality remains unvalidated. [Media credits](docs/assets/rag-observatory-demo-credits.txt).
 
 ## Reading order
