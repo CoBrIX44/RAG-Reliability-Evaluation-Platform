@@ -7,6 +7,7 @@ import subprocess
 import time
 from datetime import UTC, datetime
 from pathlib import Path
+from typing import IO
 from uuid import uuid4
 
 from rag_core.backup import database_fingerprint, file_hash, inventory, verify_bundle
@@ -96,7 +97,9 @@ print(json.dumps({"files": len(actual), "bytes": sum(v["bytes"] for v in actual.
 """
 
 
-def run(args: list[str], *, stdout: object = subprocess.PIPE, timeout: float = 600) -> str:
+def run(
+    args: list[str], *, stdout: int | IO[bytes] | None = subprocess.PIPE, timeout: float = 600
+) -> str:
     result = subprocess.run(
         args, cwd=ROOT, check=True, stdout=stdout, stderr=subprocess.PIPE, timeout=timeout
     )
@@ -161,6 +164,20 @@ def save_archive(container: str, image: str, folder: str, destination: Path) -> 
         )
 
 
+def copy_research(source: Path, destination: Path) -> None:
+    # An OS-held controller lock is transient coordination, not recoverable evidence.
+    lock_folder = (source / "postgresql-18.0" / "completion").resolve()
+
+    def ignore(folder: str, names: list[str]) -> list[str]:
+        return (
+            ["controller.lock"]
+            if Path(folder).resolve() == lock_folder and "controller.lock" in names
+            else []
+        )
+
+    shutil.copytree(source, destination, ignore=ignore)
+
+
 def create(destination: Path) -> None:
     # All output is private, ignored local data. Refuse reuse and partial overwrite.
     destination.mkdir(parents=True, exist_ok=False)
@@ -215,7 +232,7 @@ def create(destination: Path) -> None:
         shutil.copyfile(source, target)
     research = ROOT / "data" / "research"
     if research.exists():
-        shutil.copytree(research, destination / "research-local")
+        copy_research(research, destination / "research-local")
     run(
         [
             "docker",
@@ -226,6 +243,7 @@ def create(destination: Path) -> None:
             *sorted(set(images.values())),
         ]
     )
+    captured_files = inventory(destination)
     manifest = {
         "schema": "workspace-backup-v1",
         "created_at": datetime.now(UTC).isoformat(),
@@ -241,13 +259,16 @@ def create(destination: Path) -> None:
             "Live rag database, Docker artifacts/models, runtime.env, "
             "source/locks and local research"
         ),
-        "excludes": "rag_test, native virtualenv/node_modules and separate native inference caches",
-        "files": inventory(destination),
+        "excludes": (
+            "rag_test, native virtualenv/node_modules, separate native inference caches; "
+            "transient data/research/postgresql-18.0/completion/controller.lock"
+        ),
+        "files": captured_files,
     }
     (destination / "backup-manifest.json").write_text(
         json.dumps(manifest, indent=2), encoding="utf-8"
     )
-    print(json.dumps({"backup": str(destination), "files": len(manifest["files"])}), flush=True)
+    print(json.dumps({"backup": str(destination), "files": len(captured_files)}), flush=True)
 
 
 def verify(destination: Path) -> None:

@@ -87,3 +87,12 @@ Added actual hardware/resource observations and an unreviewed30-case development
 
 ## Frontend refresh - 2026-10-17
 User requested six design/taste skills; apply their product-appropriate rules through updated DESIGN_SYSTEM.md. Outfit/IBM Plex Mono are self-hosted via next/font/local; persistent system/light/dark themes and reorganized research UI are verified. Native production preview3001 was started by owner; Docker3000 remains older UI.28 Chromium, build/lint/types pass; actual five pages/two themes/four widths inspected without overflow or external font requests. Do not change package-lock/uv.lock or rebuild frozen Python services mid-campaign. Source hash remains1123f6e613ba27ca7a9b1a97bbabe3159d6d074e1d101c8db8fbff041cda0f5e. M7 controller continues; UI completion is not benchmark completion.
+
+
+## M7 exploratory delivery completed
+
+<!-- m7-exploratory-delivery:82b6219f2b9e3d1906fec0a59add4340995b7ce76428b10de73e06492f30ba41 -->
+
+Recorded at 2026-10-20T09:25:30.283278+00:00. All eight development runs qualified; all eight held-out runs completed 135 successful observations each (1,080 held-out observations); all eight exploratory comparisons and requested evidence exports completed. Outer/member checksums and the post-experiment manifest-bound isolated restore passed. See research/postgresql-18.0/BENCHMARK_REPORT.md and private data/research/postgresql-18.0/completion/delivery.json for actual evidence.
+
+M7 is complete only under the owner's exploratory-retrieval delivery scope. Answer quality is unvalidated; human calibration was not performed; the primary factual-accuracy hypothesis is not established. Missing quality/cost remain unavailable. The backup captures experiments/evidence before this terminal receipt/document update; same-machine recovery is not offsite recovery or inference replay. No commit/push or public deployment is implied.

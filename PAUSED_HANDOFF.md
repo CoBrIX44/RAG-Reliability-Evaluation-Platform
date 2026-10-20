@@ -1,4 +1,16 @@
-# Paused at owner request — 2026-10-17
+# Historical pause records — M7 now delivered
+
+**Current status2026-10-20: completed_exploratory.** The final receipt and manifest-bound isolated restore pass. These pause/resume commands below are historical; do not relaunch the completed campaign. Read CODEX_HANDOFF.md and research/postgresql-18.0/BENCHMARK_REPORT.md for final status. Answer quality remains unvalidated.
+
+# Pause record — 2026-10-19 (historical)
+
+**Resumed by the owner on2026-10-20.** Existing worker is healthy; the owner-terminal controller holds its OS lock. Do not launch a duplicate controller. See latest CODEX_HANDOFF.md for actual counts. The pause details below are historical.
+
+The owner requested another pause. Verified controller processes36160/28164 stopped and worker container stopped gracefully. Post-stop API confirms **840/840 development** and **531/1,080 held-out successes, zero failures**. Fixed lexical/dense/hybrid are completed135/135 each; fixed hybrid+reranking is126/135 (stored running state), and four section configurations remain queued. API/db/web remain running; results and existing volumes are preserved. No cancellation, resubmission, image rebuild, Git commit/push, or fresh full backup was performed.
+
+Private receipt: data/research/postgresql-18.0/completion/pause-receipt-20261019.json. Native controller-process.json is historical stopped-launch metadata until resumed. The saved controller state can lag the final API counts; refresh it from live runs on resume. The resume commands below still apply. Do not start worker/controller until the owner asks to resume.
+
+## Earlier pause and resumption (historical)
 
 **Resumed at owner request on 2026-10-19.** The pause below is historical. Existing worker restarted and native controller relaunched; consult the latest CODEX_HANDOFF.md and private completion/controller-process.json for current process metadata. Frozen API/worker execution identities match the locked campaign. Do not start another controller while this one is active.
 

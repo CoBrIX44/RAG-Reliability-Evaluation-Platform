@@ -36,6 +36,25 @@ def test_restore_reuses_only_exact_installed_image_ids(
     assert calls[0][1:3] == ["image", "inspect"]
 
 
+def test_research_copy_excludes_only_the_transient_controller_lock(
+    operator: ModuleType, tmp_path: Path
+) -> None:
+    source = tmp_path / "research"
+    completion = source / "postgresql-18.0" / "completion"
+    completion.mkdir(parents=True)
+    (completion / "controller.lock").write_bytes(b"0")
+    (completion / "state.json").write_text('{"phase":"requires_attention"}')
+    (completion / "evidence.lock").write_bytes(b"retained evidence")
+    (source / "controller.lock").write_bytes(b"unrelated file retained")
+    destination = tmp_path / "copied"
+    operator.copy_research(source, destination)
+    copied = destination / "postgresql-18.0" / "completion"
+    assert not (copied / "controller.lock").exists()
+    assert (copied / "state.json").read_bytes() == (completion / "state.json").read_bytes()
+    assert (copied / "evidence.lock").read_bytes() == b"retained evidence"
+    assert (destination / "controller.lock").read_bytes() == b"unrelated file retained"
+
+
 def test_restore_loads_missing_image_and_checks_exact_id(
     operator: ModuleType, monkeypatch: pytest.MonkeyPatch, tmp_path: Path
 ) -> None:

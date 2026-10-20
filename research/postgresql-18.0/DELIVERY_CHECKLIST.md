@@ -8,13 +8,13 @@ Scope: owner-selected exploratory retrieval report, answer quality unvalidated (
 - [x] Verify the pre-experiment checkpoint02 isolated restoration.
 - [x] Submit all eight development qualification runs and inspect completed real traces.
 - [x] Implement/test guarded automatic controls, submissions, reports, exports and recovery.
-- [ ] Complete all840 development observations successfully and freeze unchanged controls.
-- [ ] Complete all1,080 held-out observations successfully.
-- [ ] Complete eight exploratory paired comparisons with honest counts/exclusions.
-- [ ] Generate/check all requested worker evidence ZIPs and actual timing/retrieval report.
-- [ ] Verify final private backup against an isolated restore.
-- [ ] Write terminal delivery receipt and final handoff from actual completed evidence.
+- [x] Complete all840 development observations successfully and freeze unchanged controls.
+- [x] Complete all1,080 held-out observations successfully.
+- [x] Complete eight exploratory paired comparisons with honest counts/exclusions.
+- [x] Generate/check all requested worker evidence ZIPs and actual timing/retrieval report.
+- [x] Verify final private backup against an isolated restore.
+- [x] Write terminal delivery receipt and final handoff from actual completed evidence.
 
-The final controller receipt is private data/research/postgresql-18.0/completion/delivery.json; until its verified scoped completion exists, this remains unfinished. Once created, the receipt and latest CODEX_HANDOFF supersede this preparation checklist. Controller process/state/log references live in completion/controller-process.json and completion/state.json. A native controller must be resumed after machine restart; preserve current API/worker code identity. No public deployment is required or authorized by M7.
+Delivery completed2026-10-20 under the exploratory scope. The terminal receipt at private data/research/postgresql-18.0/completion/delivery.json records m7_complete=true, execution_complete=true, analysis_complete=true and restore_status=passed. The final restore report binds backup manifest SHA-256 d9d5b07a80c6cd81a6fdff08198600c87e989a480a80ec8f318eff125308a261. The controller completed and exited; no inference/controller terminal needs to remain open for this campaign. No public deployment is implied.
 
 The answer-review guide is optional preparation for future validation under this delivery scope. All sample judgments remain blank. Shared-host/cache timing and local financial/energy cost limitations are retained; same-machine restoration does not prove offsite recovery or bitwise inference replay.

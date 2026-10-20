@@ -1,6 +1,6 @@
-# PostgreSQL 18.0 benchmark preparation
+# PostgreSQL 18.0 exploratory benchmark
 
-Status: corpus acquired/published; **30 reviewed drafts: 10 human, 20 AI source-reviewed**, and no published research dataset. No benchmark experiment or answer-quality finding exists.
+Status2026-10-20: exploratory delivery complete. Published150-question dataset (10 human/140 AI source reviews),840 development and1,080 held-out observations, eight comparisons and16 verified evidence exports. Final private backup passed isolated restoration. See [benchmark report](BENCHMARK_REPORT.md) and [delivery checklist](DELIVERY_CHECKLIST.md). Answer quality remains unvalidated; factual-accuracy improvement is not established. Older dated preparation notes below are historical.
 
 The source is the [official 18.0 documentation archive](https://ftp.postgresql.org/pub/source/v18.0/postgresql-18.0-docs.tar.gz), not the moving `/docs/18/` website. `selection.json` fixes 40 pages, eight per planned topic: SQL, transactions, indexes, configuration and troubleshooting. This is a purposeful subset, not the entire manual or a probability sample. The archive SHA-256 was locally captured over official HTTPS, not independently authenticated through an upstream signed digest.
 

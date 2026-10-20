@@ -2,9 +2,9 @@
 
 A research-oriented full-stack platform for uploading technical documents, building evidence-annotated datasets, running controlled RAG experiments, and investigating failures.
 
-**Current status: M1-M6 implemented; M7 benchmark/delivery remains.** Upload/publish corpora, curate reviewed datasets, build lexical/dense indexes, run pinned local CPU generation, and inspect saved retrieval scores and complete question traces. PostgreSQL queues preserve results through cancellation/recovery. Hybrid RRF and CPU cross-encoder reranking are also available. Versioned answer evaluation and human review are available. Paired comparisons and observed latency/usage summaries are available; research benchmark execution remains M7.
+**Current status: M1-M7 delivered under the exploratory research scope (2026-10-20).** The platform supports document ingestion, reviewed datasets, local CPU RAG experiments, evidence inspection, paired comparisons, and checksummed exports. The PostgreSQL18.0 benchmark completed840 development and1,080 held-out observations with zero execution failures, eight exploratory comparisons, and16 verified evidence exports. A post-experiment private backup passed isolated restoration.
 
-First benchmark: a frozen PostgreSQL documentation release. Lexical/dense search, hybrid RRF, cross-encoder reranking and fixed-token/section chunking are implemented. Metrics: retrieval precision/recall, correctness, faithfulness, citation support, abstention, latency, and cost.
+Read the [benchmark report](research/postgresql-18.0/BENCHMARK_REPORT.md) and [delivery checklist](research/postgresql-18.0/DELIVERY_CHECKLIST.md). **Answer quality remains unvalidated**: correctness, faithfulness, citation support, and abstention quality have no validated findings; improved factual accuracy is not established. Gold source reviews comprise10 human and140 AI reviews. Retrieval measurements and observed latency are reported with coverage and limitations; local financial/energy cost is unavailable.
 
 ## Project workflow
 
@@ -12,7 +12,7 @@ First benchmark: a frozen PostgreSQL documentation release. Lexical/dense search
 
 Index preparation and dataset curation independently use the published corpus, then join in an immutable experiment manifest. Heavy retrieval and inference execute in the durable worker; the dashboard exposes saved traces, comparisons, and evidence exports. Answer assessments are optional and separate from retrieval metrics; unavailable scores remain unavailable.
 
-This diagram describes the implemented workflow, not completion of the ongoing M7 benchmark or validation of answer quality. [Open the editable vector diagram](docs/assets/project-workflow.svg) · [Read the architecture](ARCHITECTURE.md).
+This diagram describes the implemented workflow. Completed exploratory delivery does not establish validated answer quality. [Open the editable vector diagram](docs/assets/project-workflow.svg) · [Read the architecture](ARCHITECTURE.md).
 
 ## Reading order
 1. PRD.md, USER_FLOWS.md, REQUIREMENTS.md — product and scope.
@@ -123,7 +123,7 @@ Open a saved run, select a question result, and choose **Evaluate this answer**.
 
 Optional `LOCAL_JUDGE_ENABLED=true` enables the pinned local CPU Qwen self-judge in the durable worker. Restart API and worker with matching source/settings; no paid API is used. It reuses existing cached Qwen weights offline. `.env.example` defaults to disabled; human review is available either way. Read the rubric and keep model estimates separate from human judgments. The tiny self-judge is uncalibrated: the actual development-fixture smoke produced invalid rubric output, correctly retained as failed with unavailable scores. Inspect raw output/usage and do not treat a judge response as objective truth.
 
-Expanded answer evaluations show applicable/scored/error/unavailable counts for the run, latest human/model assessments, denominators, and disagreements. They are separate post-hoc records; original run traces/metrics stay unchanged. Means count observations, not independent questions. Paired/bootstrap, controlled warm/cold p50/p95 and cost summaries are the remaining M5 work; the research benchmark remains uncurated.
+Expanded answer evaluations show applicable/scored/error/unavailable counts for the run, latest human/model assessments, denominators, and disagreements. They are separate post-hoc records; original run traces/metrics stay unchanged. Means count observations, not independent questions. Paired/bootstrap and observed stage-timing summaries are implemented. Cache/shared-host timing is uncontrolled; local financial/energy cost remains unavailable.
 
 
 ## Compare saved runs
@@ -136,18 +136,14 @@ Open [comparisons](http://localhost:3000/comparisons) to create immutable paired
 
 Exports include frozen manifests/results/assessments, canonical corpus text, index chunks/vectors, and checksums. They exclude original upload binaries and model weights. Historical code bytes are included only when their hashes match; provenance/availability.json explicitly lists unavailable files. These artifacts support evidence inspection and do not guarantee a complete historical runtime. Live data remains one reviewed development question; benchmark acquisition, annotation and actual research experiments are M7.
 
-## M7 execution in progress - 2026-10-16
+## M7 exploratory delivery — 2026-10-20
 
-The official PostgreSQL18.0 subset contains40 documents and2,013 canonical sections. The locally published150-question benchmark has a frozen105/45 grouped split and10 human/140 AI gold source reviews. Same-assistant curation is not independent human validation. See research/postgresql-18.0/CURATION_REVIEW.md and DATASET_CARD.md for provenance and limitations.
+The official PostgreSQL18.0 subset contains40 documents and2,013 canonical sections. The published150-question benchmark uses a frozen105/45 grouped split with10 human/140 AI gold source reviews. Same-assistant curation is not independent validation; see [curation review](research/postgresql-18.0/CURATION_REVIEW.md) and [dataset card](DATASET_CARD.md).
 
-Eight development runs are submitted (840 planned observations). A native completion controller is running and will require full development qualification before freezing unchanged controls and submitting the held-out three-repeat matrix (1,080 planned observations). Reports, evidence ZIPs and a post-experiment recovery rehearsal follow execution; these stages are not yet complete. Generated-answer quality remains unassessed. M7 is still in progress.
+All eight development configurations completed105 observations each. All eight held-out configurations completed45 questions ×three repeats each. Eight exploratory paired comparisons and16 worker evidence ZIPs completed with checksums verified. The [report](research/postgresql-18.0/BENCHMARK_REPORT.md) preserves unavailable answer-quality scores, group-based uncertainty, sample counts, and uncontrolled timing/cost limitations.
 
-Keep Docker Desktop and the machine running. Inspect the [live Runs screen](http://localhost:3000/runs) or private `data/research/postgresql-18.0/completion/state.json`. See research/postgresql-18.0/DEVELOPMENT_PLAN.md for controller resume/recovery commands. Preserve matching API/worker code and configuration while jobs are unfinished.
+The final private backup passed a manifest-bound isolated restore:23 tables,100 artifact files,86 model files,41 originals,17 total historical/current exports,22 saved runs and11 comparisons verified. See [backup and restore](BACKUP_RESTORE.md). The backup contains secrets and remains under ignored `data/`; never publish it. Same-machine recovery does not prove offsite recovery or inference replay. The snapshot precedes terminal receipt/document updates.
 
-BACKUP_RESTORE.md documents private point-in-time snapshots. Checkpoint02 isolated restoration verified23 database tables,83 artifact files and86 model files; it predates current experiment runs. This proves same-machine restoration, not offsite recovery or inference replay. Current M7 changes remain uncommitted; pushed checkpoint863b267 has a successful three-job GitHub workflow.
+## Frontend
 
-## Refreshed frontend preview
-
-The2026-10-17 interface refresh adds locally bundled Outfit/IBM Plex Mono, light/dark/system appearance, saved-run filters and clearer configuration/evidence hierarchy. The verified native production preview is http://127.0.0.1:3001; Docker port3000 keeps its currently running image. All28 Chromium checks and build/lint/type checks pass. Preserve frozen experiment API/worker identities while M7 runs; frontend source changes need a native build/restart to update the preview. See DESIGN_SYSTEM.md for tokens and interaction rules.
-
-The frontend opens with a product landing page at `/`; use `/experiments` for the research workspace or `/demo` for a read-only synthetic walkthrough. The landing bundles Instrument Serif/Ostrich Sans locally and uses Lenis/GSAP with reduced-motion support. Frontend-only dependency updates do not change already-running frozen benchmark images.
+Open [the local landing page](http://localhost:3000/), [the research workspace](http://localhost:3000/experiments), or the clearly synthetic [read-only demo](http://localhost:3000/demo). Instrument Serif/Ostrich Sans are bundled locally; technical evidence uses monospace. Light/dark/system themes, finite GSAP transitions and Lenis scrolling support reduced motion. Earlier native preview ports3001/3002 are historical builds. See [design system](DESIGN_SYSTEM.md).

@@ -1,6 +1,6 @@
 # Dataset card
 
-Status: M7 curation frozen and locally published:150 source-reviewed questions (10 human/140 AI),105 development/45 test across23 groups. Controlled benchmark execution/report remains pending; no measured research results. Verified2026-10-16.
+Status: M7 curation frozen and locally published:150 source-reviewed questions (10 human/140 AI),105 development/45 test across23 groups. Exploratory benchmark execution/report completed2026-10-20; see research/postgresql-18.0/BENCHMARK_REPORT.md. Retrieval results do not establish answer correctness or independent human validation.
 
 ## Intended use
 Compare retrieval strategies on one frozen PostgreSQL documentation release. Not a general benchmark of all database knowledge or a guarantee of safe production answers.
